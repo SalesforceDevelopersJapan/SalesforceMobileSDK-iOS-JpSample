@@ -88,6 +88,7 @@
     Route					*rt;
 	UtilManager				*um;
 	BOOL					drawProgress;
+  BOOL firstGPS;
 }
 
 @property (strong, nonatomic) IBOutlet UIView *mapView;

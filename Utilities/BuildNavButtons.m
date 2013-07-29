@@ -29,6 +29,7 @@
 #import "ChatterViewController.h"
 #import "OrderViewController.h"
 #import "UtilManager.h"
+#import "MemoViewController.h"
 
 @implementation BuildNavButtons
 
@@ -101,15 +102,16 @@
 	[menuPanel addSubview:[self buildMapBtnForMenuPanel]];
 	[menuPanel addSubview:[self buildOrdersBtnForMenuPanel]];
 	[menuPanel addSubview:[self buildChatterBtnForMenuPanel]];
-
-  NSLog(@"fileRenew %@", [pData getDataForKey:@"fileRenew"]);
-  NSLog(@"CacheFileDelegate : %@", _cacheDelegate);
+  [menuPanel addSubview:[self buildMemoBtnForMenuPanel]];
   
+  //NSLog(@"fileRenew %@", [pData getDataForKey:@"fileRenew"]);
+  //NSLog(@"CacheFileDelegate : %@", _cacheDelegate);
+  /*
   if([[pData getDataForKey:@"fileRenew"] isEqual:@"YES"] && _cacheDelegate!=nil){
     [menuPanel addSubview:[self buildFileRenewBtnForMenuPanel]];
   }else{
     [menuPanel addSubview:[self buildDummy1BtnForMenuPanel]];
-  }
+  }*/
 	[menuPanel addSubview:[self buildDummy2BtnForMenuPanel]];
 
 	//ラベル追加
@@ -118,6 +120,7 @@
 	UILabel *lbl2 = [[UILabel alloc]init];
 	UILabel *lbl3 = [[UILabel alloc]init];
 	UILabel *lbl4 = [[UILabel alloc]init];
+  UILabel *lbl5 = [[UILabel alloc]init];
 
 	pData = [PublicDatas instance];
 	
@@ -149,11 +152,19 @@
 	[lbl4 sizeToFit];
 	[lbl4 setCenter:CGPointMake(50, 180)];
 	
+  [lbl5 setText:[pData getDataForKey:@"DEFINE_MENU_MEMO"]];
+	[lbl5 setFont:font];
+	[lbl5 setTextColor:[UIColor whiteColor]];
+	[lbl5 setBackgroundColor:[UIColor clearColor]];
+	[lbl5 sizeToFit];
+	[lbl5 setCenter:CGPointMake(130, 180)];
+  
 	[menuPanel addSubview:lbl1];
 	[menuPanel addSubview:lbl2];
 	[menuPanel addSubview:lbl3];
 	[menuPanel addSubview:lbl4];
-
+  [menuPanel addSubview:lbl5];
+  
 	[menuPanel setUserInteractionEnabled:YES];
 	
 	[parent3 addSubview:menuPanel];
@@ -254,11 +265,27 @@
 	return dummyfbtn;
 }
 
+-(UIButton*)buildMemoBtnForMenuPanel
+{
+	UIButton *dummy1btn = [UIButton buttonWithType:UIButtonTypeCustom];
+	dummy1btn.frame = CGRectMake(100,110, 60,60);
+	[dummy1btn setBackgroundImage:[UIImage imageNamed:@"StoreMemo.png"] forState:UIControlStateNormal];
+  [dummy1btn addTarget:self action:@selector(didSelectFunction:) forControlEvents:UIControlEventTouchUpInside];
+  dummy1btn.tag = 4;
+  
+	CGSize size = CGSizeMake(5.0, 5.0);
+	UtilManager *um = [[UtilManager alloc]init];
+	[um makeViewRound: dummy1btn corners:UIRectCornerAllCorners size:&size];
+  
+	return dummy1btn;
+}
+
 -(UIButton*)buildDummy1BtnForMenuPanel
 {
 	UIButton *dummy1btn = [UIButton buttonWithType:UIButtonTypeCustom];
 	dummy1btn.frame = CGRectMake(100,110, 60,60);
-	[dummy1btn setBackgroundImage:[UIImage imageNamed:@"DummyButton.png"] forState:UIControlStateNormal];
+	[dummy1btn setBackgroundImage:[UIImage imageNamed:@"DummyFileButton.png"] forState:UIControlStateNormal];
+  [dummy1btn addTarget:self action:@selector(didSelectFunction:) forControlEvents:UIControlEventTouchUpInside];
 
 	CGSize size = CGSizeMake(5.0, 5.0);
 	UtilManager *um = [[UtilManager alloc]init];
@@ -384,14 +411,6 @@
 	}
 }
 
-// キャッシュファイル更新
--(void)cacheFileUpdate:(id)sender
-{
-  if ([self.cacheDelegate respondsToSelector:@selector(didCacheFileUpdate)]){
-		[self.cacheDelegate didCacheFileUpdate];
-	}
-}
-
 
 //機能（画面）選択
 -(void)didSelectFunction:(id)sender
@@ -403,7 +422,7 @@
 	OrderViewController *orderVC;
 	StoreMapViewController *mapVC;
 	ChatterViewController *chatter;
-
+  
 	UIView *parent = [sender superview];
 	NSLog(@"%@",parent.description);
 	
@@ -446,9 +465,13 @@
 			if ([self.delegate respondsToSelector:@selector(didPushChangeFunction:)]){
 				[self.delegate didPushChangeFunction:chatter];
 			}
-			
-			//ナビゲーションバー　設定
-//			[self.navigationController.navigationBar setHidden:NO];
+			break;
+    case 4:
+			//Memo表示
+
+			if ([self.delegate respondsToSelector:@selector(didPushMemoFunction:)]){
+				[self.delegate didPushMemoFunction:nil];
+			}
 			break;
 			
 		default:

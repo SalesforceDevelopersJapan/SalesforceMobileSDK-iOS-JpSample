@@ -33,12 +33,13 @@
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
+  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+  if (self) {
+    // Custom initialization
+		_tag = 65534;
+  }
 	self.withCancelBtn = NO;
-    return self;
+  return self;
 }
 
 -(void)setContents:(UIView *)contents
@@ -55,7 +56,7 @@
 		self.view.frame = CGRectMake(0, 0, contents.frame.size.width,contents.frame.size.height+40);
 	}
 	else {
-		self.view.frame = CGRectMake(0, 0, contents.frame.size.width,contents.frame.size.height);		
+		self.view.frame = CGRectMake(0, 0, contents.frame.size.width,contents.frame.size.height);
 	}
 	
 	self.contentSizeForViewInPopover = self.view.frame.size;
@@ -63,22 +64,22 @@
 
 -(void)attachCancelPushed
 {
-	if ([self.delegate respondsToSelector:@selector(didAttachAborted)]){
-		[self.delegate didAttachAborted];
+	if ([self.delegate respondsToSelector:@selector(didAttachAborted:)]){
+		[self.delegate didAttachAborted:_tag];
 	}
 }
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
+  [super viewDidLoad];
 	// Do any additional setup after loading the view.
-
+  
 }
 
 - (void)didReceiveMemoryWarning
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+  [super didReceiveMemoryWarning];
+  // Dispose of any resources that can be recreated.
 }
 
 

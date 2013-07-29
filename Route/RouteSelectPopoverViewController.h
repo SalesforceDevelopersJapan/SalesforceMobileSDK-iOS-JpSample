@@ -25,14 +25,16 @@
 
 
 #import "PublicDatas.h"
+#import "UtilManager.h"
 
 @protocol RouteSelectPopoverDelegate <NSObject>
 -(void)didSelectRoute:(NSString*)routeName Id:(NSString*)Id;
 @end
 
 @interface RouteSelectPopoverViewController : UIViewController <UITableViewDelegate,UITableViewDataSource,UISearchBarDelegate>
-{	
+{
 	NSInteger *dataCount;
+  UtilManager *um;
 }
 @property (strong, nonatomic) NSMutableArray *routeList;
 @property (strong, nonatomic) UITableView *resultTable;

@@ -32,6 +32,7 @@
 #import "MapViewController.h"
 #import "SMCalloutView.h"
 #import "BuildNavButtons.h"
+#import "MemoViewController.h"
 
 @class CompanyProfiles;
 @class PublicDatas;
@@ -41,7 +42,7 @@
 @class Company;
 @class UtilManager;
 
-@interface StoreMapViewController : UIViewController <GMSMapViewDelegate,CLLocationManagerDelegate,ChangeFunctionDelegate>
+@interface StoreMapViewController : UIViewController <GMSMapViewDelegate,CLLocationManagerDelegate,ChangeFunctionDelegate,MemoViewControllerDelegate>
 {
 	PublicDatas				*pData;
 	Company					*cp;
@@ -71,7 +72,8 @@
 	UIButton				*chatterBtn;
 	UtilManager				*um;
 	BuildNavButtons			*btnBuilder;
-  
+  MemoViewController *memoVC;
+  BOOL firstGPS;
 }
 @property (strong, nonatomic) SMCalloutView *calloutView;
 @property (strong, nonatomic) UIView *emptyCalloutView;

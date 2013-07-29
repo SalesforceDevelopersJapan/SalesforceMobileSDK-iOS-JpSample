@@ -31,6 +31,7 @@
 #import "ChatterViewController.h"
 #import "Company.h"
 #import "UtilManager.h"
+#import "MemoViewController.h"
 
 static const CGFloat CalloutYOffset = 25.0f;
 static const float InitialZoom = 15.0f;				//ズーム値
@@ -58,16 +59,6 @@ static const float InitialZoom = 15.0f;				//ズーム値
   um = [UtilManager sharedInstance];
   pData = [PublicDatas instance];
   
-	//現在地取得準備
-	locationManager = [[CLLocationManager alloc]init];
-	if ([CLLocationManager locationServicesEnabled]){
-		
-		//位置情報取得可能なら測位開始
-		[locationManager setDelegate:self];
-		[locationManager startUpdatingLocation];
-	}
-	
-	
 	//ナビゲーションバー　設定
 	NSData *iData =[um navBarType];
 	if ( [((NSString*)iData) isEqualToString:@"gray"] ) {
@@ -276,9 +267,32 @@ static const float InitialZoom = 15.0f;				//ズーム値
   [um makeViewRound:self.mapBase corners:UIRectCornerAllCorners size:&size];
 }
 
+-(void)viewWillAppear:(BOOL)animated
+{
+  firstGPS = YES;
+  
+  //現在地取得準備
+	locationManager = [[CLLocationManager alloc]init];
+	if ([CLLocationManager locationServicesEnabled]){
+		
+		//位置情報取得可能なら測位開始
+    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    //locationManager.distanceFilter = 10.0;
+    //locationManager.pausesLocationUpdatesAutomatically = NO;
+		[locationManager setDelegate:self];
+		[locationManager startUpdatingLocation];
+	}
+}
+
 //画面遷移
 -(void)didPushChangeFunction:(UIViewController *)func
 {
+  if ([CLLocationManager locationServicesEnabled]){
+		//位置情報取得停止
+		[locationManager setDelegate:nil];
+		[locationManager stopUpdatingLocation];
+	}
+  
 	NSString *tgt = NSStringFromClass([func class]);
 	NSString *myClass = NSStringFromClass([self class]);
 	if ( ![tgt isEqualToString:myClass]){
@@ -286,6 +300,52 @@ static const float InitialZoom = 15.0f;				//ズーム値
 	}
 }
 
+// 手書きメモ
+-(void)didPushMemoFunction:(id)sender
+{
+  
+  metricsBtn.enabled = NO;
+  self.navigationItem.leftBarButtonItem.enabled = NO;
+  
+  memoVC = [[MemoViewController alloc] initWithNibName:@"MemoViewController" bundle:[NSBundle mainBundle]company:cp];
+  memoVC.delegate = self;
+  [memoVC.view setClipsToBounds:YES];
+  
+  memoVC.view.frame = CGRectMake(0, 0, 200, 100);
+  memoVC.view.center = self.view.center;
+  memoVC.view.alpha = 1.0;
+  
+  [self addChildViewController:memoVC];
+  
+  
+  // フリップ移動前処理
+  [UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDuration:0.01];
+  [self.view addSubview:memoVC.view];
+  [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:memoVC.view cache:YES];
+  [UIView setAnimationDidStopSelector:@selector(dispMemoViewAppear:finished:context:)];
+	[UIView commitAnimations];
+}
+
+- (void)dispMemoViewAppear:(NSString *)animationID finished:(NSNumber *) finished context:(void *) context
+{
+  [UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDuration:0.5];
+  memoVC.view.frame = self.view.frame;
+  memoVC.view.alpha = 1.0;
+  [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:memoVC.view cache:YES];
+	[UIView commitAnimations];
+}
+
+// close時のdelegate
+-(void)didClose:(id)sender
+{
+  // ボタンを戻す
+  metricsBtn.enabled = YES;
+  self.navigationItem.leftBarButtonItem.enabled = YES;
+}
 //ナビゲーションバーの「戻る」ボタン処理
 -(void)didPushback:(int)pos
 {
@@ -589,6 +649,8 @@ static const float InitialZoom = 15.0f;				//ズーム値
 //現在地ボタン押下（ルート検索）
 -(void)currentPos
 {
+  firstGPS = YES;
+  
 	// 位置情報利用チェック
 	AppDelegate* appli = (AppDelegate*)[[UIApplication sharedApplication] delegate];
 	
@@ -952,21 +1014,26 @@ static const float InitialZoom = 15.0f;				//ズーム値
 //位置取得時処理
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-	CLLocation *location;
-	
-	//初回の位置取得時のみ地図を移動（自身の位置追跡しない）
-	location = [locations objectAtIndex:0];
-  /*
-   if ( moveCurrentPos == YES) {
-   
-   
-   GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:location.coordinate.latitude longitude:location.coordinate.longitude zoom:InitialZoom];
-   [map setCamera:pos];
-   moveCurrentPos = NO;
-   }
-   */
-	myPos = location.coordinate;
-	[locationManager startUpdatingLocation];
+  if(firstGPS==YES || [um getCurrentSecond]==0){
+    NSLog(@"location up");
+    
+    CLLocation *location;
+    
+    //初回の位置取得時のみ地図を移動（自身の位置追跡しない）
+    location = [locations objectAtIndex:0];
+    /*
+     if ( moveCurrentPos == YES) {
+     
+     
+     GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:location.coordinate.latitude longitude:location.coordinate.longitude zoom:InitialZoom];
+     [map setCamera:pos];
+     moveCurrentPos = NO;
+     }
+     */
+    myPos = location.coordinate;
+    [locationManager startUpdatingLocation];
+    firstGPS = NO;
+  }
 }
 
 //位置取得時処理 ios 5
@@ -974,19 +1041,23 @@ static const float InitialZoom = 15.0f;				//ズーム値
     didUpdateToLocation:(CLLocation *)newLocation
            fromLocation:(CLLocation *)oldLocation
 {
-	NSLog(@"location up");
-	
-	// 位置情報を取り出す
-	myPos = newLocation.coordinate;
-  /*
-   if ( moveCurrentPos == YES) {
-   // ローディング
-   [self alertShow];
-   moveCurrentPos = NO;
-   GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:myPos.latitude longitude:myPos.longitude zoom:InitialZoom];
-   [map setCamera:pos];
-   }
-   */
+  if(firstGPS==YES || [um getCurrentSecond]==0){
+    
+    NSLog(@"location up");
+    
+    // 位置情報を取り出す
+    myPos = newLocation.coordinate;
+    /*
+     if ( moveCurrentPos == YES) {
+     // ローディング
+     [self alertShow];
+     moveCurrentPos = NO;
+     GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:myPos.latitude longitude:myPos.longitude zoom:InitialZoom];
+     [map setCamera:pos];
+     }
+     */
+    firstGPS = NO;
+  }
 }
 
 

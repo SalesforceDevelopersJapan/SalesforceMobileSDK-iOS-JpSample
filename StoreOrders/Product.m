@@ -54,6 +54,9 @@
   self.badgeValue = @"";
 	self.pdfNameArray = [NSMutableArray array];
 	self.pdfURLArray = [NSMutableArray array];
+  
+  self.stock__c_id = @"";
+  self.StockCount__c = 0;
 	return  self;
 }
 @end

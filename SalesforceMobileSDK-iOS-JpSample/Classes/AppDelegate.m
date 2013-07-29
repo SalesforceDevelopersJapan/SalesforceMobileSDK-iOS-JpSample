@@ -32,6 +32,7 @@
 #import "Reachability.h"
 #import "GoogleMaps/GoogleMaps.h"
 #import "UtilManager.h"
+
 /*
  NOTE if you ever need to update these, you can obtain them from your Salesforce org,
  (When you are logged in as an org administrator, go to Setup -> Develop -> Remote Access -> New )
@@ -115,6 +116,15 @@ static NSString *const OAuthRedirectURI = @"testsfdc:///mobilesdk/detect/oauth/d
 -(void)setUserDefaults
 {
 	NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+  // ロゴ画像のデータのみ先の削除
+  NSDictionary * _dic = [ud dictionaryRepresentation];
+  for(NSString *str in [_dic allKeys]){
+    NSRange range = [str rangeOfString:@"img_"];
+    if (range.location != NSNotFound) {
+      [ud removeObjectForKey:str];
+    }
+  }
+  
 	NSMutableDictionary *dic = [NSMutableDictionary dictionary];
 	NSData *idata;
 	
@@ -485,6 +495,8 @@ static NSString *const OAuthRedirectURI = @"testsfdc:///mobilesdk/detect/oauth/d
 	alertView = [theTimer userInfo];
 	[alertView dismissWithClickedButtonIndex:0 animated:NO];
 }
+
+
 
 @end
 

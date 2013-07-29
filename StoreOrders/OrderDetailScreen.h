@@ -36,18 +36,11 @@
 @property (strong, nonatomic) IBOutlet UITextView *detailDescription;
 
 @property (strong, nonatomic) IBOutlet UIButton *detailmovieBtn;
-@property (strong, nonatomic) IBOutlet UIButton *detailmovieIconBtn;
 
-//@property (strong, nonatomic) IBOutlet UIImageView *detailPrimaryImage;
 @property (strong, nonatomic) IBOutlet UIView *detailPrimaryImage;
 
 @property (strong, nonatomic) IBOutlet UILabel *photosLabel;
 
-@property (strong, nonatomic) IBOutlet UIView *subView1;
-@property (strong, nonatomic) IBOutlet UIView *subView2;
-@property (strong, nonatomic) IBOutlet UIView *subView3;
 @property (strong, nonatomic) IBOutlet UIImageView *detailSubImage1;
-@property (strong, nonatomic) IBOutlet UIImageView *detailSubImage2;
-@property (strong, nonatomic) IBOutlet UIImageView *detailSubImage3;
 
 @end

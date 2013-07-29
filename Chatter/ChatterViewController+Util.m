@@ -46,6 +46,13 @@
 	[alertView dismissWithClickedButtonIndex:0 animated:NO];
 }
 
+-(void)alertClose
+{
+  if(!alertView.visible) return;
+  
+  [alertView dismissWithClickedButtonIndex:0 animated:NO];
+}
+
 - (void)keyboardWillBeHidden:(NSNotification*)aNotification
 {
 	//スクロール領域を元に戻す
@@ -125,7 +132,7 @@
 -(id)resizeImage:(UIImage*)img Rect:(CGRect)Rect
 {
 	if (( img.size.height > Rect.size.height) || ( img.size.width > Rect.size.width)) {
-		NSLog(@"%f : %f",img.size.width,img.size.height);
+		//NSLog(@"%f : %f",img.size.width,img.size.height);
 		float asp = (float)img.size.width / (float)img.size.height;
 		CGRect r = CGRectMake(0,0,0,0);
 		if ( img.size.width > img.size.height) {
@@ -203,7 +210,6 @@ didReceiveResponse:(NSURLResponse *)response
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-  NSLog(@"2077");
 	NSLog(@"Succeeded! Received %d bytes of data",[rcvData length]);
 	NSLog(@"%@", [[NSString alloc]initWithData:rcvData
                                     encoding:NSUTF8StringEncoding]);

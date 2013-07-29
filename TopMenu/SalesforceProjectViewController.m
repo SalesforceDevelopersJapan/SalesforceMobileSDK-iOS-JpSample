@@ -233,10 +233,10 @@ static const int	MaxLoadingSize = ( 200 * 1024 );
   // プロフィール recordsを解析
   // メッセージ messagesを解析
   NSArray *records = [jsonResponse objectForKey:@"records"];
-  NSLog(@"request:didLoadResponse: #records: %d", records.count);
+  //NSLog(@"request:didLoadResponse: #records: %d", records.count);
   
   NSArray *messages = [jsonResponse objectForKey:@"messages"];
-  NSLog(@"request:didLoadResponse: #messages: %d", messages.count);
+  //NSLog(@"request:didLoadResponse: #messages: %d", messages.count);
   
   NSArray *items = [jsonResponse objectForKey:@"items"];
   NSLog(@"request:didLoadResponse: #messages: %d", items.count);
@@ -295,7 +295,7 @@ static const int	MaxLoadingSize = ( 200 * 1024 );
     }
     // トークンを取得
     NSString *access_token = [[[[SFRestAPI sharedInstance]coordinator]credentials]accessToken];
-    NSLog(@"access_token %@", access_token);
+    //NSLog(@"access_token %@", access_token);
     
     // 認証したユーザー情報にアクセス
     SFAccountManager *sm = [SFAccountManager sharedInstance];
@@ -304,7 +304,7 @@ static const int	MaxLoadingSize = ( 200 * 1024 );
     NSString *str = [NSString stringWithFormat:@"%@?oauth_token=%@",[sm.idData.pictureUrl absoluteString], access_token];
     
     NSURL *url = [NSURL URLWithString:str];
-    NSLog(@"url ..%@",url);
+    //NSLog(@"url ..%@",url);
     // HTTPリクエストオブジェクトを生成
     NSURLRequest *_request = [NSURLRequest
                               requestWithURL:url];
@@ -389,7 +389,7 @@ static const int	MaxLoadingSize = ( 200 * 1024 );
             if([_key isEqual:@"photo"]){
               NSDictionary *picDic = [senderDic valueForKey:_key];
               NSString *standardEmailPhotoUrl =[picDic valueForKey:@"standardEmailPhotoUrl"];
-              NSLog(@"standardEmailPhotoUrl %@ ", standardEmailPhotoUrl);
+              //NSLog(@"standardEmailPhotoUrl %@ ", standardEmailPhotoUrl);
               if([um chkString:standardEmailPhotoUrl]){
                 NSURL *url = [NSURL URLWithString:standardEmailPhotoUrl];
                 NSData *data = [NSData dataWithContentsOfURL:url];
@@ -421,7 +421,7 @@ static const int	MaxLoadingSize = ( 200 * 1024 );
     if([messageList count]){
       // 402x200
       //[messageView addSubview:[messageList objectAtIndex:MessageIndex]];
-      NSLog(@"list count %d", [messageList count]);
+      //NSLog(@"list count %d", [messageList count]);
       _scrollView.pagingEnabled = YES;
       _scrollView.contentSize = CGSizeMake(402*[messageList count], 0);
       //scrollView.showsHorizontalScrollIndicator = NO;

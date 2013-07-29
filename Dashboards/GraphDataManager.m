@@ -215,7 +215,7 @@ static GraphDataManager *_instance = nil;
   PublicDatas *pData = [PublicDatas instance];
 
   int _tag = [tag intValue];
-  NSLog(@"_tag %d", _tag);
+  //NSLog(@"_tag %d", _tag);
   int _graphIndex = _tag-1;
   NSMutableDictionary *tmp = [[NSMutableDictionary alloc]init];
   [tmp setObject:[NSString stringWithFormat:@"%d", _graphIndex] forKey:@"graphIndex"];
@@ -325,8 +325,6 @@ static GraphDataManager *_instance = nil;
   //クエリ作成
   NSString *query = @"SELECT Family FROM product2 GROUP BY Family";
   
-  NSLog(@"%@",query);
-  
   [[SFRestAPI sharedInstance] performSOQLQuery:query
    //エラーハンドラ
                                      failBlock:^(NSError *e) {
@@ -336,7 +334,7 @@ static GraphDataManager *_instance = nil;
                                  completeBlock:^(NSDictionary *results) {
                                    
                                    NSArray *records = [results objectForKey:@"records"];
-                                   NSLog(@"request:didLoadResponse: #records: %d", records.count);
+                                   //NSLog(@"request:didLoadResponse: #records: %d", records.count);
                                    
                                    for ( NSDictionary *obj in records ) {
                                      if(![self.familyList containsObject:[obj valueForKey:@"Family"]]){
@@ -360,8 +358,8 @@ static GraphDataManager *_instance = nil;
   PublicDatas *pData = [PublicDatas instance];
   NSString *company_id = [pData getDataForKey:@"cp_company_id"];
   
-  NSLog(@"company_id %@", [pData getDataForKey:@"cp_company_id"]);
-  NSLog(@"company_id %@", company_id);
+  //NSLog(@"company_id %@", [pData getDataForKey:@"cp_company_id"]);
+  //NSLog(@"company_id %@", company_id);
   
   // ファミリー指定の場合
   if(familyStr!=nil && ![familyStr isEqualToString:@""] && ![familyStr isEqualToString:[pData getDataForKey:@"DEFINE_DASHBOARD_TITLE_FAMILY"]]){
@@ -419,7 +417,7 @@ static GraphDataManager *_instance = nil;
       query2 = [NSString stringWithFormat:@" From OpportunityLineItem WHERE  CreatedDate >= %@ AND CreatedDate <= %@ group by PriceBookEntry.Product2.Family order by sum(TotalPrice) desc ", startStr, endStr];
     }
     NSString *query = [query1 stringByAppendingString:query2];
-    NSLog(@"%@",query);
+    //NSLog(@"%@",query);
     
     [[SFRestAPI sharedInstance] performSOQLQuery:query
      //エラーハンドラ
@@ -431,7 +429,7 @@ static GraphDataManager *_instance = nil;
                                    completeBlock:^(NSDictionary *results) {
                                      
                                      NSArray *records = [results objectForKey:@"records"];
-                                     NSLog(@"request:didLoadResponse: #records: %d", records.count);
+                                     //NSLog(@"request:didLoadResponse: #records: %d", records.count);
                                      
                                      for ( NSDictionary *obj in records ) {
                                        //NSLog(@"obj %@",obj);
@@ -559,8 +557,6 @@ static GraphDataManager *_instance = nil;
     }
     NSString *query = [query1 stringByAppendingString:query2];
     
-    NSLog(@"%@",query);
-    
     [[SFRestAPI sharedInstance] performSOQLQuery:query
      //エラーハンドラ
                                        failBlock:^(NSError *e) {
@@ -570,7 +566,7 @@ static GraphDataManager *_instance = nil;
                                    completeBlock:^(NSDictionary *results) {
                                      
                                      NSArray *records = [results objectForKey:@"records"];
-                                     NSLog(@"request:didLoadResponse: #records: %d", records.count);
+                                     //NSLog(@"request:didLoadResponse: #records: %d", records.count);
                                      
                                      for ( NSDictionary *obj in records ) {
                                        NSMutableDictionary *tmp = [[NSMutableDictionary alloc] init];
@@ -595,8 +591,6 @@ static GraphDataManager *_instance = nil;
     }
     NSString *query = [query1 stringByAppendingString:query2];
     
-    NSLog(@"%@",query);
-    
     [[SFRestAPI sharedInstance] performSOQLQuery:query
      //エラーハンドラ
                                        failBlock:^(NSError *e) {
@@ -606,7 +600,7 @@ static GraphDataManager *_instance = nil;
                                    completeBlock:^(NSDictionary *results) {
                                      
                                      NSArray *records = [results objectForKey:@"records"];
-                                     NSLog(@"request:didLoadResponse: #records: %d", records.count);
+                                     //NSLog(@"request:didLoadResponse: #records: %d", records.count);
                                      
                                      for ( NSDictionary *obj in records ) {
                                        NSMutableDictionary *tmp = [[NSMutableDictionary alloc] init];
@@ -647,16 +641,14 @@ static GraphDataManager *_instance = nil;
   PublicDatas *pData = [PublicDatas instance];
   
   NSMutableDictionary *dic = [self getDictionaryByTag:tag];
-  
-  NSLog(@" dic %@", dic);
+  //NSLog(@" dic %@", dic);
   
   NSString *barMonth = [dic objectForKey:@"barMonth"];
   NSString *barItem = [dic objectForKey:@"barItem"];
   NSString *barTerm = [dic objectForKey:@"barTerm"];
-  
-  NSLog(@" barMonth %@", barMonth);
-  NSLog(@" barItem %@", barItem);
-  NSLog(@" barTerm %@", barTerm);
+  //NSLog(@" barMonth %@", barMonth);
+  //NSLog(@" barItem %@", barItem);
+  //NSLog(@" barTerm %@", barTerm);
   
   NSCalendar *calendar = [NSCalendar currentCalendar];
   NSDateComponents *comps = [[NSDateComponents alloc] init];
@@ -739,16 +731,16 @@ static GraphDataManager *_instance = nil;
     for(int i=0; i<3; i++){
       [comps setMonth:i];
       NSDate *date1 = [calendar dateByAddingComponents:comps toDate:inputDate options:0];
-      NSLog(@"date1 %@", date1);
+      //NSLog(@"date1 %@", date1);
       
       [inputDateFormatter setDateFormat:@"yyyy"];
       NSString *_year = [inputDateFormatter stringFromDate:date1];
-      NSLog(@"year %@", _year);
+      //NSLog(@"year %@", _year);
       [startYear addObject:_year];
       
       [inputDateFormatter setDateFormat:@"MM"];
       NSString *_month = [inputDateFormatter stringFromDate:date1];
-      NSLog(@"month %@", _month);
+      //NSLog(@"month %@", _month);
       [startMonth addObject:_month];
     }
     
@@ -797,16 +789,16 @@ static GraphDataManager *_instance = nil;
     for(int i=1; i<4; i++){
       [comps setMonth:-i];
       NSDate *date1 = [calendar dateByAddingComponents:comps toDate:inputDate options:0];
-      NSLog(@"date1 %@", date1);
+      //NSLog(@"date1 %@", date1);
       
       [inputDateFormatter setDateFormat:@"yyyy"];
       NSString *_year = [inputDateFormatter stringFromDate:date1];
-      NSLog(@"year %@", _year);
+      //NSLog(@"year %@", _year);
       [startYear addObject:_year];
       
       [inputDateFormatter setDateFormat:@"MM"];
       NSString *_month = [inputDateFormatter stringFromDate:date1];
-      NSLog(@"month %@", _month);
+      //NSLog(@"month %@", _month);
       [startMonth addObject:_month];
     }
     // 1年前
@@ -871,8 +863,8 @@ static GraphDataManager *_instance = nil;
     
     //クエリ作成
     NSString *company_id = [pData getDataForKey:@"cp_company_id"];
-    NSLog(@"company_id %@", [pData getDataForKey:@"cp_company_id"]);
-    NSLog(@"company_id %@", company_id);
+    //NSLog(@"company_id %@", [pData getDataForKey:@"cp_company_id"]);
+    //NSLog(@"company_id %@", company_id);
     NSString *query1;
     NSString *query2;
     if(company_id!=nil && ![company_id isEqualToString:@""]){
@@ -883,8 +875,6 @@ static GraphDataManager *_instance = nil;
       query2 = [NSString stringWithFormat:@" From OpportunityLineItem Where Opportunity.CloseDate >= %@ AND Opportunity.CloseDate <= %@ ", startStr, endStr];
     }
     NSString *query = [query1 stringByAppendingString:query2];
-    
-    NSLog(@"%@",query);
     
     [NSThread sleepForTimeInterval:0.1];
     
@@ -897,7 +887,7 @@ static GraphDataManager *_instance = nil;
                                    completeBlock:^(NSDictionary *results) {
                                      
                                      NSArray *records = [results objectForKey:@"records"];
-                                     NSLog(@"request:didLoadResponse: #records: %d", records.count);
+                                     //NSLog(@"request:didLoadResponse: #records: %d", records.count);
                                      
                                      for ( NSDictionary *obj in records ) {
                                        //NSLog(@"obj %@",obj);
@@ -989,8 +979,6 @@ static GraphDataManager *_instance = nil;
     }
     NSString *query = [query1 stringByAppendingString:query2];
     
-    NSLog(@"%@",query);
-    
     [NSThread sleepForTimeInterval:0.1];
     
     [[SFRestAPI sharedInstance] performSOQLQuery:query
@@ -1002,7 +990,7 @@ static GraphDataManager *_instance = nil;
                                    completeBlock:^(NSDictionary *results) {
                                      
                                      NSArray *records = [results objectForKey:@"records"];
-                                     NSLog(@"request:didLoadResponse: #records: %d", records.count);
+                                     //NSLog(@"request:didLoadResponse: #records: %d", records.count);
                                      
                                      for ( NSDictionary *obj in records ) {
                                        //NSLog(@"obj %@",obj);
@@ -1042,8 +1030,8 @@ static GraphDataManager *_instance = nil;
                                      //NSLog(@"%@", lastdataList);
                                      [dic setObject:sortArray forKey:@"lastdataList"];
                                      
-                                     NSLog(@"datalist count %d", [[dic objectForKey:@"dataList"] count]);
-                                     NSLog(@"dlastatalist count %d", [[dic objectForKey:@"lastdataList"] count]);
+                                     //NSLog(@"datalist count %d", [[dic objectForKey:@"dataList"] count]);
+                                     //NSLog(@"dlastatalist count %d", [[dic objectForKey:@"lastdataList"] count]);
                                      
                                      //if([[dic objectForKey:@"dataList"] count]==[[dic objectForKey:@"lastdataList"] count]){
                                      
@@ -1143,7 +1131,7 @@ static GraphDataManager *_instance = nil;
     // 最大値
     NSPredicate *maxPred = [NSPredicate predicateWithFormat:
                             @"SELF == max:(%@)", valueArray];
-    NSLog(@"%@", [valueArray filteredArrayUsingPredicate:maxPred]);
+    //NSLog(@"%@", [valueArray filteredArrayUsingPredicate:maxPred]);
     max1 = [[[valueArray filteredArrayUsingPredicate:maxPred] objectAtIndex:0] intValue];
     
     // 桁数
@@ -1151,11 +1139,11 @@ static GraphDataManager *_instance = nil;
     
     float b = (float)(max1/pow(10, digit-1));
     max1F = ceil(b) * pow(10, digit-1);
-    NSLog(@"%d", max1F);
+    //NSLog(@"%d", max1F);
     
     maxPred = [NSPredicate predicateWithFormat:
                @"SELF == max:(%@)", oldvalueArray];
-    NSLog(@"%@", [oldvalueArray filteredArrayUsingPredicate:maxPred]);
+    //NSLog(@"%@", [oldvalueArray filteredArrayUsingPredicate:maxPred]);
     max2 = [[[oldvalueArray filteredArrayUsingPredicate:maxPred] objectAtIndex:0] intValue]*2;
     
     // 桁数
@@ -1167,8 +1155,8 @@ static GraphDataManager *_instance = nil;
     if(max1F<0) max1F =0;
     if(max2F<0) max2F =0;
     
-    NSLog(@"max1F %d", max1F);
-    NSLog(@"max2F %d", max2F);
+    //NSLog(@"max1F %d", max1F);
+    //NSLog(@"max2F %d", max2F);
     
     if(max1F<max2F) max1F = max2F;
     
@@ -1178,7 +1166,6 @@ static GraphDataManager *_instance = nil;
     [leftGraph setMaxValAry:maxArray];
   }
   @catch (NSException *exception) {
-    NSLog(@"%d", __LINE__);
     NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
   }
   
@@ -1260,21 +1247,21 @@ static GraphDataManager *_instance = nil;
       if(j>12) j=j-12;
       [mArray addObject:[[NSNumber alloc]initWithInt:j]];
     }
-    NSLog(@" mArray %@", mArray);
+    //NSLog(@" mArray %@", mArray);
     // 開始月の判定 当月が含まれる期間を判定
     for(int i=0; i<[mArray count]; i++){
       int min = [[mArray objectAtIndex:i] intValue];
       int max = min+2;
       
-      NSLog(@" min %d  max %d", min, max);
+      //NSLog(@" min %d  max %d", min, max);
       
       if(min<= now_month && now_month<=max){
         m = min;
         break;
       }
     }
-    NSLog(@" now_month %d", now_month);
-    NSLog(@" m %d", m);
+    //NSLog(@" now_month %d", now_month);
+    //NSLog(@" m %d", m);
     
     // 今回の表示用
     NSDateFormatter *inputDateFormatter = [[NSDateFormatter alloc] init];
@@ -1287,16 +1274,16 @@ static GraphDataManager *_instance = nil;
     for(int i=0; i<3; i++){
       [comps setMonth:i];
       NSDate *date1 = [calendar dateByAddingComponents:comps toDate:inputDate options:0];
-      NSLog(@"date1 %@", date1);
+      //NSLog(@"date1 %@", date1);
       
       [inputDateFormatter setDateFormat:@"yyyy"];
       NSString *_year = [inputDateFormatter stringFromDate:date1];
-      NSLog(@"year %@", _year);
+      //NSLog(@"year %@", _year);
       [startYear addObject:_year];
       
       [inputDateFormatter setDateFormat:@"MM"];
       NSString *_month = [inputDateFormatter stringFromDate:date1];
-      NSLog(@"month %@", _month);
+      //NSLog(@"month %@", _month);
       [startMonth addObject:_month];
     }
   }
@@ -1329,16 +1316,16 @@ static GraphDataManager *_instance = nil;
     for(int i=1; i<4; i++){
       [comps setMonth:-i];
       NSDate *date1 = [calendar dateByAddingComponents:comps toDate:inputDate options:0];
-      NSLog(@"date1 %@", date1);
+      //NSLog(@"date1 %@", date1);
       
       [inputDateFormatter setDateFormat:@"yyyy"];
       NSString *_year = [inputDateFormatter stringFromDate:date1];
-      NSLog(@"year %@", _year);
+      //NSLog(@"year %@", _year);
       [startYear addObject:_year];
       
       [inputDateFormatter setDateFormat:@"MM"];
       NSString *_month = [inputDateFormatter stringFromDate:date1];
-      NSLog(@"month %@", _month);
+      //NSLog(@"month %@", _month);
       [startMonth addObject:_month];
     }
   }
@@ -1391,8 +1378,6 @@ static GraphDataManager *_instance = nil;
     NSString *query2 = [NSString stringWithFormat:@" From OpportunityLineItem Where Opportunity.CloseDate >= %@ AND Opportunity.CloseDate <= %@ ", startStr, endStr];
     NSString *query = [query1 stringByAppendingString:query2];
     
-    NSLog(@"%@",query);
-    
     [NSThread sleepForTimeInterval:0.1];
     
     [[SFRestAPI sharedInstance] performSOQLQuery:query
@@ -1404,7 +1389,7 @@ static GraphDataManager *_instance = nil;
                                    completeBlock:^(NSDictionary *results) {
                                      
                                      NSArray *records = [results objectForKey:@"records"];
-                                     NSLog(@"request:didLoadResponse: #records: %d", records.count);
+                                     //NSLog(@"request:didLoadResponse: #records: %d", records.count);
                                      
                                      for ( NSDictionary *obj in records ) {
                                        //NSLog(@"obj %@",obj);
@@ -1498,8 +1483,6 @@ static GraphDataManager *_instance = nil;
     }
     NSString *query = [query1 stringByAppendingString:query2];
     
-    NSLog(@"%@",query);
-    
     [NSThread sleepForTimeInterval:0.1];
     
     [[SFRestAPI sharedInstance] performSOQLQuery:query
@@ -1511,7 +1494,7 @@ static GraphDataManager *_instance = nil;
                                    completeBlock:^(NSDictionary *results) {
                                      
                                      NSArray *records = [results objectForKey:@"records"];
-                                     NSLog(@"request:didLoadResponse: #records: %d", records.count);
+                                     //NSLog(@"request:didLoadResponse: #records: %d", records.count);
                                      
                                      for ( NSDictionary *obj in records ) {
                                        //NSLog(@"obj %@",obj);
@@ -1551,9 +1534,9 @@ static GraphDataManager *_instance = nil;
                                      //NSLog(@"%@", lastdataList);
                                      [dic setObject:sortArray forKey:@"lastdataList"];
                                      
-                                     NSLog(@"%@", lineTerm );
-                                     NSLog(@"datalist count %d", [[dic objectForKey:@"dataList"] count]);
-                                     NSLog(@"lastatalist count %d", [[dic objectForKey:@"lastdataList"] count]);
+                                     //NSLog(@"%@", lineTerm );
+                                     //NSLog(@"datalist count %d", [[dic objectForKey:@"dataList"] count]);
+                                     //NSLog(@"lastatalist count %d", [[dic objectForKey:@"lastdataList"] count]);
                                      
                                      //if([[dic objectForKey:@"dataList"] count]==[[dic objectForKey:@"lastdataList"] count]){
                                      // グラフ数チェック
@@ -1579,8 +1562,8 @@ static GraphDataManager *_instance = nil;
     [self performLineGraph:tag UIView:baseView];
     return;
   }
-  NSLog(@"dataList %@", dataList);
-  NSLog(@"lastdataList %@", lastdataList);
+  //NSLog(@"dataList %@", dataList);
+  //NSLog(@"lastdataList %@", lastdataList);
   
   // 既存グラフを消す
   for (UIView *view in [baseView subviews]) {
@@ -1641,8 +1624,8 @@ static GraphDataManager *_instance = nil;
 	salesGraph.graphSizeX = 220;
 	salesGraph.graphSizeY = 220;
   
-  NSLog(@"valueArray %@", valueArray);
-  NSLog(@"oldvalueArray %@", oldvalueArray);
+  //NSLog(@"valueArray %@", valueArray);
+  //NSLog(@"oldvalueArray %@", oldvalueArray);
   
 	//データ
 	NSMutableArray *datAry = [NSMutableArray array];
@@ -1658,7 +1641,7 @@ static GraphDataManager *_instance = nil;
     // 最大値
     NSPredicate *maxPred = [NSPredicate predicateWithFormat:
                             @"SELF == max:(%@)", valueArray];
-    NSLog(@"%@", [valueArray filteredArrayUsingPredicate:maxPred]);
+    //NSLog(@"%@", [valueArray filteredArrayUsingPredicate:maxPred]);
     max1 = [[[valueArray filteredArrayUsingPredicate:maxPred] objectAtIndex:0] intValue];
     
     // 桁数
@@ -1666,14 +1649,14 @@ static GraphDataManager *_instance = nil;
     
     float b = (float)(max1/pow(10, digit-1));
     max1F = ceil(b) * pow(10, digit-1);
-    NSLog(@"max1 %d", max1F);
+    //NSLog(@"max1 %d", max1F);
     
     maxPred = [NSPredicate predicateWithFormat:
                @"SELF == max:(%@)", oldvalueArray];
-    NSLog(@"%@", [oldvalueArray filteredArrayUsingPredicate:maxPred]);
+    //NSLog(@"%@", [oldvalueArray filteredArrayUsingPredicate:maxPred]);
     max2 = [[[oldvalueArray filteredArrayUsingPredicate:maxPred] objectAtIndex:0] intValue]*2;
     
-    NSLog(@"max2 %d", max2);
+    //NSLog(@"max2 %d", max2);
     // 桁数
     int _digit = (int)log10( [[[NSNumber alloc]initWithInt:max2] doubleValue] ) + 1;
     
@@ -1682,8 +1665,8 @@ static GraphDataManager *_instance = nil;
     
     if(max2==0) max2F = 0;
     
-    NSLog(@"max1F %d", max1F);
-    NSLog(@"max2F %d", max2F);
+    //NSLog(@"max1F %d", max1F);
+    //NSLog(@"max2F %d", max2F);
     
     if(max1F<0) max1F =0;
     if(max2F<0) max2F =0;
@@ -1696,7 +1679,6 @@ static GraphDataManager *_instance = nil;
     [salesGraph setMaxValAry:maxArray];
   }
   @catch (NSException *exception) {
-    NSLog(@"%d", __LINE__);
     NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
   }
   
@@ -1704,7 +1686,6 @@ static GraphDataManager *_instance = nil;
 	salesGraph.y_section = 4;
 	salesGraph.backgroundColor = [UIColor whiteColor];
 	[baseView addSubview:salesGraph];
-  
   
   [dic setObject:[[NSMutableArray alloc]init] forKey:@"dataList"];
   [dic setObject:[[NSMutableArray alloc]init] forKey:@"lastdataList"];

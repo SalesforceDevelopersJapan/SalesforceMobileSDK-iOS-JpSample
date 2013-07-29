@@ -165,16 +165,9 @@
 	}
 	[_companyProfile setInfo:cp];
 	_companyProfile.delegate = self;
-	
-	//スクロールビュー追加
-	//rect = CGRectMake(10,5,StoreContactView.frame.size.width - 20, StoreContactView.frame.size.height - 10 );
-  CGRect rect = CGRectMake(0,0,_storeContactView.frame.size.width, _storeContactView.frame.size.height);
-	scrl = [[UIScrollView alloc]initWithFrame:rect];
-	scrl.backgroundColor = [UIColor whiteColor];
-	scrl.contentSize = scrl.frame.size;
-	//[_storeContactView addSubview:scrl];
-	
+  
   // カバーフロー
+  CGRect rect = CGRectMake(0,0,_storeContactView.frame.size.width, _storeContactView.frame.size.height);
   carousel = [[iCarousel alloc]initWithFrame:rect];
   carousel.delegate = self;
   carousel.dataSource = self;
@@ -184,7 +177,6 @@
   //carousel.type = iCarouselTypeCoverFlow2;
   UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:rect]; //_storeContactView.frame];
   backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-  backgroundView.image = [UIImage imageNamed:@"coverflowbackground.png"];
   [_storeContactView addSubview:backgroundView];
   carousel.backgroundColor = [UIColor whiteColor];
   
@@ -244,10 +236,69 @@
 -(void)didPushChangeFunction:(UIViewController *)func
 {
 	NSString *tgt = NSStringFromClass([func class]);
-	NSString *myClass = NSStringFromClass([self class]);
-	if ( ![tgt isEqualToString:myClass]){
+	NSString *myClass = NSStringFromClass([self class]);;
+	if ( ![tgt isEqualToString:myClass] ){
 		[self.navigationController pushViewController:func animated:NO];
 	}
+}
+
+-(void)didPushMemoFunction:(id)sender
+{
+  
+  metricsBtn.enabled = NO;
+  self.navigationItem.leftBarButtonItem.enabled = NO;
+  
+  memoVC = [[MemoViewController alloc] initWithNibName:@"MemoViewController" bundle:[NSBundle mainBundle]company:cp];
+  memoVC.delegate = self;
+  [memoVC.view setClipsToBounds:YES];
+  
+  memoVC.view.frame = CGRectMake(0, 0, 200, 100);
+  memoVC.view.center = self.view.center;
+  memoVC.view.alpha = 1.0;
+  
+  [self addChildViewController:memoVC];
+  //[self.view addSubview:memoVC.view];
+  
+  
+  // フリップ移動前処理
+  [UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDuration:0.01];
+  [self.view addSubview:memoVC.view];
+  [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:memoVC.view cache:YES];
+  [UIView setAnimationDidStopSelector:@selector(dispMemoViewAppear:finished:context:)];
+	[UIView commitAnimations];
+  
+  /*
+  // 下から表示（既定）
+  memoVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+  // 回転して表示
+  //memoVC.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+  // 浮かび上がって表示
+  //modalViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+  [self presentViewController:memoVC
+                     animated:YES
+                   completion:nil
+   ];*/
+}
+
+- (void)dispMemoViewAppear:(NSString *)animationID finished:(NSNumber *) finished context:(void *) context
+{
+  [UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDuration:0.5];
+  memoVC.view.frame = self.view.frame;
+  memoVC.view.alpha = 1.0;
+  [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:memoVC.view cache:YES];
+	[UIView commitAnimations];
+}
+
+// close時のdelegate
+-(void)didClose:(id)sender
+{
+  // ボタンを戻す
+  metricsBtn.enabled = YES;
+  self.navigationItem.leftBarButtonItem.enabled = YES;
 }
 
 //ナビゲーションバーの「戻る」ボタン処理
@@ -355,143 +406,26 @@
   
 	NSLog(@"%@",jsonResponse);
 	NSArray *records = [jsonResponse objectForKey:@"records"];
-	if ( [self isNull:records] == NO ) {
+	if ( [um chkString:records] ) {
 		
 		//取引責任者リスト初期化
 		svList = [NSMutableArray array];
 		
-		float y = 0;
 		for ( int i = 0; i < [records count]; i++ ){
 			NSDictionary *rec = [records objectAtIndex:i];
 			Person *ps = [[Person alloc]init];
-			ps.name = [rec objectForKey:@"Name"];
+			ps.name = [um chkNullString:[rec objectForKey:@"Name"]];
 			ps.userId = [rec objectForKey:@"Id"];
-			ps.twitterAccount = [rec objectForKey:@"Twitter__c"];
+			ps.twitterAccount = [um chkNullString:[rec objectForKey:@"Twitter__c"]];
       
       if([um chkString:[rec objectForKey:@"MailingState"]] && [um chkString:[rec objectForKey:@"MailingCity"]] && [um chkString:[rec objectForKey:@"MailingStreet"]]){
         ps.address = [[[rec objectForKey:@"MailingState"]stringByAppendingString:[rec objectForKey:@"MailingCity"]]stringByAppendingString:[rec objectForKey:@"MailingStreet"]];
       }
-			ps.belongsto = [rec objectForKey:@"Department"];
-			ps.position = [rec objectForKey:@"Title"];
+			ps.belongsto = [um chkNullString:[rec objectForKey:@"Department"]];
+			ps.position = [um chkNullString:[rec objectForKey:@"Title"]];
 			
 			//リストに追加
 			[svList addObject:ps];
-			
-			//
-			//取引責任者、部署・約束、住所、チェックイン・アウトボタンを作る
-			//
-			
-			CGRect rect = CGRectMake(0, 0, 130, 35);
-			UIButton *name = [UIButton buttonWithType:UIButtonTypeCustom];
-			name.frame = rect;
-			name.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-			[name setTitle:[self isStringEmpty:ps.name] forState:UIControlStateNormal];
-			[name setBackgroundColor:[UIColor clearColor]];
-			[name setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-			[name addTarget:self action:@selector(svBtnPushed:) forControlEvents:UIControlEventTouchUpInside];
-			name.tag = i;
-			
-			rect = CGRectMake(150, 0, 180, 35);
-			UIButton *pos = [UIButton buttonWithType:UIButtonTypeCustom];
-			pos.frame = rect;
-			NSString *temp = [[[self isStringEmpty:ps.belongsto]stringByAppendingString:@" "]stringByAppendingString:[self isStringEmpty:ps.position]];
-			pos.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-			[pos setTitle:temp forState:UIControlStateNormal];
-			[pos setBackgroundColor:[UIColor clearColor]];
-			[pos setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-			[pos addTarget:self action:@selector(svBtnPushed:) forControlEvents:UIControlEventTouchUpInside];
-			pos.tag = i;
-			
-			rect = CGRectMake(350, 0, 310, 35);
-			UIButton *address = [UIButton buttonWithType:UIButtonTypeCustom];
-			address.frame = rect;
-			address.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-			[address setTitle:[self isStringEmpty:ps.address] forState:UIControlStateNormal];
-			[address setBackgroundColor:[UIColor clearColor]];
-			[address setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-			[address addTarget:self action:@selector(svBtnPushed:) forControlEvents:UIControlEventTouchUpInside];
-			address.tag = i;
-      
-			rect = CGRectMake(705, 3, 25 ,25);
-			UIButton *twitterBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-			twitterBtn.frame = rect;
-			[twitterBtn setBackgroundImage:[UIImage imageNamed:@"Twitter.png"] forState:UIControlStateNormal];
-			[twitterBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-			[twitterBtn addTarget:self action:@selector(svBtnPushed:) forControlEvents:UIControlEventTouchUpInside];
-			twitterBtn.tag = i+3000;
-      
-			rect = CGRectMake(745, 3, 25 ,25);
-			UIButton *contactChatterBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-			contactChatterBtn.frame = rect;
-			[contactChatterBtn setBackgroundImage:[UIImage imageNamed:@"ContactChatterIcon.png"] forState:UIControlStateNormal];
-			[contactChatterBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-			[contactChatterBtn addTarget:self action:@selector(svBtnPushed:) forControlEvents:UIControlEventTouchUpInside];
-			contactChatterBtn.tag = i+4000;
-			
-			rect = CGRectMake(800, 3, 70, 25);
-			UIButton *chkIn = [UIButton buttonWithType:UIButtonTypeCustom];
-			chkIn.frame = rect;
-			[chkIn setBackgroundImage:[UIImage imageNamed:@"CheckIn.png"] forState:UIControlStateNormal];
-			[chkIn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-			[chkIn addTarget:self action:@selector(svBtnPushed:) forControlEvents:UIControlEventTouchUpInside];
-			chkIn.tag = i+1000;
-      
-			rect = CGRectMake(880, 3, 70, 25);
-			UIButton *chkOut = [UIButton buttonWithType:UIButtonTypeCustom];
-			chkOut.frame = rect;
-			[chkOut setBackgroundImage:[UIImage imageNamed:@"CheckOut.png"] forState:UIControlStateNormal];
-			[chkOut setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-			[chkOut addTarget:self action:@selector(svBtnPushed:) forControlEvents:UIControlEventTouchUpInside];
-			chkOut.tag = i+2000;
-      
-			//チェックアウトが行われてないオブジェクトがある場合は、チェックイン：無効　チェックアウト：有効
-			chkOut.enabled = NO;
-			chkIn.enabled = YES;
-			for ( int i =0; i < [ObjArray count]; i++) {
-				NSDictionary *dic = [ObjArray objectAtIndex:i];
-				NSString *ObjName = [dic objectForKey:@"Subject"];
-				NSString *evId = [dic objectForKey:@"Id"];
-				NSString *cmp = [[cp.name stringByAppendingString:@"_"]stringByAppendingString:[self isStringEmpty:ps.name]];
-				if ( [self isInclude:ObjName cmp:cmp] == YES ) {
-					chkOut.enabled = YES;
-					chkIn.enabled = NO;
-					
-					//EventIDを配列に保存する。管理者のIDをキーとする
-					NSString *svId =[NSString stringWithFormat:@"chkin_%@",ps.userId];
-					[pData setData:evId forKey:svId];
-          // ボタンを無効化
-          [self changeBtnState:(chkOut.tag) state:YES];
-          [self changeBtnState:(chkIn.tag) state:NO];
-					break;
-				}
-			}
-			rect = CGRectMake(0, y, 1000, 30);
-			UIView *base = [[UIView alloc]initWithFrame:rect];
-			[base setBackgroundColor:[UIColor whiteColor]];
-      
-			rect = CGRectMake(0, y+30, 1000, 2);
-			UIView *border = [[UIView alloc]initWithFrame:rect];
-			[border setBackgroundColor:[UIColor blackColor]];
-      
-			//Twitterアカウントが設定されている場合のみ、Twitterボタンを表示
-			if ( ![self isNull:ps.twitterAccount]) {
-				[base addSubview:twitterBtn];
-			}
-			
-			[base addSubview:name];
-			[base addSubview:pos];
-			[base addSubview:address];
-			[base addSubview:contactChatterBtn];
-			[base addSubview:chkIn];
-			[base addSubview:chkOut];
-      
-			[scrl addSubview:base];
-			[scrl addSubview:border];
-			
-			CGSize siz = scrl.contentSize;
-			y+= base.frame.size.height+border.frame.size.height;
-			siz.height = y;
-			scrl.contentSize = siz;
 		}
     
     // カーソル更新
@@ -587,21 +521,6 @@
     // ボタンを無効化
     [self changeBtnState:(wrkBtn.tag) state:NO];
 	}
-	else {
-    /*
-     SelectViewController *sV = [[SelectViewController alloc]init];
-     sV.delegate = self;
-     pop = [[UIPopoverController alloc]initWithContentViewController:sV];
-     pop.delegate = self;
-     pop.popoverContentSize = sV.view.frame.size;
-     CGRect rect = wrkBtn.frame;
-     UIView *tmp = [wrkBtn superview];
-     CGRect frm = tmp.frame;
-     frm.origin.y+= 20;
-     [pop presentPopoverFromRect:frm inView:scrl permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-     selectedSV = [svList objectAtIndex:wrkBtn.tag];
-     */
-	}
 }
 
 //アラートのボタン押下デリゲート
@@ -646,72 +565,6 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
 				break;
 		}
 	}
-}
-
-/*
- -(void)didSelectOption:(int)opt
- {
- NSLog(@"%d",opt);
- [pop dismissPopoverAnimated:YES];
- 
- if ( opt == 0 ) {
- 
- //TwitterPage表示
- 
- //リクエスト作成
- NSString *url = [NSString stringWithFormat:@"https://twitter.com/%@",selectedSV.twitterAccount];
- NSURL *myURL = [NSURL URLWithString:url];
- NSMutableURLRequest *requestDoc = [[NSMutableURLRequest alloc]initWithURL:myURL];
- 
- //viewerViewController内のUIWebviewで表示
- viewerViewController *vView = [[viewerViewController alloc]init];
- [vView setReq:requestDoc];
- 
- //ナビゲーションバー　設定
- [self.navigationController.navigationBar setHidden:NO];
- 
- //画面遷移
- [self.navigationController pushViewController:vView animated:YES];
- }
- else {
- 
- //戻り先を記録
- pData = [publicData instance];
- [pData setData:@"STORE" forKey:@"ReturnScreen"];
- 
- //Chatter表示
- chatterViewController *chatter = [[chatterViewController alloc]init];
- [chatter setInitialId:selectedSV.userId];
- [chatter setInitialName:selectedSV.name];
- [chatter setInitialCompnay:cp];
- [chatter setChatterType:1];					//取引先責任者のチャター
- 
- //ナビゲーションバー　設定
- [self.navigationController.navigationBar setHidden:NO];
- 
- //画面遷移
- [self.navigationController pushViewController:chatter animated:YES];
- }
- }
- */
-
-//NSStringがNull相当の場合、空のNSStringを返す
--(NSString*)isStringEmpty:(NSString*)tgt
-{
-	if ((( tgt == (NSString *)[NSNull null] ) || ([tgt isEqual:[NSNull null]] ) || ( tgt ==  nil ))){
-		NSString *ret = @"";
-		return ret;
-	}
-	return tgt;
-	
-}
-//オブジェクトがNULLであるかチェック
--(BOOL)isNull:(id)tgt
-{
-	if ((( tgt == [NSNull null] ) || ([tgt isEqual:[NSNull null]] ) || ( tgt ==  nil ))){
-		return YES;
-	}
-	return NO;
 }
 
 //チェックイン実行
@@ -796,7 +649,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
                                     }
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"%@",dict);
+                                  //NSLog(@"%@",dict);
                                   
                                   NSNumber *success = [dict objectForKey:@"success"];
                                   if ( [success intValue] == 1 ){
@@ -834,33 +687,16 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
                                   }
                                 }];
 }
+
+// ボタンのON/OFF
 -(void)changeBtnState:(int)index state:(BOOL)state
 {
 	id view;
-	id childview;
-	for ( view in [scrl subviews]) {
-		NSString *className = NSStringFromClass([view class]);
-		if ([className isEqualToString:@"UIView"]){
-			for ( childview in [view subviews]) {
-				NSString *childclassName = NSStringFromClass([childview class]);
-				if ([childclassName isEqualToString:@"UIButton"]){
-					if (((UIButton*)childview).tag == index) {
-						((UIButton*)childview).enabled = state;
-						break;
-					}
-				}
-			}
-		}
-	}
   for ( view in [nameCardCenter subviews]) {
     NSString *className = NSStringFromClass([view class]);
-    NSLog(@"classname %@", className);
     if ([className isEqualToString:@"UIButton"]){
       if (((UIButton*)view).tag == index) {
         ((UIButton*)view).enabled = state;
-        NSLog(@"tag %d", index);
-        NSLog(@"state %d", state);
-        NSLog(@"break");
         break;
       }
     }
@@ -917,8 +753,8 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
                                       [self changeBtnState:(index+2000) state:YES];
                                     }
                                 completeBlock:^(id jsonResponse){
-                                  NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"%@",dict);
+                                  //NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                  //NSLog(@"%@",dict);
                                   
                                   //チェックイン有効化
                                   [self changeBtnState:(index+1000) state:YES];
@@ -955,7 +791,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
   
 	//24H以内に自分のIDで作成され、チェックインのみの（チェックアウトしてない）オブジェクトを抽出
 	NSString *query = [NSString  stringWithFormat:@"SELECT Subject ,Id,StartDateTime from Event WHERE OwnerId ='%@' AND StartDateTime >=%@ AND timestamp_checkin__c <> NULL AND timestamp_Checkout__c = NULL",myId ,sttForRegist ];
-	NSLog(@"%@",query);
+	//NSLog(@"%@",query);
 	SFRestRequest *request = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] sendRESTRequest:request
                                     failBlock:^(NSError *e) {
@@ -972,7 +808,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
                                     }
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"%@",dict);
+                                  //NSLog(@"%@",dict);
                                   NSArray *records = [dict objectForKey:@"records"];
                                   
                                   for ( int i = 0; i < [records count]; i++ ) {
@@ -988,8 +824,8 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
                                   [self changeBtnState:(pIndex+2000) state:NO]; //チェックアウト無効
                                   [self changeBtnState:(pIndex+1000) state:YES];
                                   
-                                  NSLog(@"cp.name %@", cp.name);
-                                  NSLog(@"pName %@", pName);
+                                  //NSLog(@"cp.name %@", cp.name);
+                                  //NSLog(@"pName %@", pName);
                                   
                                   if([um chkString:cp.name] && [um chkString:pName]){
                                     for ( int i =0; i < [ObjArray count]; i++) {
@@ -998,18 +834,13 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
                                       NSString *evId = [dic objectForKey:@"Id"];
                                       
                                       NSString *cmp = [[cp.name stringByAppendingString:@"_"]stringByAppendingString:pName];
-                                      NSLog(@"cmp %@", cmp);
                                       // DBに名前があればチェックインを無効にする
-                                      if ( [self isInclude:ObjName cmp:cmp] == YES ) {
-                                        NSLog(@"#################");
+                                      if ( [um isInclude:ObjName cmp:cmp] == YES ) {
                                         
                                         //EventIDを配列に保存する。管理者のIDをキーとする
                                         NSString *svId =[NSString stringWithFormat:@"chkin_%@",pId];
                                         [pData setData:evId forKey:svId];
                                         
-                                        NSLog(@"chkOut.tag : %d", pIndex+2000);
-                                        NSLog(@"chkIn.tag : %d", pIndex+1000);
-                                        NSLog(@"#################");
                                         // ボタンを無効化
                                         [self changeBtnState:(pIndex+2000) state:YES]; //チェックアウト有効
                                         [self changeBtnState:(pIndex+1000) state:NO];
@@ -1038,16 +869,6 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
 	cp.image = img;
 }
 
-
-//str1がstr2を含む場合はYESを返す
--(BOOL)isInclude:(NSString*)str1 cmp:(NSString*)cmp
-{
-	NSRange result = [str1 rangeOfString:cmp];
-	if (result.location == NSNotFound){
-		return NO;
-	}
-	return  YES;
-}
 
 //位置取得時のデリゲート
 -(void)detectMyPosition:(CLLocationCoordinate2D)pos
@@ -1150,7 +971,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
     NSString *endDate = [NSString stringWithFormat:@"%@-%02d-%02d", endYear, [endMonth intValue], range.length];
     
     // 円グラフ描画
-    NSLog(@"company_id %@", [pData getDataForKey:@"cp_company_id"]);
+    //NSLog(@"company_id %@", [pData getDataForKey:@"cp_company_id"]);
     [gm requestDataList:family startDate:startDate endDate:endDate UIView:baseView tag:tag];
   }
 }
@@ -1238,8 +1059,8 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
       if ([currentObject isKindOfClass:[NameCard class]]) {
         nameCard = (NameCard*)currentObject;
         nameCard.nameLabel.text = person.name;
-        nameCard.departmentLabel.text = [self isStringEmpty:person.belongsto];
-        nameCard.positionLabel.text = [self isStringEmpty:person.position];
+        nameCard.departmentLabel.text = [um chkNullString:person.belongsto];
+        nameCard.positionLabel.text = [um chkNullString:person.position];
         
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(buildNameCardWindow:)];
         tap.numberOfTapsRequired = 1;    // シングル
@@ -1287,8 +1108,8 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
       if ([currentObject isKindOfClass:[NameCard class]]) {
         nameCard = (NameCard*)currentObject;
         nameCard.nameLabel.text = person.name;
-        nameCard.departmentLabel.text = [self isStringEmpty:person.belongsto];
-        nameCard.positionLabel.text = [self isStringEmpty:person.position];
+        nameCard.departmentLabel.text = [um chkNullString:person.belongsto];
+        nameCard.positionLabel.text = [um chkNullString:person.position];
       }
       break;
     }
@@ -1391,13 +1212,13 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
       [pData setData:person.name forKey:@"PersonName"];
       [pData setData:[NSString stringWithFormat:@"%d",index] forKey:@"PersonIndex"];
       [pData setData:person.userId forKey:@"PersonUserId"];
-      nameCardCenter.departmentLabel.text = [self isStringEmpty:person.belongsto];
-      nameCardCenter.positionLabel.text = [self isStringEmpty:person.position];
+      nameCardCenter.departmentLabel.text = [um chkNullString:person.belongsto];
+      nameCardCenter.positionLabel.text = [um chkNullString:person.position];
       nameCardCenter.addressLabel.numberOfLines = 0;
       [nameCardCenter.addressLabel setLineBreakMode:UILineBreakModeWordWrap];
       
-      NSString *addressAndTel = [[[self isStringEmpty:person.address] stringByAppendingString:@"\n"]stringByAppendingString:cp.phone1];
-      //		nameCardCenter.addressLabel.text = [self isStringEmpty:person.address];
+      NSString *addressAndTel = [[[um chkNullString:person.address] stringByAppendingString:@"\n"]stringByAppendingString:cp.phone1];
+      //		nameCardCenter.addressLabel.text = [um chkNullString:person.address];
       nameCardCenter.addressLabel.text = addressAndTel;
       [nameCardCenter.addressLabel sizeToFit];
       //   nameCardCenter.telLabel.text = cp.phone1;

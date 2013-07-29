@@ -32,13 +32,10 @@
 -(void)didPushback:(int)pos;
 -(void)didPushbackStep;
 -(void)didPushHomeStep;
+-(void)didPushMemoFunction:(id)sender;
 
 @end
 
-@protocol CacheFileDelegate <NSObject>
--(void)didCacheFileUpdate;
-
-@end
 
 @interface BuildNavButtons : NSObject
 {
@@ -49,7 +46,6 @@
 
 @property(strong,nonatomic) Company *cp;
 @property (nonatomic,strong) id<ChangeFunctionDelegate>delegate;
-@property (nonatomic,strong) id<CacheFileDelegate>cacheDelegate;
 //@property (nonatomic,strong) UIView *menuPanel;
 
 -(id)initWithCompany:(Company*)cpny;

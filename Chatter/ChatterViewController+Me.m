@@ -45,7 +45,7 @@
    
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"%@",dict);
+                                  //NSLog(@"%@",dict);
                                   myInfo = [[Person alloc]init];
                                   myInfo.userId = [dict objectForKey:@"id"];
                                   myInfo.company = [dict objectForKey:@"companyName"];
@@ -84,6 +84,8 @@
                                     return;
                                   }
                                 }];
+  
+  [self getMention];
 }
 
 //自分のアカウントの写真を取得
@@ -91,7 +93,7 @@
 {
 	// トークンを取得
   NSString *access_token = [[[[SFRestAPI sharedInstance]coordinator]credentials]accessToken];
-  NSLog(@"access_token %@", access_token);
+  //NSLog(@"access_token %@", access_token);
   
   // 認証したユーザー情報にアクセス
   SFAccountManager *sm = [SFAccountManager sharedInstance];

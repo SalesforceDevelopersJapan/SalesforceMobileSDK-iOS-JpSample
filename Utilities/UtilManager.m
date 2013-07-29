@@ -78,7 +78,7 @@ static UtilManager *_instance = nil;
                                                        , NSUserDomainMask, YES);
 	NSString *documentsDirectory = [paths objectAtIndex:0];
 	NSString *fileName = [documentsDirectory stringByAppendingPathComponent:searchFileName];
- 
+  
   NSDictionary *dictionary;
   NSFileManager *fileManager = [NSFileManager defaultManager];
   [fileManager fileExistsAtPath:fileName];
@@ -128,7 +128,7 @@ static UtilManager *_instance = nil;
   
   NSString* bodyText = [[NSString alloc] initWithFormat:@"%d", count];
 	
-  NSLog(@"%d", count);
+  //NSLog(@"%d", count);
 	for ( int i= 0; i < count; i++ ) {
     if(i>=dataCount) break;
 		NSString* data = (NSString*)[searchWordList objectAtIndex:i];
@@ -211,6 +211,25 @@ static UtilManager *_instance = nil;
   }
 }
 
+// Null replace
+// 受け取ったオブジェクトがNSString以外なら空のNSStringを返す
+-(NSString*)chkNullString:(id)tgt
+{
+	NSString *cls = NSStringFromClass([tgt class]);
+	NSString *ret = @"";
+  
+  @try{
+    if ( ![cls isEqualToString:@"__NSCFString"]) {
+      return ret;
+    }
+    else {
+      return tgt;
+    }
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+    return ret;
+  }
+}
 
 //タイムゾーン変換処理
 -(NSString*)conv2Tz:(NSString*)src
@@ -252,7 +271,7 @@ static UtilManager *_instance = nil;
 -(id)resizeImage:(UIImage*)img Rect:(CGRect)rect
 {
 	if (( img.size.height > rect.size.height) || ( img.size.width > rect.size.width)) {
-		NSLog(@"%f : %f",img.size.width,img.size.height);
+		//NSLog(@"%f : %f",img.size.width,img.size.height);
 		float asp = (float)img.size.width / (float)img.size.height;
 		CGRect r = CGRectMake(0,0,0,0);
 		if ( img.size.width > img.size.height) {
@@ -295,7 +314,7 @@ static UtilManager *_instance = nil;
 //強制リサイズする。角丸め無し
 -(id)forceResizeImage:(UIImage*)img Rect:(CGRect)rect
 {
-	NSLog(@"%f : %f",img.size.width,img.size.height);
+	//NSLog(@"%f : %f",img.size.width,img.size.height);
 	UIGraphicsBeginImageContext(rect.size);
 	[img drawInRect:CGRectMake(0,0,rect.size.width,rect.size.height)];
 	img = UIGraphicsGetImageFromCurrentImageContext();
@@ -477,7 +496,10 @@ static UtilManager *_instance = nil;
 		// = で分割
 		NSArray *tmp = [str componentsSeparatedByString:@"="];
 		if([tmp count]<2) continue;
-		[pData setData:[tmp objectAtIndex:1] forKey:[tmp objectAtIndex:0]];
+    
+    // ¥nで改行
+    NSString *textVal = [[tmp objectAtIndex:1] stringByReplacingOccurrencesOfString:@"¥n" withString:@"\n"];
+		[pData setData:textVal forKey:[tmp objectAtIndex:0]];
 		//NSLog(@"str : %@ :%@", [tmp objectAtIndex:0], [tmp objectAtIndex:1]);
 	}
 	
@@ -520,7 +542,10 @@ static UtilManager *_instance = nil;
 		// = で分割
 		NSArray *tmp = [str componentsSeparatedByString:@"="];
 		if([tmp count]<2) continue;
-		[pData setData:[tmp objectAtIndex:1] forKey:[tmp objectAtIndex:0]];
+
+    // ¥nで改行
+    NSString *textVal = [[tmp objectAtIndex:1] stringByReplacingOccurrencesOfString:@"¥n" withString:@"\n"];
+		[pData setData:textVal forKey:[tmp objectAtIndex:0]];
 		//NSLog(@"str : %@ :%@", [tmp objectAtIndex:0], [tmp objectAtIndex:1]);
 	}
 }
@@ -581,7 +606,7 @@ static UtilManager *_instance = nil;
   // 明らかに関係ないものを除く
   for(NSString *file in array){
     if(![self isInclude:file cmp:@".dat"] && ![self isInclude:file cmp:@"com."]
-     && ![self isInclude:file cmp:@".com"] && ![self isInclude:file cmp:@".DS_Store"]){
+       && ![self isInclude:file cmp:@".com"] && ![self isInclude:file cmp:@".DS_Store"]){
       [marray addObject:file];
     }
   }
@@ -628,7 +653,7 @@ static UtilManager *_instance = nil;
   NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
   NSString *documentsDirectory = [paths objectAtIndex:0];
   NSString *fileName = [documentsDirectory stringByAppendingPathComponent:syncFileName];
-  NSLog(@"exit sync file : %@", fileName);
+  //NSLog(@"exit sync file : %@", fileName);
   NSFileManager *fm = [NSFileManager defaultManager];
   return [fm fileExistsAtPath:fileName];
 }
@@ -671,7 +696,7 @@ static UtilManager *_instance = nil;
   NSString *fileName = [documentsDirectory stringByAppendingPathComponent:productDateFileName];
   
   NSString *str =  [[NSString alloc] initWithContentsOfFile:fileName encoding:NSUTF8StringEncoding error:nil];
-
+  
   NSDateFormatter *outputFormatter = [[NSDateFormatter alloc] init];
   [outputFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ssZZZZ"];
   NSDate *inputDate = [outputFormatter dateFromString:str];
@@ -694,7 +719,7 @@ static UtilManager *_instance = nil;
   NSString *pathName = [documentsDirectory stringByAppendingPathComponent:dir];
   NSString *fileName = [pathName stringByAppendingPathComponent:name];
   
-  NSLog(@"exit chk file : %@", fileName);
+  //NSLog(@"exit chk file : %@", fileName);
   NSFileManager *fm = [NSFileManager defaultManager];
   return [fm fileExistsAtPath:fileName];
 }
@@ -800,7 +825,7 @@ static UtilManager *_instance = nil;
   
   NSDictionary *att = [fm attributesOfItemAtPath:fileName error:&error];
   return [att objectForKey:@"NSFileModificationDate"];
-
+  
 }
 
 // SOQLで帰った日付をNSDateにして返す
@@ -818,7 +843,7 @@ static UtilManager *_instance = nil;
 // ファイル生成日時とdateを比較 (YESの場合に更新ファイルを取得）
 - (BOOL) compareFileDate:(NSString*)dir name:(NSString*)name date:(NSString*)date
 {
-  // ファイルが存在しなければYES 
+  // ファイルが存在しなければYES
   if(![self existProductFile:dir name:name]) return YES;
   
   // ファイル生成日時
@@ -894,7 +919,7 @@ static UtilManager *_instance = nil;
   NSString *pathName = [documentsDirectory stringByAppendingPathComponent:dir];
   NSString *fileName = [pathName stringByAppendingPathComponent:movieURLFileName];
   
-  NSLog(@" loade url file : %@", fileName);
+  //NSLog(@" loade url file : %@", fileName);
   NSString *urlStr = [NSString stringWithContentsOfFile:fileName encoding:NSUTF8StringEncoding error:nil];
   
   return urlStr;
@@ -909,7 +934,7 @@ static UtilManager *_instance = nil;
   NSString *pathName = [documentsDirectory stringByAppendingPathComponent:dir];
   NSString *fileName = [pathName stringByAppendingPathComponent:movieFileName];
   
-  NSLog(@"exit chk file : %@", fileName);
+  //NSLog(@"exit chk file : %@", fileName);
   NSFileManager *fm = [NSFileManager defaultManager];
   return [fm fileExistsAtPath:fileName];
 }
@@ -943,7 +968,7 @@ static UtilManager *_instance = nil;
   NSFileManager *fm = [NSFileManager defaultManager];
   NSError *error;
   NSDictionary *att = [fm attributesOfItemAtPath:fileName error:&error];
-  NSLog(@"attr : %@", att);
+  //NSLog(@"attr : %@", att);
   return att;
 }
 
@@ -1016,6 +1041,24 @@ static UtilManager *_instance = nil;
   player.shouldAutoplay = NO;
   UIImage *image = [player thumbnailImageAtTime:10.0 timeOption:MPMovieTimeOptionNearestKeyFrame];
   return image;
+}
+
+-(NSInteger)getCurrentSecond
+{
+  NSDate *now = [NSDate date];
+  
+  NSCalendar *calendar = [NSCalendar currentCalendar];
+  NSUInteger flags;
+  NSDateComponents *comps;
+  
+  flags = NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
+  comps = [calendar components:flags fromDate:now];
+  
+  //NSInteger hour = comps.hour;
+  //NSInteger minute = comps.minute;
+  NSInteger second = comps.second;
+  //NSLog(@"%d", second);
+  return second;
 }
 
 @end

@@ -34,10 +34,11 @@
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
+  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+  if (self) {
 		_pData = [PublicDatas instance];
-		
+    um = [UtilManager sharedInstance];
+    
 		self.view.frame = CGRectMake(0,50,300,520);
 		UILabel *titleLbl = [[UILabel alloc]initWithFrame:CGRectMake(0,0,300,50)];
 		titleLbl.text = [_pData getDataForKey:@"DEFINE_ROUTE_POPOVERTITLE"];
@@ -50,8 +51,8 @@
 		_resultTable.delegate = self;
 		_resultTable.dataSource = self;
 		[self.view addSubview:_resultTable];
-    }
-    return self;
+  }
+  return self;
 }
 
 -(void)setRouteList:(NSMutableArray *)rtl
@@ -62,32 +63,20 @@
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
+  [super viewDidLoad];
 	// Do any additional setup after loading the view.
 	
 }
 
 - (void)didReceiveMemoryWarning
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+  [super didReceiveMemoryWarning];
+  // Dispose of any resources that can be recreated.
 }
 
 - (void)viewDidUnload {
 	[self setResultTable:nil];
 	[super viewDidUnload];
-}
-
--(NSString*)chkString:(id)tgt
-{
-	NSString *cls = NSStringFromClass([tgt class]);
-	NSString *ret = @"";
-	if ( ![cls isEqualToString:@"__NSCFString"]) {
-		return ret;
-	}
-	else {
-		return tgt;
-	}
 }
 
 //セル内容設定処理
@@ -98,13 +87,13 @@
 	}
 	static NSString *CellIdentifier = @"CellIdentifier";
 	
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+  UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+  if (cell == nil) {
+    cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
 		
-    }
+  }
   NSDictionary *tmp = [_routeList objectAtIndex:indexPath.row];
-	cell.textLabel.text = [self chkString:[tmp valueForKey:@"Name"]];
+	cell.textLabel.text = [um chkNullString:[tmp valueForKey:@"Name"]];
 	cell.detailTextLabel.font = [UIFont systemFontOfSize:8.0f];
 	return  cell;
 }
@@ -115,16 +104,16 @@
   NSDictionary *tmp = [_routeList objectAtIndex:indexPath.row];
   NSLog(@"%@", tmp);
 	if ([self.delegate respondsToSelector:@selector(didSelectRoute:Id:)]){
-		[self.delegate didSelectRoute:[self chkString:[tmp valueForKey:@"Name"]] Id:[tmp valueForKey:@"Id"]];
+		[self.delegate didSelectRoute:[um chkNullString:[tmp valueForKey:@"Name"]] Id:[tmp valueForKey:@"Id"]];
 	}
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
+  return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [_routeList count];
+  return [_routeList count];
 }
 
 

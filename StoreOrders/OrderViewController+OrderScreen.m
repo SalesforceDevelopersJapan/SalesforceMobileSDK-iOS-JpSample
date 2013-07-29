@@ -46,10 +46,7 @@
   
   
 	//ポップオーバー表示中は消す
-	if (![self isNull:pop]){
-		[pop dismissPopoverAnimated:YES];
-		pop = nil;
-	}
+  [pop dismissPopoverAnimated:YES];
 	
 	self.orderWindow = [[UIView alloc]initWithFrame:CGRectMake(100,80,TOTAL_WIDTH+80, 470)];
 	orderScrl = [[UIScrollView alloc]initWithFrame:CGRectMake(40,ROW_HEIGHT*3,TOTAL_WIDTH, 6*ROW_HEIGHT)];
@@ -122,7 +119,7 @@
 	r.size.height = 40;
 	[orderExec setFrame:r];
 	//	[orderExec setTitle:@"確定"forState:UIControlStateNormal];
-//	[orderExec setBackgroundImage:[UIImage imageNamed:@"OrderPlaceButton.png"] forState:UIControlStateNormal];
+  //	[orderExec setBackgroundImage:[UIImage imageNamed:@"OrderPlaceButton.png"] forState:UIControlStateNormal];
 	[orderExec addTarget:self action:@selector(exec) forControlEvents:UIControlEventTouchUpInside];
 	orderExec.opaque = YES;
 	orderExec.alpha = 0.5;
@@ -133,7 +130,7 @@
 	[orderExec.titleLabel setFont:[UIFont boldSystemFontOfSize:18.0f]];
 	CGSize size = CGSizeMake(5.0, 5.0);
 	[um makeViewRound:orderExec corners:UIRectCornerAllCorners size:&size];
-
+  
 	
 	[self.orderWindow addSubview:orderExec];
 	
@@ -397,7 +394,8 @@
 	//
 	//新規商談作成
 	//
-	
+	[self alertShow];
+
 	NSString *path = @"/services/data/v26.0/sobjects/Opportunity/";
 	
 	//開始・終了時間
@@ -418,80 +416,80 @@
 	
 	//投稿用parameter
 	NSString *title = [NSString stringWithFormat:@"%@_%@",
-					   [pData getDataForKey:@"DEFINE_STORORDER_OPPORTUNITY"],
-					   sttForObjName];
+                     [pData getDataForKey:@"DEFINE_STORORDER_OPPORTUNITY"],
+                     sttForObjName];
 	NSDictionary *param;
 	
 	param = [NSDictionary dictionaryWithObjectsAndKeys:	title,@"Name",
-			 cp.company_id,@"AccountId",
-			 @"Closed Won",@"StageName",
-			 endForRegist,@"CloseDate",
-			 nil];
+           cp.company_id,@"AccountId",
+           @"Closed Won",@"StageName",
+           endForRegist,@"CloseDate",
+           nil];
 	
 	SFRestRequest *req =[SFRestRequest requestWithMethod:SFRestMethodPOST path:path queryParams:param];
 	
 	[[SFRestAPI sharedInstance] sendRESTRequest:req
-									  failBlock:^(NSError *e) {
-										  NSLog(@"FAILWHALE with error: %@", [e description] );
-										  
-										  //エラーアラート
-										  alertView = [[UIAlertView alloc]
-													   initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_SIGN_ERROR"]
-													   message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_SIGN_MESSAGE_ERROR"]
-													   delegate:nil
-													   cancelButtonTitle:nil
-													   otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_SIGN_OK_ERROR"], nil ];
-										  
-										  [alertView show];
-									  }
-								  completeBlock:^(id jsonResponse){
-									  
-									  //
-									  //サイン登録
-									  //
-									  
-									  NSDictionary *dict = (NSDictionary *)jsonResponse;
-									  NSLog(@"%@",dict);
-									  
-									  NSString *opId = [dict objectForKey:@"id"];
-									  NSNumber *success = [dict objectForKey:@"success"];
-									  NSArray *err = [dict objectForKey:@"errors"];
-									  if ([err count] == 0 ){
-										  if ( [success intValue] == 1 ){
-											  NSString *path2 = @"/services/data/v26.0/sobjects/Attachment/";
-											  NSString *title2 = [NSString stringWithFormat:@"%@_%@.PNG",
-																  [pData getDataForKey:@"DEFINE_STORORDER_SIGN"],
-																  sttForObjName];
-											  
-											  //サインを画像化し、NSData => Base64 Encodeする
-											  UIGraphicsBeginImageContext(self.sign.frame.size);
-											  [self.sign.layer renderInContext:UIGraphicsGetCurrentContext()];
-											  UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-											  NSData *sendData = UIImagePNGRepresentation(image);
-											  NSString *encodedString = [self base64forData:sendData];
-											  NSDictionary *param2;
-											  param2 = [NSDictionary dictionaryWithObjectsAndKeys:	title2,@"Name",
-														encodedString,@"Body",
-														opId,@"ParentId",
-														nil];
-											  
-											  SFRestRequest *req2 =[SFRestRequest requestWithMethod:SFRestMethodPOST path:path2 queryParams:param2];
-											  
-											  [[SFRestAPI sharedInstance] sendRESTRequest:req2
-																				failBlock:^(NSError *e) {
-																					NSLog(@"FAILWHALE with error: %@", [e description] );
-																				}
-																			completeBlock:^(id jsonResponse){
-																				NSDictionary *dict = (NSDictionary *)jsonResponse;
-																				NSLog(@"%@",dict);
-																			}
-											   ];
-											  
-											  //発注内容を商談に登録
-											  [self setOpportunityItem:opId];
-										  }
-									  }
-								  }
+                                    failBlock:^(NSError *e) {
+                                      NSLog(@"FAILWHALE with error: %@", [e description] );
+                                      
+                                      //エラーアラート
+                                      alertView = [[UIAlertView alloc]
+                                                   initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_SIGN_ERROR"]
+                                                   message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_SIGN_MESSAGE_ERROR"]
+                                                   delegate:nil
+                                                   cancelButtonTitle:nil
+                                                   otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_SIGN_OK_ERROR"], nil ];
+                                      
+                                      [alertView show];
+                                    }
+                                completeBlock:^(id jsonResponse){
+                                  
+                                  //
+                                  //サイン登録
+                                  //
+                                  
+                                  NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                  //NSLog(@"%@",dict);
+                                  
+                                  NSString *opId = [dict objectForKey:@"id"];
+                                  NSNumber *success = [dict objectForKey:@"success"];
+                                  NSArray *err = [dict objectForKey:@"errors"];
+                                  if ([err count] == 0 ){
+                                    if ( [success intValue] == 1 ){
+                                      NSString *path2 = @"/services/data/v26.0/sobjects/Attachment/";
+                                      NSString *title2 = [NSString stringWithFormat:@"%@_%@.PNG",
+                                                          [pData getDataForKey:@"DEFINE_STORORDER_SIGN"],
+                                                          sttForObjName];
+                                      
+                                      //サインを画像化し、NSData => Base64 Encodeする
+                                      UIGraphicsBeginImageContext(self.sign.frame.size);
+                                      [self.sign.layer renderInContext:UIGraphicsGetCurrentContext()];
+                                      UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+                                      NSData *sendData = UIImagePNGRepresentation(image);
+                                      NSString *encodedString = [self base64forData:sendData];
+                                      NSDictionary *param2;
+                                      param2 = [NSDictionary dictionaryWithObjectsAndKeys:	title2,@"Name",
+                                                encodedString,@"Body",
+                                                opId,@"ParentId",
+                                                nil];
+                                      
+                                      SFRestRequest *req2 =[SFRestRequest requestWithMethod:SFRestMethodPOST path:path2 queryParams:param2];
+                                      
+                                      [[SFRestAPI sharedInstance] sendRESTRequest:req2
+                                                                        failBlock:^(NSError *e) {
+                                                                          NSLog(@"FAILWHALE with error: %@", [e description] );
+                                                                        }
+                                                                    completeBlock:^(id jsonResponse){
+                                                                      //NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                                                      //NSLog(@"%@",dict);
+                                                                    }
+                                       ];
+                                      
+                                      //発注内容を商談に登録
+                                      [self setOpportunityItem:opId];
+                                    }
+                                  }
+                                }
 	 ];
 }
 
@@ -532,7 +530,8 @@
 	
 	//キー（商品ID)を取得
 	NSArray *keys = [orderArray allKeys];
-	
+	orderNum = [orderArray count];
+
 	for ( NSString *pId in keys ) {
 		
 		//製品単位でオーダー取得
@@ -548,30 +547,39 @@
 		NSDictionary *param;
 		
 		param = [NSDictionary dictionaryWithObjectsAndKeys:	opId,@"OpportunityId",
-				 od.priceBookEntryId,@"PriceBookEntryId",
-				 [NSString stringWithFormat:@"%d",od.quanty],@"Quantity",
-				 [NSString stringWithFormat:@"%d",od.price],@"UnitPrice",
-				 nil];
+             od.priceBookEntryId,@"PriceBookEntryId",
+             [NSString stringWithFormat:@"%d",od.quanty],@"Quantity",
+             [NSString stringWithFormat:@"%d",od.price],@"UnitPrice",
+             nil];
 		
 		SFRestRequest *req =[SFRestRequest requestWithMethod:SFRestMethodPOST path:path queryParams:param];
 		
 		[[SFRestAPI sharedInstance] sendRESTRequest:req
-										  failBlock:^(NSError *e) {
-											  NSLog(@"FAILWHALE with error: %@", [e description] );
-											  
-											  //エラーアラート
-											  alertView = [[UIAlertView alloc]
-														   initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ORDER_ERROR"]
-														   message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ORDER_MESSAGE_ERROR"]
-														   delegate:nil
-														   cancelButtonTitle:nil
-														   otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ORDER_OK_ERROR"], nil ];
-											  [alertView show];
-										  }
-									  completeBlock:^(id jsonResponse){
-										  NSDictionary *dict = (NSDictionary *)jsonResponse;
-										  NSLog(@"%@",dict);
-									  }
+                                      failBlock:^(NSError *e) {
+                                        NSLog(@"FAILWHALE with error: %@", [e description] );
+                                        
+                                        // アラートを閉じる
+                                        if(alertView.visible) {
+                                          [alertView dismissWithClickedButtonIndex:0 animated:NO];
+                                        }
+                                        
+                                        //エラーアラート
+                                        alertView = [[UIAlertView alloc]
+                                                     initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ORDER_ERROR"]
+                                                     message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ORDER_MESSAGE_ERROR"]
+                                                     delegate:nil
+                                                     cancelButtonTitle:nil
+                                                     otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ORDER_OK_ERROR"], nil ];
+                                        [alertView show];
+                                      }
+                                  completeBlock:^(id jsonResponse){
+                                    //NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                    //NSLog(@"%@",dict);
+                                    
+                                    // 在庫数の更新
+                                    [self minusOpportunityItem:pId orderInfo:od OpportunityId:opId];
+                                    
+                                  }
 		 ];
 	}
 	
@@ -582,7 +590,7 @@
 		NSArray *keys = [orderArray allKeys];
 		for ( NSString *key in keys ){
 			od = [orderArray objectForKey:key];
-			if ( [self isNull:[saledArray objectForKey:key]] ) {
+			if ( ![um chkString:[saledArray objectForKey:key]] ) {
 				subVal = [[NSNumber alloc]initWithInt:od.quanty];
 			}
 			else {
@@ -601,30 +609,251 @@
 	//ポップオーバーを消す
 	[pop dismissPopoverAnimated:YES];
 	
+  
 	//発注数表示を0に戻す
 	for ( int i = 0; i < [productList count]; i++){
 		UIButton *btn = (UIButton*)[self searchBtn:i];
-//		[btn setTitle:[NSString stringWithFormat:@"%d箱",0] forState:UIControlStateNormal];
+    //		[btn setTitle:[NSString stringWithFormat:@"%d箱",0] forState:UIControlStateNormal];
 		[btn setTitle:[NSString stringWithFormat:[pData getDataForKey:@"DEFINE_STORORDER_POP_UNIT_TITLE"],0] forState:UIControlStateNormal];
 	}
 	
 	//オーダー画面を閉じる
 	[self orderClosePushed];
-	
+	/*
 	cmpltAlert = [[UIAlertView alloc]
-				  initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_COMPLETE"]
-				  message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_COMPLETE_MESSAGE"]
-				  delegate:self
-				  cancelButtonTitle:nil
-				  otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_COMPLETE_OK"], nil ];
+                initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_COMPLETE"]
+                message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_COMPLETE_MESSAGE"]
+                delegate:self
+                cancelButtonTitle:nil
+                otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_COMPLETE_OK"], nil ];
 	[cmpltAlert show];
-	
+	*/
 }
+
+// 在庫マスターの在庫を引き当て
+-(void)minusOpportunityItem:(NSString*)pId orderInfo:(OrderInfo*)od OpportunityId:(NSString*)opId
+{
+  orderCompNum = 0;
+  
+  // 商品情報を取得
+  Product *pd;
+  for ( int i = 0; i < [productList count]; i++ ){
+    Product *tempPd = [productList objectAtIndex:i];
+    if ( [tempPd.productId isEqualToString:pId]){
+      pd = tempPd;
+      break;
+    }
+  }
+  
+	NSString *path = @"/services/data/v26.0/sobjects/stock__c/";
+	
+	//時間
+	NSDate *stJPN= [NSDate dateWithTimeIntervalSinceNow:0];
+	
+	//登録用フォーマット
+	NSDateFormatter *fmt1 = [[NSDateFormatter alloc] init];
+	[fmt1 setDateFormat:@"yyyy-MM-dd"];
+	
+	
+	//日付を文字列化
+	NSString *sttForObjName = [fmt1 stringFromDate:stJPN];
+	
+  // 認証したユーザー情報にアクセス
+  SFAccountManager *sm = [SFAccountManager sharedInstance];
+  
+	//投稿用parameter
+	NSDictionary *param;
+	
+	param = [NSDictionary dictionaryWithObjectsAndKeys:sm.idData.userId, @"OwnerId",
+           //sm.idData.userId, @"CreatedById",
+           //sm.idData.userId, @"LastModifiedById",
+           pd.productId,@"product__c",
+           @"出庫",@"TransactionType__c",
+           opId,@"Opportunity__c",
+           sttForObjName,@"date__c",
+           [[NSNumber alloc] initWithInteger:od.quanty], @"quantity__c",
+           nil];
+	
+	SFRestRequest *req =[SFRestRequest requestWithMethod:SFRestMethodPOST path:path queryParams:param];
+	
+	[[SFRestAPI sharedInstance] sendRESTRequest:req
+                                    failBlock:^(NSError *e) {
+                                      NSLog(@"FAILWHALE with error: %@", [e description] );
+                                      
+                                      // アラートを閉じる
+                                      if(alertView.visible) {
+                                        [alertView dismissWithClickedButtonIndex:0 animated:NO];
+                                      }
+                                      
+                                      //エラーアラート
+                                      UIAlertView *ealertView = [[UIAlertView alloc]
+                                                   initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_NUM_ERROR"]
+                                                   message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_NUM_MESSAGE_ERROR"]
+                                                   delegate:nil
+                                                   cancelButtonTitle:nil
+                                                   otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_NUM_OK_ERROR"], nil ];
+                                      
+                                      [ealertView show];
+                                      orderCompNum++;
+                                    }
+                                completeBlock:^(id jsonResponse){
+                                  
+                                  //
+                                  //ok
+                                  //
+                                  
+                                  NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                  NSLog(@"%@",dict);
+                                  
+                                  orderCompNum++;
+                                  if(orderNum == orderCompNum){
+                                    // アラートを閉じる
+                                    if(alertView.visible) {
+                                      [alertView dismissWithClickedButtonIndex:0 animated:NO];
+                                    }
+                                    cmpltAlert = [[UIAlertView alloc]
+                                                  initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_COMPLETE"]
+                                                  message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_COMPLETE_MESSAGE"]
+                                                  delegate:self
+                                                  cancelButtonTitle:nil
+                                                  otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_COMPLETE_OK"], nil ];
+                                    [cmpltAlert show];
+                                  }
+                                }
+	 ];
+
+}
+
+/*
+// 在庫マスターの在庫を引き当て
+-(void)minusOpportunityItem:(NSString*)pId orderInfo:(OrderInfo*)od
+{
+  // 商品情報を取得
+  Product *pd;
+  for ( int i = 0; i < [productList count]; i++ ){
+    Product *tempPd = [productList objectAtIndex:i];
+    if ( [tempPd.productId isEqualToString:pId]){
+      pd = tempPd;
+      break;
+    }
+  }
+  
+  // 最新の在庫数
+  int _badgeVal = [pd.badgeValue intValue];
+  
+  // 注文した数を引く
+  int newq = _badgeVal-od.quanty;
+  
+  NSString *qVal = [NSString stringWithFormat:@"%d", newq];
+  
+  // 該当商品のstock__cレコード更新
+  //投稿用parameter
+  NSDictionary *messageSegments = [[NSDictionary alloc]initWithObjectsAndKeys:qVal, @"quantity__c",nil];
+  
+  //リクエスト作成
+  NSString *url = [NSString stringWithFormat:@"/services/data/v26.0/sobjects/stock__c/%@", pd.stock__c_id];
+  SFRestRequest *req =[SFRestRequest requestWithMethod:SFRestMethodPATCH path:url queryParams:messageSegments];
+  
+  //POST実行
+  [[SFRestAPI sharedInstance] sendRESTRequest:req
+                                    failBlock:^(NSError *e) {
+                                      NSLog(@"FAILWHALE with error: %@", [e description] );
+                                    }
+                                completeBlock:^(id jsonResponse){
+                                  //NSDictionary  *dic = (NSDictionary *)jsonResponse;
+                                  //NSLog(@"%d : dic::%@",__LINE__,dic);
+                                }
+   ];
+  
+}
+ */
+
 //オーダー完了アラートのボタン押下
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
 	//グラフを再表示
 	[self dispGraphs:currentPrd];
+  [carousel reloadData];
+  
+  // current index以外のバッヂを更新
+  if(orderNum >1)[self getProductListBadge:selectedFamily];
+}
+
+
+//商品カテゴリが(family)の商品のバッヂ数更新
+-(void)getProductListBadge:(NSString*)family
+{
+	NSString *query = [NSString stringWithFormat:@"SELECT Id,ProductCode,Name,Family,Description,URL__c ,order__c, StockCount__c FROM product2 WHERE IsActive=true AND Family = '%@'  ORDER BY order__c",family];
+	SFRestRequest *request = [[SFRestAPI sharedInstance] requestForQuery:query];
+	[[SFRestAPI sharedInstance] sendRESTRequest:request
+                                    failBlock:^(NSError *e) {
+                                      NSLog(@"FAILWHALE with error: %@", [e description] );
+                                      
+                                      //エラーアラート
+                                      alertView = [[UIAlertView alloc]
+                                                   initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEM_ERROR"]
+                                                   message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEM_MESSAGE_ERROR"]
+                                                   delegate:nil
+                                                   cancelButtonTitle:nil
+                                                   otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEM_OK_ERROR"], nil ];
+                                      [alertView show];
+                                    }
+                                completeBlock:^(id jsonResponse){
+                                  NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                  //NSLog(@"%d : dic : %@",__LINE__,dict);
+                                  
+                                  // 本日日付
+                                  NSDateFormatter* fmt= [[NSDateFormatter alloc] init];
+                                  [fmt setDateFormat:@"YYYY-MM-dd"];
+                                  [fmt setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"JST"]];
+                                  NSString *dateStr = [fmt stringFromDate:[NSDate date]];
+                                  NSDate *tmpDate = [fmt dateFromString:dateStr];
+                                  
+                                  NSLog(@"%d dateStr %@", __LINE__, dateStr);
+                                  NSLog(@"%d tmpDate %@", __LINE__, tmpDate);
+                                  
+                                  NSArray *records= [dict objectForKey:@"records"];
+                                  for ( int i = 0; i < [records count]; i++ ){
+                                    NSDictionary *rec = [records objectAtIndex:i];
+                                    
+                                    NSString *pId = [um chkNullString:[rec objectForKey:@"Id"]];
+                                    NSNumber *pStockCount = [rec objectForKey:@"StockCount__c"];
+                                    
+                                    // 商品情報を取得
+                                    Product *pd;
+                                    for ( int i = 0; i < [productList count]; i++ ){
+                                      Product *tempPd = [productList objectAtIndex:i];
+                                      if ( [tempPd.productId isEqualToString:pId]){
+                                        pd = tempPd;
+                                        break;
+                                      }
+                                    }
+                                    
+                                    @try {
+                                      pd.StockCount__c = [pStockCount intValue];
+                                      pd.badgeValue = [NSString stringWithFormat:@"%@", pStockCount];
+                                    }
+                                    @catch (NSException *exception) {
+                                      pd.StockCount__c = 0;
+                                      pd.badgeValue = @"0";
+                                    }
+                                    
+                                    /*
+                                    // バッヂ数を変更
+                                    for ( int i = 0; i < [productList count]; i++ ){
+                                      for(UIView *view in [[carousel itemViewAtIndex:i] subviews]){
+                                        if ([view isKindOfClass:[ItemBadge class]]) {
+                                          ItemBadge *iv = (ItemBadge*)view;
+                                          iv.textLabel.text = [NSString stringWithFormat:@"%@", pd.badgeValue];
+                                          NSLog(@"%d pd.badgeValue %@", __LINE__, pd.badgeValue);
+                                        }
+                                      }
+                                    }
+                                     */
+                                  }
+                                  
+                                }
+	 ];
 }
 
 @end

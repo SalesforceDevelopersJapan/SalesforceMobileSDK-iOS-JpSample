@@ -49,9 +49,9 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
-	
+  
 	um = [UtilManager sharedInstance];
-
+  
 	//共有データのインスタンス取得
 	pData = [PublicDatas instance];
  	
@@ -62,19 +62,19 @@
                                                   forBarMetrics:UIBarMetricsDefault];
 		self.navigationController.navigationBar.tintColor = [UIColor grayColor];
 		_orderHeader.backgroundColor = [UIColor grayColor];
-
+    
 		UIView *btnView = [[UIView alloc]initWithFrame:CGRectMake(0,0, 100, 30)];
 		btnView.backgroundColor = [UIColor grayColor];
 		btnImg = [um convViewToImage:btnView];
-
+    
 	}
 	else if ( [((NSString*)iData) isEqualToString:@"black"] ) {
 		[self.navigationController.navigationBar setBackgroundImage:nil
                                                   forBarMetrics:UIBarMetricsDefault];
 		self.navigationController.navigationBar.tintColor = [UIColor blackColor];
 		_orderHeader.backgroundColor = [UIColor blackColor];
-
-	    UIView *btnView = [[UIView alloc]initWithFrame:CGRectMake(0,0, 100, 30)];
+    
+    UIView *btnView = [[UIView alloc]initWithFrame:CGRectMake(0,0, 100, 30)];
 		btnView.backgroundColor = [UIColor blackColor];
 		btnImg = [um convViewToImage:btnView];
 	}
@@ -92,7 +92,7 @@
       //[orderHeader addSubview:im];
 		}
 	}
-
+  
 	//ナビバータイトル
 	self.title = [pData getDataForKey:@"DEFINE_STORORDER_TITLE"];
 	titleLabel = [[UILabel alloc]initWithFrame:CGRectZero];
@@ -130,21 +130,20 @@
 	//画面（機能）切り替えボタン
 	btnBuilder = [[BuildNavButtons alloc]initWithCompany:cp];
 	btnBuilder.delegate = self;
-  btnBuilder.cacheDelegate = self;
-//	metricsBtn = [btnBuilder buildMetricsBtn];
-//	mapBtn = [btnBuilder buildMapBtn];
-//	ordersBtn = [btnBuilder buildOrdersBtn];
-//	chatterBtn = [btnBuilder buildChatterBtn];
+  //	metricsBtn = [btnBuilder buildMetricsBtn];
+  //	mapBtn = [btnBuilder buildMapBtn];
+  //	ordersBtn = [btnBuilder buildOrdersBtn];
+  //	chatterBtn = [btnBuilder buildChatterBtn];
 	metricsBtn = [btnBuilder buildMenuBtn];
 	
-//	UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+  //	UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 	toolbar.items = [NSArray arrayWithObjects:
-					 [[UIBarButtonItem alloc]initWithCustomView:metricsBtn],
-/*					 space,
-					 [[UIBarButtonItem alloc]initWithCustomView:mapBtn],
-					 [[UIBarButtonItem alloc]initWithCustomView:ordersBtn],
-					 [[UIBarButtonItem alloc]initWithCustomView:chatterBtn],*/
-					 nil];
+                   [[UIBarButtonItem alloc]initWithCustomView:metricsBtn],
+                   /*					 space,
+                    [[UIBarButtonItem alloc]initWithCustomView:mapBtn],
+                    [[UIBarButtonItem alloc]initWithCustomView:ordersBtn],
+                    [[UIBarButtonItem alloc]initWithCustomView:chatterBtn],*/
+                   nil];
 	
 	//ツールバーをナビバーに設置
 	self.navigationItem.rightBarButtonItem = toolbarBarButtonItem;
@@ -170,10 +169,6 @@
 	rect.origin.x = 0;
 	rect.origin.y = 5;
 	rect.size.height = 240;
-	scrl = [[UIScrollView alloc]initWithFrame:rect];
-	[scrl setUserInteractionEnabled:YES];
-	//scrl.contentSize = CGSizeMake(1900, 180);
-	//[_orderView addSubview:scrl];
 	
   // カバーフロー
   carousel = [[iCarousel alloc]initWithFrame:rect];
@@ -202,20 +197,20 @@
 	_companyProfile.delegate = self;
 	
 	salesGraph = [[LineGrapth alloc]initWithFrame:CGRectMake(30, 222, 600, 220)];
-	[salesGraph setBackgroundColor:[UIColor whiteColor]];
+	[salesGraph setBackgroundColor:[UIColor clearColor]];
 	salesGraph.graphSizeX = 500;
 	salesGraph.graphSizeY = 170;
   
 	stockGraph = [[BarGraph alloc]initWithFrame:CGRectMake(660, 222, 300, 220)];
-	[stockGraph setBackgroundColor:[UIColor whiteColor]];
+	[stockGraph setBackgroundColor:[UIColor clearColor]];
 	stockGraph.graphSizeX = 220;
 	stockGraph.graphSizeY = 170;
   
 	//グラフ表示の対象商品名表示用ラベル
-	productLabel = [[UILabel alloc]initWithFrame:CGRectMake(10,230, 1000, 30)];
+	productLabel = [[UILabel alloc]initWithFrame:CGRectMake(10,220, 1000, 30)];
 	[productLabel setTextAlignment:NSTextAlignmentLeft];
 	[productLabel setFont:[UIFont boldSystemFontOfSize:16.0f]];
-	[productLabel setBackgroundColor:[UIColor whiteColor]];
+	[productLabel setBackgroundColor:[UIColor clearColor]];
 	[productLabel setTextColor:[UIColor blackColor]];
 	
 	//PDFリストを取得
@@ -228,7 +223,7 @@
 	[_histroyBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
 	[_histroyBtn setBackgroundColor:[UIColor colorWithPatternImage:btnImg]];
 	[_histroyBtn.titleLabel setFont:[UIFont boldSystemFontOfSize:18.0f]];
-
+  
 	[_orderBtn setTitle:[pData getDataForKey:@"DEFINE_STORORDER_ORDERCONFIRM_BTN_TITLE"] forState:UIControlStateNormal];
 	[_orderBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
 	[_orderBtn setBackgroundColor:[UIColor colorWithPatternImage:btnImg]];
@@ -241,7 +236,7 @@
 	[um makeViewRound:_orderView corners:UIRectCornerBottomLeft|UIRectCornerBottomRight size:&size];
 	[um makeViewRound:_histroyBtn corners:UIRectCornerAllCorners size:&size];
 	[um makeViewRound:_orderBtn corners:UIRectCornerAllCorners size:&size];
-
+  
   // 仮画像
   clearImgView = [[UIView alloc]initWithFrame:CGRectMake(0,0, 200, 200)];
   clearImgView.backgroundColor = [UIColor colorWithRed:0.00 green:0.00 blue:.00 alpha:0.0];
@@ -257,6 +252,53 @@
 	if ( ![tgt isEqualToString:myClass]){
 		[self.navigationController pushViewController:func animated:NO];
 	}
+}
+
+// 手書きメモ
+-(void)didPushMemoFunction:(id)sender
+{
+  
+  metricsBtn.enabled = NO;
+  self.navigationItem.leftBarButtonItem.enabled = NO;
+  
+  memoVC = [[MemoViewController alloc] initWithNibName:@"MemoViewController" bundle:[NSBundle mainBundle]company:cp];
+  memoVC.delegate = self;
+  [memoVC.view setClipsToBounds:YES];
+  
+  memoVC.view.frame = CGRectMake(0, 0, 200, 100);
+  memoVC.view.center = self.view.center;
+  memoVC.view.alpha = 1.0;
+  
+  [self addChildViewController:memoVC];
+  
+  
+  // フリップ移動前処理
+  [UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDuration:0.01];
+  [self.view addSubview:memoVC.view];
+  [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:memoVC.view cache:YES];
+  [UIView setAnimationDidStopSelector:@selector(dispMemoViewAppear:finished:context:)];
+	[UIView commitAnimations];
+}
+
+- (void)dispMemoViewAppear:(NSString *)animationID finished:(NSNumber *) finished context:(void *) context
+{
+  [UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDuration:0.5];
+  memoVC.view.frame = self.view.frame;
+  memoVC.view.alpha = 1.0;
+  [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:memoVC.view cache:YES];
+	[UIView commitAnimations];
+}
+
+// close時のdelegate
+-(void)didClose:(id)sender
+{
+  // ボタンを戻す
+  metricsBtn.enabled = YES;
+  self.navigationItem.leftBarButtonItem.enabled = YES;
 }
 
 
@@ -284,7 +326,7 @@
 	if ([familyList count] == 0 ) {
 		return;
 	}
-	if (![self isNull:pop]){
+	if (pop.popoverVisible){
 		return;
 	}
 	
@@ -308,9 +350,6 @@
 {
 	
 	[pop dismissPopoverAnimated:YES];
-	if (![self isNull:pop]){
-		pop = nil;
-	}
 	
 	
 	if ( tag == ENUM_FAMILYSELECT ) {
@@ -321,7 +360,7 @@
 		}
     
 		NSArray *keyList = [familyList allKeys];
-		if ( ![self isNull:[keyList objectAtIndex:index]] ){
+		if ( [um chkString:[keyList objectAtIndex:index]] ){
 			
 			//ファミリー選択
 			[self selectFamily:[keyList objectAtIndex:index]];
@@ -341,14 +380,13 @@
 		[self changeSortNumber:pd.productId number:selectedItemOder];
 		
 		//ローディングアラート表示
-    NSLog(@"loading %d", __LINE__);
 		[self alertShow];
     
 		[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2.0]];
     
 		//表示商品クリア
 		dispProductCount = 0;
-		[self clearSubView:scrl];
+		//[self clearSubView:scrl];
 		
 		//商品リスト取得
 		[self getProductList:selectedFamily];
@@ -374,7 +412,7 @@
 	
 	//表示商品クリア
 	dispProductCount = 0;
-	[self clearSubView:scrl];
+	//[self clearSubView:scrl];
 	
 	//商品リスト取得
 	[self getProductList:selectedFamily];
@@ -384,7 +422,10 @@
 //商品カテゴリが(family)の商品を検索する
 -(void)getProductList:(NSString*)family
 {
-	NSString *query = [NSString stringWithFormat:@"SELECT Id,ProductCode,Name,Family,Description,URL__c ,order__c FROM product2 WHERE IsActive=true AND Family = '%@'  ORDER BY order__c",family];
+  [self alertShow];
+  
+	NSString *query = [NSString stringWithFormat:@"SELECT Id,ProductCode,Name,Family,Description,URL__c ,order__c, StockCount__c FROM product2 WHERE IsActive=true AND Family = '%@'  ORDER BY order__c",family];
+	//NSString *query = [NSString stringWithFormat:@"SELECT Id,ProductCode,Name,Family,Description,URL__c ,order__c FROM product2 WHERE IsActive=true AND Family = '%@'  ORDER BY order__c",family];
 	SFRestRequest *request = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] sendRESTRequest:request
                                     failBlock:^(NSError *e) {
@@ -403,25 +444,57 @@
                                   productList = [NSMutableArray array];
                                   [carousel reloadData];
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"%@",dict);
+                                  //NSLog(@"%d : dic : %@",__LINE__,dict);
+                                  
+                                  // 本日日付
+                                  NSDateFormatter* fmt= [[NSDateFormatter alloc] init];
+                                  [fmt setDateFormat:@"YYYY-MM-dd"];
+                                  [fmt setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"JST"]];
+                                  NSString *dateStr = [fmt stringFromDate:[NSDate date]];
+                                  NSDate *tmpDate = [fmt dateFromString:dateStr];
+                                  
+                                  NSLog(@"%d dateStr %@", __LINE__, dateStr);
+                                  NSLog(@"%d tmpDate %@", __LINE__, tmpDate);
+                                  
                                   NSArray *records= [dict objectForKey:@"records"];
                                   for ( int i = 0; i < [records count]; i++ ){
                                     NSDictionary *rec = [records objectAtIndex:i];
                                     
                                     Product *pd = [[Product alloc]init];
-                                    NSString *pId = [rec objectForKey:@"Id"];
-                                    NSString *pDesc = [rec objectForKey:@"Description"];
-                                    NSString *pName = [rec objectForKey:@"Name"];
-                                    NSString *pFamily = [rec objectForKey:@"Family"];
-                                    NSString *pMovie = [rec objectForKey:@"URL__c"];
+                                    NSString *pId = [um chkNullString:[rec objectForKey:@"Id"]];
+                                    NSString *pDesc = [um chkNullString:[rec objectForKey:@"Description"]];
+                                    NSString *pName = [um chkNullString:[rec objectForKey:@"Name"]];
+                                    NSString *pFamily = [um chkNullString:[rec objectForKey:@"Family"]];
+                                    NSString *pMovie = [um chkNullString:[rec objectForKey:@"URL__c"]];
                                     NSNumber *pSortOrder = [rec objectForKey:@"order__c"];
+                                    NSNumber *pStockCount = [rec objectForKey:@"StockCount__c"];
                                     
                                     pd.productId = pId;
                                     pd.productName = pName;
                                     pd.productFamily = pFamily;
                                     pd.description = pDesc;
                                     pd.movieURL = pMovie;
-                                    pd.sortOrder = [pSortOrder intValue];
+                                    @try {
+                                      pd.sortOrder = [pSortOrder intValue];
+                                    }
+                                    @catch (NSException *exception) {
+                                      pd.sortOrder = 10000;
+                                    }
+                                    @try {
+                                      pd.StockCount__c = [pStockCount intValue];
+                                      pd.badgeValue = [NSString stringWithFormat:@"%@", pStockCount];
+                                    }
+                                    @catch (NSException *exception) {
+                                      pd.StockCount__c = 0;
+                                      pd.badgeValue = @"0";
+                                    }
+                                    
+                                    // 在庫と日付本日分
+                                    pd.stockArray = [NSMutableArray array];
+                                    pd.stockDateArray = [NSMutableArray array];
+                                    [pd.stockArray addObject:[NSNumber numberWithInt:[pd.badgeValue intValue]]];
+                                    [pd.stockDateArray addObject:tmpDate];
+                                    
                                     pd.index = i;
                                     
                                     //商品リストに追加
@@ -457,7 +530,7 @@
                                                                     }
                                                                 completeBlock:^(id jsonResponse){
                                                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                                                  NSLog(@"%@",dict);
+                                                                  //NSLog(@"%@",dict);
                                                                   NSArray *records= [dict objectForKey:@"records"];
                                                                   for ( int i = 0; i < [ records count]; i++ ) {
                                                                     NSDictionary *rec = [records objectAtIndex:i];
@@ -474,31 +547,107 @@
                                                                       }
                                                                     }
                                                                   }
+                                                                  NSLog(@"%d log", __LINE__);
                                                                   //商品画像取得
                                                                   [self getProductsImage];
                                                                   
+                                                                  NSLog(@"%d log", __LINE__);
                                                                   //在庫・入荷予定を取得
-                                                                  [self getProductStocks:productList];
+                                                                  //[self getProductStocks:productList];
+                                                                  [self getFutureStocks:productList];
                                                                 }
                                    ];
                                   
                                   //最初の商品のグラフを表示
                                   currentPrd = [productList objectAtIndex:0];
                                   [self dispGraphs:currentPrd];
-                                  if(alertView.visible) {
-                                    [alertView dismissWithClickedButtonIndex:0 animated:NO];
-                                  }
+                                  //if(alertView.visible) {
+                                  //  [alertView dismissWithClickedButtonIndex:0 animated:NO];
+                                  //}
                                 }
 	 ];
 }
 
+// 現在の在庫数＝バッヂ数の更新
+-(void)getProductInfo:(Product*)prd
+{
+  //過去の在庫数取得
+	NSString *query = [NSString stringWithFormat:@"SELECT Id,ProductCode,Name,Family,Description,URL__c ,order__c, StockCount__c FROM product2 WHERE IsActive=true AND Id = '%@'  ORDER BY order__c",prd.productId];
+	SFRestRequest *request = [[SFRestAPI sharedInstance] requestForQuery:query];
+	[[SFRestAPI sharedInstance] sendRESTRequest:request
+                                    failBlock:^(NSError *e) {
+                                      NSLog(@"FAILWHALE with error: %@", [e description] );
+                                      
+                                    }
+                                completeBlock:^(id jsonResponse){
+                                  NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                  //NSLog(@"%d %@", __LINE__, dict);
+                                  
+                                  NSNumber *recCount = [dict objectForKey:@"totalSize"];
+                                  
+                                  //取得レコードがあれば、先頭の一件（最新在庫）のみを読んで在庫数確定
+                                  if ( [recCount intValue] ){
+                                    NSArray *records = [dict objectForKey:@"records"];
+                                    NSDictionary *rec = [records objectAtIndex:0];
+                                    NSNumber *quantity = [rec objectForKey:@"StockCount__c"];
+                                    
+                                    //在庫数
+                                    prd.badgeValue = [NSString stringWithFormat:@"%@", quantity];
+                                    //prd.StockCount__c = [quantity intValue];
+                                    NSLog(@"%d pd.badgeValue %@", __LINE__, prd.badgeValue);
+                                    
+                                    // 本日日付
+                                    NSDateFormatter* fmt= [[NSDateFormatter alloc] init];
+                                    [fmt setDateFormat:@"YYYY-MM-dd"];
+                                    [fmt setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"JST"]];
+                                    NSString *dateStr = [fmt stringFromDate:[NSDate date]];
+                                    NSDate *tmpDate = [fmt dateFromString:dateStr];
+                                    
+                                    NSLog(@"%d dateStr %@", __LINE__, dateStr);
+                                    NSLog(@"%d tmpDate %@", __LINE__, tmpDate);
+                                    
+                                    // 在庫と日付本日分
+                                    prd.stockArray = [NSMutableArray array];
+                                    prd.stockDateArray = [NSMutableArray array];
+                                    [prd.stockArray addObject:[NSNumber numberWithInt:[prd.badgeValue intValue]]];
+                                    [prd.stockDateArray addObject:tmpDate];
+                                    
+                                    NSLog(@"%d pd.stockDateArray : %@", __LINE__, prd.stockDateArray);
+                                    NSLog(@"%d pd.stockArray : %@", __LINE__, prd.stockArray);
+                                    /*
+                                     // バッヂ数を変更
+                                     for(UIView *view in [carousel.currentItemView subviews]){
+                                     if ([view isKindOfClass:[ItemBadge class]]) {
+                                     ItemBadge *iv = (ItemBadge*)view;
+                                     iv.textLabel.text = [NSString stringWithFormat:@"%@", prd.badgeValue];
+                                     //NSLog(@"%d pd.badgeValue %@", __LINE__, pd.badgeValue);
+                                     }
+                                     }*/
+                                    
+                                    [self getFutureStockAPI:prd drawGraph:YES];
+                                  }
+                                }
+   ];
+  
+}
 
-//商品の在庫、入荷予定日を取得
+//商品の在庫、入荷予定日を表示
 -(void)getProductStock:(Product*)pd  drawGraph:(BOOL)draw
 {
-	
+  NSLog(@"%d getProductStock", __LINE__);
+  
+  [self getFutureStock:pd drawGraph:draw];
+  if(alertView.visible) {
+    [alertView dismissWithClickedButtonIndex:0 animated:NO];
+  }
+}
+
+// 利用停止
+//商品の在庫、入荷予定日をAPIを利用して取得
+-(void)getProductStockAPI:(Product*)pd  drawGraph:(BOOL)draw
+{
 	//過去の在庫数取得
-	NSString *query = [NSString stringWithFormat:@"SELECT Id, Name ,product__c,date__c,quantity__c FROM stock__c  WHERE product__c ='%@' AND date__c <= N_DAYS_AGO:0 ORDER BY date__c DESC",pd.productId];
+	NSString *query = [NSString stringWithFormat:@"SELECT SystemModstamp, Id, CreatedDate, CreatedById, IsDeleted, Product__c, Name, StockCount__c, OwnerId, date__c, LastModifiedDate, LastModifiedById FROM StockSnapShot__c  WHERE Product__c ='%@' AND date__c <= N_DAYS_AGO:0 ORDER BY date__c DESC",pd.productId];
 	SFRestRequest *request = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] sendRESTRequest:request
                                     failBlock:^(NSError *e) {
@@ -516,7 +665,7 @@
                                     }
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"482 %@",dict);
+                                  //NSLog(@"%d %@", __LINE__, dict);
                                   
                                   NSNumber *recCount = [dict objectForKey:@"totalSize"];
                                   
@@ -525,7 +674,7 @@
                                     NSArray *records = [dict objectForKey:@"records"];
                                     NSDictionary *rec = [records objectAtIndex:0];
                                     NSString *date = [rec objectForKey:@"date__c"];
-                                    NSNumber *quantity = [rec objectForKey:@"quantity__c"];
+                                    NSNumber *quantity = [rec objectForKey:@"StockCount__c"];
                                     
                                     pd.stockArray = [NSMutableArray array];
                                     pd.stockDateArray = [NSMutableArray array];
@@ -536,29 +685,47 @@
                                     [fmt setDateFormat:@"YYYY-MM-dd"];
                                     pd.newestStockDate = [fmt dateFromString:date];
                                     
-                                    
+                                    // 在庫更新用 stock__cのID 最新
                                     //グラフ表示用データ
                                     //在庫取得日
-                                    //				NSDate *tmpDate = [fmt dateFromString:date];
+                                    //NSDate *tmpDate = [fmt dateFromString:date];
                                     
-                                    //在庫取得日は、今日の日付とする
-                                    NSDate *tmpDate = [NSDate date];
-                                    [pd.stockDateArray addObject:tmpDate];
+                                    //在庫取得日
+                                    //NSDate *tmpDate = [NSDate date];
+                                    [pd.stockDateArray addObject:[fmt dateFromString:date]];
                                     
                                     //在庫数
-                                    [pd.stockArray addObject:quantity];
+                                    // 本日分は商品の方の在庫にするs
+                                    NSString *str = [fmt stringFromDate:[NSDate date]];
+                                    if([str isEqualToString:date]){
+                                      [pd.stockArray addObject:[NSNumber numberWithInt:[pd.badgeValue intValue]]];
+                                    }else{
+                                      [pd.stockArray addObject:quantity];
+                                    }
+                                    // snapshotではバッヂは更新しない グラフ用のみ
+                                    
+                                    //NSLog(@"%d pd.stockArray * %@",__LINE__,pd.stockArray);
+                                    
+                                    [self getFutureStockAPI:pd drawGraph:draw];
+                                    if(alertView.visible) {
+                                      [alertView dismissWithClickedButtonIndex:0 animated:NO];
+                                    }
                                   }
-                                  [self getFutureStock:pd drawGraph:draw];
-                                  if(alertView.visible) {
-                                    [alertView dismissWithClickedButtonIndex:0 animated:NO];
+                                  else{
+                                    [self getFutureStockAPI:pd drawGraph:draw];
+                                    if(alertView.visible) {
+                                      [alertView dismissWithClickedButtonIndex:0 animated:NO];
+                                    }
                                   }
                                 }
    ];
 }
 
+// 使用停止
 //商品の在庫、入荷予定日を取得
 -(void)getProductStocks:(NSArray*)pdArray
 {
+  
 	NSString *where = @"";
 	int loopMax = [pdArray count];
 	int loopCnt = 0;
@@ -570,7 +737,7 @@
 	}
   
 	//過去の在庫数取得
-	NSString *query = [NSString stringWithFormat:@"SELECT Id, Name ,product__c,date__c,quantity__c FROM stock__c  WHERE (%@) AND date__c <= N_DAYS_AGO:0 ORDER BY date__c DESC",where];
+	NSString *query = [NSString stringWithFormat:@"SELECT SystemModstamp, Id, CreatedDate, CreatedById, IsDeleted, Product__c, Name, StockCount__c, OwnerId, date__c, LastModifiedDate, LastModifiedById FROM StockSnapShot__c  WHERE (%@) AND date__c <= N_DAYS_AGO:0 ORDER BY date__c DESC",where];
 	SFRestRequest *request = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] sendRESTRequest:request
                                     failBlock:^(NSError *e) {
@@ -588,9 +755,11 @@
                                     }
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"554 %@",dict);
+                                  //NSLog(@"%d dict: %@",__LINE__, dict);
                                   
                                   NSNumber *recCount = [dict objectForKey:@"totalSize"];
+                                  
+                                  //NSLog(@"%d recCount: %@",__LINE__, recCount);
                                   
                                   //取得レコードがあれば、先頭の一件（最新在庫）のみを読んで在庫数確定
                                   if ( [recCount intValue] ){
@@ -602,10 +771,14 @@
                                       for ( int i = 0; i < [records count]; i++ ) {
                                         
                                         rec = [records objectAtIndex:i];
-                                        NSString *prId = [rec objectForKey:@"product__c"];
+                                        //NSLog(@"%d rec: %@",__LINE__, rec);
+                                        
+                                        NSString *prId = [rec objectForKey:@"Product__c"];
+                                        //NSLog(@"%d prId: %@",__LINE__, prId);
+                                        
                                         if ( [tempPd.productId isEqualToString:prId] ){
                                           NSString *date = [rec objectForKey:@"date__c"];
-                                          NSNumber *quantity = [rec objectForKey:@"quantity__c"];
+                                          NSNumber *quantity = [rec objectForKey:@"StockCount__c"];
                                           
                                           tempPd.stockArray = [NSMutableArray array];
                                           tempPd.stockDateArray = [NSMutableArray array];
@@ -616,7 +789,7 @@
                                           [fmt setDateFormat:@"YYYY-MM-dd"];
                                           tempPd.newestStockDate = [fmt dateFromString:date];
                                           
-                                          //グラフ表示用データ
+                                          //グラフ表示用データ shnapshot
                                           //在庫取得日
                                           //				NSDate *tmpDate = [fmt dateFromString:date];
                                           
@@ -626,14 +799,19 @@
                                           
                                           //在庫数
                                           [tempPd.stockArray addObject:quantity];
-                                          if(tempPd.badgeValue==nil || [tempPd.badgeValue isEqualToString:@""]){
-                                            tempPd.badgeValue = [NSString stringWithFormat:@"%@", quantity];
-                                          }
-                                          //NSLog(@"tempPd.badgeValue %@", tempPd.badgeValue);
+                                          /*
+                                           if(tempPd.badgeValue==nil || [tempPd.badgeValue isEqualToString:@""]){
+                                           tempPd.badgeValue = [NSString stringWithFormat:@"%@", quantity];
+                                           // 在庫更新用 stock__cのID 最新
+                                           tempPd.stock__c_id = [rec objectForKey:@"Id"];
+                                           //NSLog(@"%d tempPd.badgeValue %@", __LINE__, tempPd.badgeValue);
+                                           }
+                                           */
                                         }
                                       }
                                       [carousel reloadData];
                                     }
+                                    [carousel reloadData];
                                     [self getFutureStocks:productList];
                                   }
                                 }
@@ -644,18 +822,32 @@
 
 -(void)getFutureStocks:(NSArray*)pdArray
 {
-	NSString *where = @"";
+  /*
+   Product *tempPd;
+   for ( int ii = 0; ii < [productList count]; ii++ ){
+   tempPd = [productList objectAtIndex:ii];
+   
+   [tempPd.stockDateArray addObject:[NSDate date]];
+   
+   //在庫数
+   [tempPd.stockArray addObject:[NSNumber numberWithInt:tempPd.StockCount__c]];
+   
+   }
+   */
+  NSString *where = @"";
 	int loopMax = [pdArray count];
 	int loopCnt = 0;
 	for ( Product *tempPd in pdArray ) {
-		where = [where stringByAppendingString:[NSString stringWithFormat:@"product__c='%@'",tempPd.productId ]];
+		where = [where stringByAppendingString:[NSString stringWithFormat:@"Product__c='%@'",tempPd.productId ]];
 		if ( loopCnt++ != loopMax - 1 ){
 			where = [where stringByAppendingString:@" OR "];
 		}
 	}
 	
+  
 	//将来の在庫数取得
-	NSString *query2 = [NSString stringWithFormat:@"SELECT Id, Name ,product__c,date__c,quantity__c FROM stock__c  WHERE (%@) AND date__c > N_DAYS_AGO:0 ORDER BY date__c ASC",where];
+	NSString *query2 = [NSString stringWithFormat:@"SELECT SystemModstamp, Id, CreatedDate, CreatedById, IsDeleted, Product__c, Name, StockCount__c, OwnerId, date__c, LastModifiedDate, LastModifiedById FROM StockSnapShot__c  WHERE (%@) AND date__c >= N_DAYS_AGO:5 ORDER BY date__c DESC", where];
+  
 	SFRestRequest *request2 = [[SFRestAPI sharedInstance] requestForQuery:query2];
 	[[SFRestAPI sharedInstance] sendRESTRequest:request2
                                     failBlock:^(NSError *e) {
@@ -672,28 +864,24 @@
                                     }
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"636 %@",dict);
-                                  
                                   NSNumber *recCount = [dict objectForKey:@"totalSize"];
                                   
                                   //取得レコードがあれば、直近で在庫数が＋(プラス)になる日付を取得
-                                  bool found = NO;
-                                  Product *tempPd;
-                                  for ( int ii = 0; ii < [productList count]; ii++ ){
-                                    tempPd = [productList objectAtIndex:ii];
+                                  if ( [recCount intValue] ){
+                                    NSArray *records = [dict objectForKey:@"records"];
                                     
-                                    if ( [recCount intValue] ){
-                                      NSArray *records = [dict objectForKey:@"records"];
+                                    for ( Product *tempPd in pdArray ) {
+                                      bool found = NO;
                                       for ( int i = 0; i < [records count]; i++ ) {
                                         NSDictionary *rec = [records objectAtIndex:i];
-                                        NSString *prId = [rec objectForKey:@"product__c"];
-                                        if (![tempPd.productId isEqualToString:prId]){
-                                          continue;
-                                        }
+                                        NSString *prId = [rec objectForKey:@"Product__c"];
                                         
-                                        NSNumber *quantity = [rec objectForKey:@"quantity__c"];
-                                        NSString *date = [rec objectForKey:@"date__c"];
-                                        if ( [quantity intValue] >= 1 ) {
+                                        // product id
+                                        if ( [tempPd.productId isEqualToString:prId] ){
+                                          
+                                          NSNumber *quantity = [rec objectForKey:@"StockCount__c"];
+                                          NSString *date = [rec objectForKey:@"date__c"];
+                                          
                                           NSDateFormatter* fmt= [[NSDateFormatter alloc] init];
                                           
                                           //直近の入荷日（オーダー詳細画面で使用）
@@ -705,30 +893,67 @@
                                           }
                                           
                                           //グラフ表示用データ
-                                          if ([tempPd.stockDateArray count]<6 ) {
+                                          if ([tempPd.stockArray count]<6 ) {
                                             
                                             //在庫取得日
                                             NSDate *tmpDate = [fmt dateFromString:date];
                                             
-                                            [tempPd.stockDateArray addObject:tmpDate];
-                                            
-                                            //在庫数
-                                            [tempPd.stockArray addObject:quantity];
+                                            if(![tempPd.stockDateArray containsObject:tmpDate]){
+                                              
+                                              // 日付
+                                              [tempPd.stockDateArray insertObject:tmpDate atIndex:0];
+                                              
+                                              // 本日分は商品の方の在庫にする
+                                              NSString *str = [fmt stringFromDate:[NSDate date]];
+                                              
+                                              //在庫数
+                                              if([str isEqualToString:date]){
+                                                [tempPd.stockArray addObject:[NSNumber numberWithInt:[tempPd.badgeValue intValue]]];
+                                              }else{
+                                                [tempPd.stockArray insertObject:quantity atIndex:0];
+                                              }
+                                            }
                                           }
-                                        }
+                                        }// if
                                       }
-                                    }
-                                  }
-                                  if(alertView.visible) {
-                                    [alertView dismissWithClickedButtonIndex:0 animated:NO];
-                                  }
+                                    }// for
+                                  }// for
                                 }
 	 ];
 }
+
 -(void)getFutureStock:(Product*)pd drawGraph:(BOOL)draw
 {
+  
+  //[pd.stockDateArray addObject:[NSDate date]];
+  //[pd.stockArray addObject:[NSNumber numberWithInt:pd.StockCount__c]];
+  
+  NSLog(@"%d getFutureStock", __LINE__);
+  
+  NSLog(@"%d pd.stockDateArray : %@", __LINE__, pd.stockDateArray);
+  NSLog(@"%d pd.stockArray : %@", __LINE__, pd.stockArray);
+  
+  if ( draw == YES ) {
+    [self setupStockGraph:pd];
+  }
+  
+}
+
+// API間で問い合わせ
+-(void)getFutureStockAPI:(Product*)pd drawGraph:(BOOL)draw
+{
+  NSLog(@"%d getFutureStockAPI", __LINE__);
+  
+  // 一旦別の変数に退避してSOQL結果取得後に入れ替え
+  NSMutableArray *tmpStockArray = pd.stockArray;
+  NSMutableArray *tmpDateArray = pd.stockDateArray;
+  
+  NSLog(@"%d pd.stockDateArray : %@", __LINE__, pd.stockDateArray);
+  NSLog(@"%d pd.stockArray : %@", __LINE__, pd.stockArray);
+  
 	//将来の在庫数取得
-	NSString *query2 = [NSString stringWithFormat:@"SELECT Id, Name ,product__c,date__c,quantity__c FROM stock__c  WHERE product__c ='%@' AND date__c > N_DAYS_AGO:0 ORDER BY date__c ASC",pd.productId];
+	NSString *query2 = [NSString stringWithFormat:@"SELECT SystemModstamp, Id, CreatedDate, CreatedById, IsDeleted, Product__c, Name, StockCount__c, OwnerId, date__c, LastModifiedDate, LastModifiedById FROM StockSnapShot__c  WHERE Product__c ='%@' AND date__c >= N_DAYS_AGO:5 ORDER BY date__c DESC",pd.productId];
+  
 	SFRestRequest *request2 = [[SFRestAPI sharedInstance] requestForQuery:query2];
 	[[SFRestAPI sharedInstance] sendRESTRequest:request2
                                     failBlock:^(NSError *e) {
@@ -745,8 +970,6 @@
                                     }
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"710 %@",dict);
-                                  
                                   NSNumber *recCount = [dict objectForKey:@"totalSize"];
                                   
                                   //取得レコードがあれば、直近で在庫数が＋(プラス)になる日付を取得
@@ -755,35 +978,55 @@
                                     NSArray *records = [dict objectForKey:@"records"];
                                     for ( int i = 0; i < [records count]; i++ ) {
                                       NSDictionary *rec = [records objectAtIndex:i];
-                                      NSNumber *quantity = [rec objectForKey:@"quantity__c"];
+                                      NSNumber *quantity = [rec objectForKey:@"StockCount__c"];
                                       NSString *date = [rec objectForKey:@"date__c"];
-                                      if ( [quantity intValue] >= 1 ) {
-                                        NSDateFormatter* fmt= [[NSDateFormatter alloc] init];
+                                      //if ( [quantity intValue] >= 1 ) {
+                                      NSDateFormatter* fmt= [[NSDateFormatter alloc] init];
+                                      
+                                      //直近の入荷日（オーダー詳細画面で使用）
+                                      [fmt setDateFormat:@"YYYY-MM-dd"];
+                                      if ( found  == NO ) {
+                                        pd.arrivalStockCount = (int)[quantity doubleValue];
+                                        pd.arrivalStockDate = [fmt dateFromString:date];
+                                        found = YES;
+                                      }
+                                      
+                                      //グラフ表示用データ
+                                      //if ([pd.stockDateArray count]<6 ) {
+                                      if ([tmpStockArray count]<6 ) {
                                         
-                                        //直近の入荷日（オーダー詳細画面で使用）
-                                        [fmt setDateFormat:@"YYYY-MM-dd"];
-                                        if ( found  == NO ) {
-                                          pd.arrivalStockCount = (int)[quantity doubleValue];
-                                          pd.arrivalStockDate = [fmt dateFromString:date];
-                                          found = YES;
-                                        }
+                                        //在庫取得日
+                                        NSDate *tmpDate = [fmt dateFromString:date];
                                         
-                                        //グラフ表示用データ
-                                        if ([pd.stockDateArray count]<6 ) {
-                                          
-                                          //在庫取得日
-                                          NSDate *tmpDate = [fmt dateFromString:date];
-                                          
-                                          [pd.stockDateArray addObject:tmpDate];
+                                        if(![tmpDateArray containsObject:tmpDate]){
+                                          //[pd.stockDateArray addObject:tmpDate];
+                                          //[tmpDateArray addObject:tmpDate];
+                                          [tmpDateArray insertObject:tmpDate atIndex:0];
                                           
                                           //在庫数
-                                          [pd.stockArray addObject:quantity];
+                                          //[pd.stockArray addObject:quantity];
+                                          //[tmpStockArray addObject:quantity];
+                                          [tmpStockArray insertObject:quantity atIndex:0];
                                         }
                                       }
+                                      //}
                                     }
-                                  }
-                                  if ( draw == YES ) {
-                                    [self setupStockGraph:pd];
+                                    if ( draw == YES ) {
+                                      pd.stockArray = tmpStockArray;
+                                      pd.stockDateArray = tmpDateArray;
+                                      
+                                      [self setupStockGraph:pd];
+                                      
+                                      NSLog(@"%d pd.stockDateArray : %@", __LINE__, pd.stockDateArray);
+                                      NSLog(@"%d pd.stockArray : %@", __LINE__, pd.stockArray);
+                                    }
+                                  }else{
+                                    if ( draw == YES ) {
+                                      pd.stockArray = tmpStockArray;
+                                      pd.stockDateArray = tmpDateArray;
+                                      
+                                      [self setupStockGraph:pd];
+                                    }
                                   }
                                 }
 	 ];
@@ -834,7 +1077,7 @@
                                     }
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"%@",dict);
+                                  //NSLog(@"%d : dic : %@",__LINE__,dict);
                                   NSArray *records = [dict objectForKey:@"records"];
                                   NSDateFormatter* fmt= [[NSDateFormatter alloc] init];
                                   [fmt setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.000Z"];
@@ -856,7 +1099,7 @@
                                     
                                     //総売上保存
                                     NSNumber *dat = [totalSales objectForKey:keyName];
-                                    if ([self isNull:dat]) {
+                                    if (![um chkString:dat]) {
                                       [totalSales setObject:sales forKey:keyName];
                                     }
                                     else {
@@ -870,7 +1113,7 @@
                                     
                                     if ([pId isEqualToString:prd.priceBookEntryId]) {
                                       NSNumber *dat = [itemSales objectForKey:keyName];
-                                      if ([self isNull:dat]) {
+                                      if (![um chkString:dat]) {
                                         [itemSales setObject:sales forKey:keyName];
                                       }
                                       else {
@@ -897,11 +1140,6 @@
 {
 	//画像読み込み済み数を初期化
 	imgLoadCount =0;
-  
-	//画像読みk見
-  //	for (int i = 0; i < [productList count]; i++){
-  //		[self getProductImage:[productList objectAtIndex:i]];
-  //	}
   
 	[self getProductsImage:productList];
   
@@ -949,7 +1187,7 @@
                                     }
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"%@",dict);
+                                  NSLog(@"%d",__LINE__);
                                   
                                   //アラート表示
                                   //		[self alertShow];
@@ -1002,7 +1240,7 @@
                                       continue;
                                     }
                                     
-                                    BOOL searchResult = [self isInclude:[name uppercaseString]cmp:@"MAIN."];
+                                    BOOL searchResult = [um isInclude:[name uppercaseString]cmp:@"MAIN."];
                                     
                                     if ( [tempPd.imgURLArray count] <= 3 ){
                                       [tempPd.imgURLArray addObject:url];
@@ -1022,7 +1260,7 @@
                                           [carousel reloadData];
                                         }
                                       }else{
-                                      
+                                        
                                         //商品画像表示
                                         
                                         //リクエスト作成
@@ -1072,7 +1310,7 @@
                                     
                                     // main.jpg がない場合の処理
                                     NSData *imgData = UIImageJPEGRepresentation(pd.image, 0);
-                                    //NSLog(@"Size of Image(bytes):%d",[imgData length]);
+                                    NSLog(@"Size of Image(bytes):%d",[imgData length]);
                                     
                                     if([imgData length]>0) continue;
                                     
@@ -1082,6 +1320,7 @@
                                     [pd.imgNameArray addObject:@"main.jpg"];
                                     [pd.imgDateArray addObject:pd.image];
                                     [pd.imgIdArray addObject:@"product_noimage.png"];
+                                    [carousel reloadData];
                                   }
                                   [carousel reloadData];
                                 }];
@@ -1092,8 +1331,8 @@
 -(void)getProductImage:(Product*)pd
 {
 	//NSString *query = [NSString stringWithFormat:@"SELECT Name,Body,BodyLength, Id, LastModifiedDate FROM Attachment WHERE ParentId='%@' ORDER BY Name, CreatedDate DESC",pd.productId];
-   // main.jpgが最後になるように
-  	NSString *query = [NSString stringWithFormat:@"SELECT Name,Body,BodyLength, Id, LastModifiedDate FROM Attachment WHERE ParentId='%@' ORDER BY Name ASC",pd.productId];;
+  // main.jpgが最後になるように
+  NSString *query = [NSString stringWithFormat:@"SELECT Name,Body,BodyLength, Id, LastModifiedDate FROM Attachment WHERE ParentId='%@' ORDER BY Name ASC",pd.productId];;
 	SFRestRequest *req = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] sendRESTRequest:req
                                     failBlock:^(NSError *e) {
@@ -1108,7 +1347,7 @@
                                     }
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"%@",dict);
+                                  NSLog(@"%d : dic : ",__LINE__);
                                   
                                   //アラート表示
                                   //		[self alertShow];
@@ -1153,7 +1392,7 @@
                                       continue;
                                     }
                                     
-                                    BOOL searchResult = [self isInclude:[name uppercaseString]cmp:@"MAIN."];
+                                    BOOL searchResult = [um isInclude:[name uppercaseString]cmp:@"MAIN."];
                                     
                                     if ( addCnt++ <= 3 ){
                                       [pd.imgURLArray addObject:url];
@@ -1185,11 +1424,8 @@
                                       if ( !err ){
                                         if ( searchResult == YES ){
                                           UIImage *img = [[UIImage alloc]initWithData:rcvData];
-                                          //画像を配列に保存
+                                          //画像を保存
                                           pd.image = img;
-                                          if (++imgLoadCount == [productList count]) {
-                                            [self dispProducts];
-                                          }
                                         }
                                       }
                                       else{
@@ -1205,12 +1441,12 @@
                                   }
                                   
                                   // main.jpgがない場合にnoimageを代用
-                                    NSLog(@"%d productName : %@", __LINE__, pd.productName);
-                                    
-                                    // main.jpg がない場合の処理
-                                    NSData *imgData = UIImageJPEGRepresentation(pd.image, 0);
-                                    //NSLog(@"Size of Image(bytes):%d",[imgData length]);
-                                    
+                                  NSLog(@"%d productName : %@", __LINE__, pd.productName);
+                                  
+                                  // main.jpg がない場合の処理
+                                  NSData *imgData = UIImageJPEGRepresentation(pd.image, 0);
+                                  //NSLog(@"Size of Image(bytes):%d",[imgData length]);
+                                  
                                   if(![imgData length]>0){
                                     // 代わりの画像を指定
                                     pd.image = [UIImage imageNamed:@"product_noimage.png"];
@@ -1218,18 +1454,10 @@
                                     [pd.imgNameArray addObject:@"main.jpg"];
                                     [pd.imgDateArray addObject:pd.image];
                                     [pd.imgIdArray addObject:@"product_noimage.png"];
+                                    [carousel reloadData];
                                   }
                                   [carousel reloadData];
                                 }];
-}
-
--(void)dispProducts
-{
-	for ( int i = 0 ;i < [productList count]; i++) {
-		[self productDisp:[productList objectAtIndex:i]];
-		NSLog(@"%d:%d",i,((Product*)[productList objectAtIndex:i]).sortOrder  );
-	}
-	if(alertView.visible) [alertView dismissWithClickedButtonIndex:0 animated:NO];
 }
 
 
@@ -1276,67 +1504,6 @@
 	[self.navigationController pushViewController:mapVC animated:NO];
 }
 
--(void)productDisp:(Product*)pd
-{
-	static const float MAXIMAGE_X = 160;
-	static const float MAXIMAGE_Y = 120;
-	
-	CGRect rect;
-	UIImageView *productImg = [[UIImageView alloc]init];
-	rect.size.width = MAXIMAGE_X;
-	rect.size.height = MAXIMAGE_Y;
-	rect.origin.x = 0;
-	rect.origin.y = 0;
-	UIImage *resize = [self resizeImage:pd.image Rect:rect];
-	productImg.image = resize;
-	rect.size.width = resize.size.width;
-	rect.size.height = resize.size.height;
-	rect.origin.x = ( dispProductCount * MAXIMAGE_X + 30 ) + (MAXIMAGE_X - resize.size.width) / 2;
-	rect.origin.y = 10;
-	productImg.frame = rect;
-	productImg.tag = pd.index;
-	[scrl addSubview:productImg];
-  
-	dTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(doubleTapDetect:)];
-	productImg.userInteractionEnabled = YES;
-	dTap.numberOfTapsRequired = 2;
-	[productImg addGestureRecognizer:dTap];
-  
-	sTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapDetect:)];
-	sTap.numberOfTapsRequired = 1;
-	[productImg addGestureRecognizer:sTap];
-  
-	lt= [[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(longtap:)];
-	lt.numberOfTapsRequired = 0;
-	lt.minimumPressDuration = 1;
-	[productImg addGestureRecognizer:lt];
-	
-	//設定済みの発注量を読み込み
-	OrderInfo *od = [orderArray objectForKey:pd.productId];
-	int qty = od.quanty;
-	
-	UIButton *qBtn = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  //	qBtn = [self setBtn:qBtn num:dispProductCount];
-	rect.size.width = 100;
-	rect.size.height = 30;
-	rect.origin.x = ( dispProductCount * MAXIMAGE_X + 30 ) + (MAXIMAGE_X - rect.size.width) / 2;
-	rect.origin.y = 140;
-	qBtn.frame = rect;
-	qBtn.titleLabel.font = [UIFont fontWithName:@"AmericanTypewriter-Bold" size:14];
-	[qBtn setTitle:[NSString stringWithFormat:[pData getDataForKey:@"DEFINE_STORORDER_UNIT_TITLE"],qty] forState:UIControlStateNormal];
-	[qBtn setTitleEdgeInsets:UIEdgeInsetsMake(0, -40,0,-40)];
-	[qBtn addTarget:self action:@selector(btnPush:) forControlEvents:UIControlEventTouchUpInside];
-	qBtn.tag = pd.index;
-	
-	[scrl addSubview:productImg];
-	[scrl addSubview:qBtn];
-  
-	//スクロール範囲設定
-	CGSize siz = scrl.contentSize;
-	siz.width = ( productImg.frame.origin.x + productImg.frame.size.width+100);
-	[scrl setContentSize:siz];
-	dispProductCount++;
-}
 
 //ロングタップ検出
 -(void)longtap:(id)sender
@@ -1386,25 +1553,25 @@
 	pop.popoverContentSize = sV.view.frame.size;
 	//[pop presentPopoverFromRect:recognizer.view.frame inView:scrl permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
   [pop presentPopoverFromRect:CGRectMake(carousel.currentItemView.bounds.size.width/2, carousel.currentItemView.bounds.size.height/2, 0, 130) inView:carousel.currentItemView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-
+  
 }
 
 //シングルタップ検出
 -(void)tapDetect:(id)sender
 {
   /*
-	if ([dblTapTimer isValid]) {
-		//グラフの二重呼び出しを避けるため
-		return;
-	}
-	
-	//１秒後にグラフ呼び出し
-	dblTapTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(callGraph) userInfo:NO repeats:NO];
-	
-	//タップした商品（tag)を保存
-	UILongPressGestureRecognizer *recognizer = (UILongPressGestureRecognizer*)sender;
-	singleTapedTag = recognizer.view.tag;
-  */
+   if ([dblTapTimer isValid]) {
+   //グラフの二重呼び出しを避けるため
+   return;
+   }
+   
+   //１秒後にグラフ呼び出し
+   dblTapTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(callGraph) userInfo:NO repeats:NO];
+   
+   //タップした商品（tag)を保存
+   UILongPressGestureRecognizer *recognizer = (UILongPressGestureRecognizer*)sender;
+   singleTapedTag = recognizer.view.tag;
+   */
   
   //グラフ２重呼び出し防止タイマーを停止
 	[dblTapTimer invalidate];
@@ -1430,6 +1597,8 @@
 	//オーダー時のグラフ再表示の為、保存
 	currentPrd = prd;
 	
+  NSLog(@"%d callGraph", __LINE__);
+  
 	[self dispGraphs:prd];
 }
 
@@ -1439,50 +1608,124 @@
 	//タイトル設定
 	NSString *ttl = prd.productName;
 	[productLabel setText:ttl];
-	[productLabel sizeToFit];
+	//[productLabel sizeToFit];
+  [_orderView addSubview:productLabel];
   
 	//ローディングアラート表示
-  NSLog(@"loading %d", __LINE__);
+  //NSLog(@"loading %d", __LINE__);
 	//[self alertShow];
 	
+  [NSThread sleepForTimeInterval:0.5];
+  
+  // バッヂ更新
+  [self getProductInfo:prd];
+  
+  // グラフ更新
+	[self getSales:prd];
+	//[self getProductStockAPI:prd drawGraph:YES];
+  //[self getFutureStockAPI:prd drawGraph:YES]; // getProductInfo内に移動
+  
+  
+  if(alertView.visible) [alertView dismissWithClickedButtonIndex:0 animated:NO];
+}
+
+// 取得済みデータを表示（売上以外）
+-(void)callDataGraph
+{
+  NSLog(@"%d callDataGraph", __LINE__);
+	Product *prd = [productList objectAtIndex:singleTapedTag];
+	
+	//オーダー時のグラフ再表示の為、保存
+	currentPrd = prd;
+	
+	[self dispDataGraphs:prd];
+}
+
+-(void)dispDataGraphs:(Product*)prd
+{
+	
+	//タイトル設定
+	NSString *ttl = prd.productName;
+	[productLabel setText:ttl];
+	//[productLabel sizeToFit];
+  [_orderView addSubview:productLabel];
+  
+	//ローディングアラート表示
+  //NSLog(@"loading %d", __LINE__);
+	//[self alertShow];
+	
+  [NSThread sleepForTimeInterval:0.5];
+  
+  // 持っているデータで表示
+  // バッヂ更新
+  //[self getProductInfo:prd];
+  // グラフ更新
 	[self getSales:prd];
 	[self getProductStock:prd drawGraph:YES];
   
   if(alertView.visible) [alertView dismissWithClickedButtonIndex:0 animated:NO];
 }
 
+
 -(void)setupStockGraph:(Product*)prd
 {
-	if ([self isNull:[stockGraph superview]]) {
-		[_orderView addSubview:stockGraph];
-	}
-	if ( [self isNull:[productLabel superview]]){
-		[_orderView addSubview:productLabel];
-	}
+  
+  // バッヂ数を変更
+  for(UIView *view in [carousel.currentItemView subviews]){
+    if ([view isKindOfClass:[ItemBadge class]]) {
+      ItemBadge *iv = (ItemBadge*)view;
+      iv.textLabel.text = [NSString stringWithFormat:@"%@", prd.badgeValue];
+      NSLog(@"%d prd.badgeValue %@", __LINE__, prd.badgeValue);
+    }
+  }
+  
+	//if ([self isNull:[stockGraph superview]]) {
+  [_orderView addSubview:stockGraph];
+	//}
+	//if ( [self isNull:[productLabel superview]]){
+  //[_orderView addSubview:productLabel];
+	//}
 	
 	NSMutableArray *stockArray = [NSMutableArray arrayWithArray:prd.stockArray];
 	
-	//売上済みの数値で在庫数を補正(For demonstration
-	NSArray *keys = [saledArray allKeys];
-	NSNumber *subVal;
-	for (NSString *key in keys ){
-		if ([prd.productId isEqualToString:key]) {
-			subVal = [saledArray objectForKey:key];
-			if ( [prd.stockDateArray count]){
-				//オリジナルの配列から在庫を読み、売上分を補正しコピーの配列に書き戻す
-				int qty = [[prd.stockArray objectAtIndex:0]intValue] - [subVal intValue];
-				[stockArray setObject:[NSNumber numberWithInt:qty] atIndexedSubscript:0];
-			}
-		}
-	}
-	
+  /*
+   //売上済みの数値で在庫数を補正(For demonstration
+   NSArray *keys = [saledArray allKeys];
+   NSNumber *subVal;
+   for (NSString *key in keys ){
+   if ([prd.productId isEqualToString:key]) {
+   subVal = [saledArray objectForKey:key];
+   if ( [prd.stockDateArray count]){
+   //オリジナルの配列から在庫を読み、売上分を補正しコピーの配列に書き戻す
+   int qty = [[prd.stockArray objectAtIndex:0]intValue] - [subVal intValue];
+   [stockArray setObject:[NSNumber numberWithInt:qty] atIndexedSubscript:0];
+   }
+   }
+   }
+   */
+  
 	//横軸ラベル
 	NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
 	[fmt setDateFormat:@"M/d"];
 	NSMutableArray *dateArray = [NSMutableArray array];
+  
+  NSLog(@"%d : prd.stockDateArray : %@", __LINE__, prd.stockDateArray);
 	for ( int i = 0; i < [prd.stockDateArray count]; i++ ) {
 		[dateArray addObject:[fmt stringFromDate:[prd.stockDateArray objectAtIndex:i]]];
 	}
+  /*
+   // 支店名に変更
+   //NSLog(@"%d stockGraph dateArray : %@", __LINE__, dateArray);
+   NSArray *alArray = [[pData getDataForKey:@"DEFINE_STORORDER_STOCKDATE_TITLE"] componentsSeparatedByString:@","];
+   
+   for ( int i = 0; i < [prd.stockDateArray count]; i++ ) {
+   if(i<[alArray count]){
+   [dateArray replaceObjectAtIndex:i withObject:[alArray objectAtIndex:i]];
+   }
+   }
+   //NSLog(@"%d stockGraph dateArray : %@", __LINE__, dateArray);
+   */
+  
 	[stockGraph setXLblAry:dateArray];
 	
 	//データ設定
@@ -1490,8 +1733,10 @@
 	[stockGraph setDatAry:(NSMutableArray*)datArray];
 	
 	//グラフ最大値
-  //	NSNumber *max = [[NSNumber alloc]initWithFloat:[self calcGraphMax:prd.stockArray]];
-	NSNumber *max = [[NSNumber alloc]initWithFloat:300.0];
+  NSLog(@"%d : stockArray : %@", __LINE__, prd.stockArray);
+  NSNumber *max = [[NSNumber alloc]initWithFloat:[self calcGraphMax:prd.stockArray]];
+	//NSNumber *max = [[NSNumber alloc]initWithFloat:300.0];
+  NSLog(@"%d : max : %@", __LINE__, max);
 	NSMutableArray *maxArray = [NSMutableArray arrayWithObject:max];
 	[stockGraph setMaxValAry:maxArray];
 	
@@ -1506,9 +1751,13 @@
 	
 	[self clearSubView:stockGraph];
 	
+  NSLog(@"%d : clearSubView", __LINE__);
+  
 	//描画
 	[stockGraph setNeedsDisplay];
 	
+  NSLog(@"%d : setNeedsDisplay", __LINE__);
+  
 	// アラートを閉じる
 	if(alertView.visible) {
 		[alertView dismissWithClickedButtonIndex:0 animated:NO];
@@ -1519,6 +1768,7 @@
 
 -(float)calcGraphMax:(NSArray*)ary
 {
+  //NSLog(@"%d : ary : %@", __LINE__, ary);
 	float max = 0;
 	for ( int i = 0; i < [ary count]; i++ ){
 		float val = [[ary objectAtIndex:i]floatValue];
@@ -1526,33 +1776,44 @@
 			max = val;
 		}
 	}
-	
+  
+	if ( max <= 0 ) {
+		return 10.0f;
+	}
 	if (( max >= 1 ) && ( max <= 10 )) {
 		return 10.0f;
 	}
 	if (( max >= 10 ) && ( max <= 100 )) {
 		return 100.0f;
 	}
-	if (( max >= 100 ) && ( max <= 1000 )) {
-		return 1000.0f;
-	}
-	if (( max >= 1000 ) && ( max <= 10000 )) {
-		return 10000.0f;
-	}
-	if (( max >= 10000 ) && ( max <= 100000 )) {
-		return 100000.0f;
-	}
-	if (( max >= 100000 ) && ( max <= 1000000 )) {
-		return 1000000.0f;
-	}
-	return FLT_MAX;
+  
+	if(max >=2000) return 2000.0f;
+  
+  int n = ceil(max/100);
+  return n * 100.0f;
+  
+  /*
+   if (( max > 100 ) && ( max <= 1000 )) {
+   return 1000.0f;
+   }
+   if (( max >= 1000 ) && ( max <= 10000 )) {
+   return 10000.0f;
+   }
+   if (( max >= 10000 ) && ( max <= 100000 )) {
+   return 100000.0f;
+   }
+   if (( max >= 100000 ) && ( max <= 1000000 )) {
+   return 1000000.0f;
+   }
+   return FLT_MAX;
+   */
 }
 
 -(void)setupSalesGraph:(Product*)prd
 {
-	if ([self isNull:[salesGraph superview]] ){
-		[_orderView addSubview:salesGraph];
-	}
+	//if ([self isNull:[salesGraph superview]] ){
+  [_orderView addSubview:salesGraph];
+	//}
 	
 	
 	NSMutableArray *itemDat = [NSMutableArray array];
@@ -1578,13 +1839,13 @@
     
 		//全売り上げ
 		NSNumber *valTotal = [totalSales objectForKey:yearMonth];
-		if ([self isNull:valTotal]) {
+		if (![um chkString:valTotal]) {
 			valTotal = [NSNumber numberWithFloat:0.0f];
 		}
 		[totalDat addObject:valTotal];
 		
 		NSNumber *valItem = [itemSales objectForKey:yearMonth];
-		if ([self isNull:valItem]) {
+		if (![um chkString:valItem]) {
 			valItem = [NSNumber numberWithFloat:0.0f];
 		}
 		[itemDat addObject:valItem];
@@ -1736,7 +1997,7 @@
 
 -(void)btnPush:(id)sender
 {
-	if (![self isNull:pop]){
+	if (pop.popoverVisible){
 		return;
 	}
 	
@@ -1759,10 +2020,7 @@
 //POPOverで発注量決定時に呼ばれるデリゲート
 -(void)didSelectQuanty:(NSInteger)qty tag:(NSInteger)tag
 {
-	if (![self isNull:pop]){
-		[pop dismissPopoverAnimated:YES];
-		pop = nil;
-	}
+  [pop dismissPopoverAnimated:YES];
 	
   // カーソル上のボタン
   for ( id view in [carousel.currentItemView subviews]) {
@@ -1772,10 +2030,7 @@
       [btn setTitle:[NSString stringWithFormat:[pData getDataForKey:@"DEFINE_STORORDER_UNIT_TITLE"],qty] forState:UIControlStateNormal];
 		}
 	}
-  /*
-	UIButton *btn = (UIButton*)[self searchBtn:tag];
-	[btn setTitle:[NSString stringWithFormat:[pData getDataForKey:@"DEFINE_STORORDER_UNIT_TITLE"],qty] forState:UIControlStateNormal];
-  */
+  
 	Product *pd = [productList objectAtIndex:tag];
 	OrderInfo *od =
 	[[OrderInfo alloc]init];
@@ -1810,10 +2065,11 @@
 	[orderArray setObject:od forKey:pd.productId];
 }
 
+
 //tag番号を元にボタンを探す
 -(id)searchBtn:(int)tag
 {
-	for ( id view in [scrl subviews]) {
+	for ( id view in [carousel.currentItemView subviews]) {
 		NSString *className = NSStringFromClass([view class]);
 		if ([className isEqualToString:@"UIRoundedRectButton"]){
 			if (((UIButton*)view).tag == tag ) {
@@ -1823,8 +2079,6 @@
 	}
 	return nil;
 }
-
-
 
 - (void)didReceiveMemoryWarning
 {
@@ -1854,7 +2108,7 @@
                                 completeBlock:^(id jsonResponse){
                                   familyList = [NSMutableDictionary dictionary];
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"%@",dict);
+                                  NSLog(@"%d : dic : ",__LINE__);
                                   NSArray *records= [dict objectForKey:@"records"];
                                   for ( int i= 0; i < [records count]; i++ ){
                                     NSDictionary *rec = [records objectAtIndex:i];
@@ -1889,9 +2143,14 @@
                                     }
                                   }
                                   
-                                  //ファミリ選択
-                                  if ( ![selectedFamily isEqualToString:@""] ) {
-                                    [self selectFamily:selectedFamily];
+                                  @try {
+                                    //ファミリ選択
+                                    if ( ![selectedFamily isEqualToString:@""] ) {
+                                      [self selectFamily:selectedFamily];
+                                    }
+                                  }
+                                  @catch (NSException *exception) {
+                                    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
                                   }
                                 }
    ];
@@ -1944,36 +2203,17 @@
                                       NSLog(@"FAILWHALE with error: %@", [e description] );
                                     }
                                 completeBlock:^(id jsonResponse){
-                                  NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"%@",dict);
+                                  //NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                  //NSLog(@"%d : dic : %@",__LINE__,dict);
                                 }
 	 ];
-}
-
-
-//オブジェクトがNULLであるかチェック
--(BOOL)isNull:(id)tgt
-{
-	if ((( tgt == [NSNull null] ) || ([tgt isEqual:[NSNull null]] ) || ( tgt ==  nil ))){
-		return YES;
-	}
-	return NO;
-}
-//str1がstr2を含む場合はYESを返す
--(BOOL)isInclude:(NSString*)str1 cmp:(NSString*)cmp
-{
-	NSRange result = [str1 rangeOfString:cmp];
-	if (result.location == NSNotFound){
-		return NO;
-	}
-	return  YES;
 }
 
 //UIImage:imgがRectより大きい場合リサイズする
 -(id)resizeImage:(UIImage*)img Rect:(CGRect)rect
 {
 	if (( img.size.height > rect.size.height) || ( img.size.width > rect.size.width)) {
-		NSLog(@"%f : %f",img.size.width,img.size.height);
+		//NSLog(@"%f : %f",img.size.width,img.size.height);
 		float asp = (float)img.size.width / (float)img.size.height;
 		CGRect r = CGRectMake(0,0,0,0);
 		if ( img.size.width > img.size.height) {
@@ -1996,23 +2236,23 @@
 -(id)forceResizeImage:(UIImage*)img Rect:(CGRect)rect
 {
 	//if (( img.size.height > rect.size.height) || ( img.size.width > rect.size.width)) {
-		NSLog(@"%f : %f",img.size.width,img.size.height);
-		float asp = (float)img.size.width / (float)img.size.height;
-		CGRect r = CGRectMake(0,0,0,0);
-		if ( img.size.width > img.size.height) {
-			r.size.width = rect.size.width;
-			r.size.height = r.size.width / asp;
-		}
-		else {
-			r.size.height = rect.size.height;
-			r.size.width = r.size.height * asp;
-		}
-    NSLog(@"%f : %f",r.size.width,r.size.height);
-		
-		UIGraphicsBeginImageContext(r.size);
-		[img drawInRect:CGRectMake(0,0,r.size.width,r.size.height)];
-		img = UIGraphicsGetImageFromCurrentImageContext();
-		UIGraphicsEndImageContext();
+  //NSLog(@"%f : %f",img.size.width,img.size.height);
+  float asp = (float)img.size.width / (float)img.size.height;
+  CGRect r = CGRectMake(0,0,0,0);
+  if ( img.size.width > img.size.height) {
+    r.size.width = rect.size.width;
+    r.size.height = r.size.width / asp;
+  }
+  else {
+    r.size.height = rect.size.height;
+    r.size.width = r.size.height * asp;
+  }
+  NSLog(@"%f : %f",r.size.width,r.size.height);
+  
+  UIGraphicsBeginImageContext(r.size);
+  [img drawInRect:CGRectMake(0,0,r.size.width,r.size.height)];
+  img = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
 	//}
 	return img;
 }
@@ -2026,9 +2266,9 @@
 
 -(void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
 {
-	if (![self isNull:pop]){
-		pop = nil;
-	}
+	//if (![self isNull:pop]){
+  pop = nil;
+	//}
 }
 
 
@@ -2097,7 +2337,6 @@
 	if ( carousel_ == carousel2) {
 		return [imgArray count];
 	}
-  NSLog(@"productList : %@", productList);
   return [productList count];
 }
 
@@ -2109,7 +2348,7 @@
 			float img_x = 291; //150;//orderDetailScreen.detailPrimaryImage.frame.size.width;
 			float img_y = 241; //150;//orderDetailScreen.detailPrimaryImage.frame.size.height;
 			UIImageView *iv = nil;
-
+      
 			CGRect rect;
 			UIImageView *productImg = [[UIImageView alloc]init];
 			rect.size.width = img_x;
@@ -2118,10 +2357,10 @@
 			rect.origin.y = 0;
 			
 			view = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, img_x, img_y)];
-//			UIImage *resize = [self resizeImage:[imgArray objectForKey:[NSString stringWithFormat:@"%d",index]] Rect:rect];
-//			productImg.image = resize;
+      //			UIImage *resize = [self resizeImage:[imgArray objectForKey:[NSString stringWithFormat:@"%d",index]] Rect:rect];
+      //			productImg.image = resize;
 			UIImage *tmpimg = [ self resizeImage:[imgArray objectForKey:[NSString stringWithFormat:@"%d",index]] Rect:CGRectMake(0,0,291,241)];
-		
+      
 			CGRect tempRect = CGRectMake(0,0,tmpimg.size.width,tmpimg.size.height);
 			productImg.image = tmpimg;
 			productImg.frame = tempRect;
@@ -2145,7 +2384,6 @@
 		}
 		return view;
 	}
-	
   
   static const float MAXIMAGE_X = 200;
 	static const float MAXIMAGE_Y = 180;
@@ -2180,6 +2418,7 @@
     iv = productImg;
     
     view.backgroundColor = [UIColor clearColor];
+    view.tag = index;
     [iv setFrame:CGRectMake((view.bounds.size.width-iv.bounds.size.width)/2, 15, iv.bounds.size.width, iv.bounds.size.height)];
     [view addSubview:iv];
     if(isFistChg && index==0) iv.alpha = 0.0;
@@ -2188,6 +2427,9 @@
       CGRect r = CGRectMake(view.bounds.size.width-80, 10, 45, 20);
       ItemBadge* bagde = [[ItemBadge alloc] initWithFrame:r];
       bagde.textLabel.text = [NSString stringWithFormat:@"%@", pd.badgeValue];
+      NSLog(@"%d pd.badgeValue %@", __LINE__, pd.badgeValue);
+      
+      bagde.tag = index;
       [view addSubview:bagde];
     }
     productImg.userInteractionEnabled = YES;
@@ -2244,7 +2486,7 @@
   if (view == nil)
   {
     view = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, MAXIMAGE_X+20, MAXIMAGE_Y+50)];
-    
+    view.tag = index;
     Product *pd = [productList objectAtIndex:index];
     CGRect rect;
     UIImageView *productImg = [[UIImageView alloc]init];
@@ -2276,6 +2518,8 @@
       CGRect r = CGRectMake(view.bounds.size.width-80, 10, 45, 20);
       ItemBadge* bagde = [[ItemBadge alloc] initWithFrame:r];
       bagde.textLabel.text = [NSString stringWithFormat:@"%@", pd.badgeValue];
+      NSLog(@"%d pd.badgeValue %@", __LINE__, pd.badgeValue);
+      bagde.tag = index;
       [view addSubview:bagde];
     }
     productImg.userInteractionEnabled = YES;
@@ -2358,7 +2602,7 @@
   if ( _carousel == carousel2) {
 		return;
 	}
-  NSLog(@" index : %d", _carousel.currentItemIndex);
+  //NSLog(@" index : %d", _carousel.currentItemIndex);
   isFistChg = NO;
   
   // 前後の拡大画像を削除、ボタンを無効
@@ -2369,25 +2613,25 @@
   
   NSLog(@"_carousel.currentItemIndex : %d", _carousel.currentItemIndex);
   
-  Product *pd = [productList objectAtIndex:_carousel.currentItemIndex];
-  NSLog(@"pd : %@", pd);
-  NSLog(@"pd.imgNameArray: %@", pd.imgNameArray);
-  NSLog(@"pd.imgIdArray: %@", pd.imgIdArray);
-  NSLog(@"pd.imgURLArray: %@", pd.imgURLArray);
-  
-  NSLog(@"nextIndex : %d", nextIndex);
-  NSLog(@"prevIndex : %d", prevIndex);
+  //Product *pd = [productList objectAtIndex:_carousel.currentItemIndex];
+  /*NSLog(@"pd : %@", pd);
+   NSLog(@"pd.imgNameArray: %@", pd.imgNameArray);
+   NSLog(@"pd.imgIdArray: %@", pd.imgIdArray);
+   NSLog(@"pd.imgURLArray: %@", pd.imgURLArray);
+   
+   NSLog(@"nextIndex : %d", nextIndex);
+   NSLog(@"prevIndex : %d", prevIndex);*/
   [self removeIndexImage:[carousel itemViewAtIndex:nextIndex] index:nextIndex];
   [self removeIndexImage:[carousel itemViewAtIndex:prevIndex] index:prevIndex];
   [self removeIndexImage:[carousel itemViewAtIndex:prevIndex] index:_carousel.currentItemIndex];
-   /*
-  if(currentImgview !=nil) [currentImgview removeFromSuperview];
-  for (UIView* view in [carousel.currentItemView subviews]){
-    if ([view isKindOfClass:[UIImageView class]]) {
-      view.alpha = 0.0;
-    }
-  }
-  */
+  /*
+   if(currentImgview !=nil) [currentImgview removeFromSuperview];
+   for (UIView* view in [carousel.currentItemView subviews]){
+   if ([view isKindOfClass:[UIImageView class]]) {
+   view.alpha = 0.0;
+   }
+   }
+   */
 }
 
 
@@ -2396,13 +2640,20 @@
   if(_carousel != carousel2){
     NSLog(@"carouselWillBeginScrollingAnimation : %d", _carousel.currentItemIndex);
   }
+  
+  // 初回以外
+  if(!isFistChg){
+    [productLabel removeFromSuperview];
+    [salesGraph removeFromSuperview];
+    [stockGraph removeFromSuperview];
+  }
 }
 
 // カーソルが変わった場合、該当する商品のグラフを表示
 - (void)carouselDidEndScrollingAnimation:(iCarousel *)_carousel;
 {
-
-  NSLog(@" chg index : %d", _carousel.currentItemIndex);
+  
+  NSLog(@" %d  chg index : %d", __LINE__, _carousel.currentItemIndex);
   if ( _carousel == carousel2) {
 		return;
 	}
@@ -2412,14 +2663,17 @@
 	}
   
   // 初回以外
-  if(!isFistChg){
+  NSLog(@"%d [stockGraph subviews] %d", __LINE__,[[stockGraph subviews] count]);
+  if(!isFistChg || [[stockGraph subviews] count]==0){
+    if([[stockGraph subviews] count]==0) [carousel reloadData];
+    
     singleTapedTag = _carousel.currentItemIndex;
     //グラフ呼び出し
     //dblTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.0f target:self selector:@selector(callGraph) userInfo:NO repeats:NO];
     dblTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(dummy) userInfo:NO repeats:NO];
-    [self callGraph];
+    [self callDataGraph];
   }
-   
+  
   // 初回の二重起動対策
   BOOL flg = NO;
   for (UIView* view in [carousel.currentItemView subviews]){
@@ -2468,7 +2722,7 @@
           [button setFrame:CGRectMake(button.frame.origin.x, carousel.currentItemView.bounds.size.height -button.bounds.size.height-20, button.bounds.size.width, button.bounds.size.height)];
         }
       }
-       
+      
       [UIView beginAnimations:nil context:nil];
       [UIView setAnimationDelegate:self];
       [UIView setAnimationDuration:0.1];
@@ -2528,7 +2782,7 @@
     //グラフ呼び出し
     //dblTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.0f target:self selector:@selector(callGraph) userInfo:NO repeats:NO];
     dblTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f target:self selector:@selector(dummy) userInfo:NO repeats:NO];
-	  [self callGraph];
+	  [self callDataGraph];
   }
 }
 
@@ -2555,7 +2809,7 @@
   for (UIView* view in [Item subviews]){
     if ([view isKindOfClass:[UIImageView class]]) {
       if(view==currentImgview){
-        NSLog(@"remove %d", index);
+        //NSLog(@"remove %d", index);
         [view removeFromSuperview];
       }//else{
       // view.alpha = 1.0;

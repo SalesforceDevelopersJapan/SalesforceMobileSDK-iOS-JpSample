@@ -48,4 +48,8 @@
 @property (nonatomic,strong) NSString *badgeValue;
 @property (nonatomic,strong) NSMutableArray *pdfURLArray;
 @property (nonatomic,strong) NSMutableArray *pdfNameArray;
+
+@property (nonatomic,strong) NSString *stock__c_id;
+@property (nonatomic, assign) int StockCount__c;
+
 @end

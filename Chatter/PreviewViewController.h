@@ -22,14 +22,16 @@
  WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 #import <UIKit/UIKit.h>
 
 @protocol AttachPreviewDelegate <NSObject>
--(void)didAttachAborted;
+-(void)didAttachAborted:(int)tag;
 @end
 @interface PreviewViewController : UIViewController{
 }
 @property (nonatomic,strong) id<AttachPreviewDelegate>delegate;
 @property (nonatomic,strong) UIView *contents;
 @property (nonatomic, assign) BOOL withCancelBtn;
+@property (nonatomic, assign) int tag;
 @end

@@ -33,7 +33,13 @@
 #import "FileNameInputViewController.h"
 #import "PreviewViewController.h"
 #import "GroupListPopoverViewController.h"
+#import "MentionPopoverViewController.h"
 #import "BuildNavButtons.h"
+#import "MentionInfoViewController.h"
+#import "MentionBookmarkViewController.h"
+#import "CommentMenuViewController.h"
+#import "MemoViewController.h"
+#import "UIColor+Hex.h"
 
 @class ViewerViewController;
 @class MetricsViewController;
@@ -46,7 +52,7 @@
 @class Person;
 @class FeedItem;
 
-@interface ChatterViewController : UIViewController <SFRestDelegate,UITextViewDelegate,AttachPreviewDelegate,UIPopoverControllerDelegate,GroupListPopoverDelegate,NSURLConnectionDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,FileNameInputDelegate,UIAlertViewDelegate,ChangeFunctionDelegate>
+@interface ChatterViewController : UIViewController <SFRestDelegate,UITextViewDelegate,AttachPreviewDelegate,UIPopoverControllerDelegate,GroupListPopoverDelegate,NSURLConnectionDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,FileNameInputDelegate,UIAlertViewDelegate,ChangeFunctionDelegate, UITextFieldDelegate, MentionPopoverDelegate, MentionInfoDelegate, MentionBookmarkDelegate, CommentMenuDelegate, MemoViewControllerDelegate>
 {
 	PublicDatas				*pData;
 	UIScrollView			*scrl;
@@ -55,6 +61,28 @@
 	int						tagNum;
 	NSMutableDictionary		*commentArray;
 	NSString				*myId;
+  
+  UIScrollView *mentionScrView;
+  UILabel *mentionLabel;
+  UIView *mentionView;
+  UITapGestureRecognizer *mTap;
+  UITextField  *mentionInput;
+  UIButton				*mentionAddButton;
+  NSMutableArray			*mentionInputArray;
+  NSMutableArray			*mentionInputLabelArray;
+  
+  NSMutableDictionary		*mentionInputLabelDictionary;
+  NSMutableDictionary		*mentionIdDictionary;
+  NSMutableDictionary		*subViewDictionary;
+  
+  NSMutableArray *mentionList;
+  NSMutableArray *mentionIdList;
+  NSMutableArray *mentionImageUrlList;
+  BOOL mentionExist;
+  NSMutableDictionary *commmentFlagDictionary;
+  
+  UITapGestureRecognizer *deleteGesture;
+  
 	UITextView				*postInput;
 	NSMutableDictionary		*attacheArray;
 	int						attachNum;
@@ -106,6 +134,8 @@
 	UIAlertView				*bookmarkAlert;
 	UtilManager				*um;
 	BuildNavButtons			*btnBuilder;
+  
+  MemoViewController *memoVC;
 }
 
 @property (strong, nonatomic) IBOutlet UIView *descriptionView;
@@ -126,6 +156,9 @@
 @property (strong, nonatomic) Company  *initialCompnay;
 @property (strong, nonatomic) UIImage  *initialImage;
 @property (nonatomic, assign) int chatterType;
+//@property (strong, nonatomic) UIPopoverController *pop;
 
 -(void)getFollowers;
+-(void)getMention;
+
 @end

@@ -46,6 +46,7 @@
 - (void)loadSearchWordList;
 - (void)deleteSearchWordListByWord:(NSString*)str;
 -(BOOL)chkString:(id)tgt;
+-(NSString*)chkNullString:(id)tgt;
 -(BOOL)isInclude:(NSString*)str1 cmp:(NSString*)cmp;
 -(NSString*)conv2Tz:(NSString*)src;
 
@@ -138,5 +139,6 @@
 
 - (void) doneSyncFile;
 - (BOOL) isDoneSync;
+-(NSInteger)getCurrentSecond;
 
 @end

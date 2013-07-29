@@ -1075,7 +1075,6 @@
   
   //クエリ作成
   NSString *query = [NSString stringWithFormat:@"SELECT Id,ProductCode,Name,Family,Description,URL__c ,order__c, LastModifiedDate  FROM product2 WHERE IsActive=true  ORDER BY order__c"];
-  NSLog(@"%@",query);
   SFRestRequest *request = [[SFRestAPI sharedInstance] requestForQuery:query];
   [[SFRestAPI sharedInstance] send:request delegate:self];
 }
@@ -1085,7 +1084,7 @@
 {
   
   NSArray *records = [jsonResponse objectForKey:@"records"];
-  NSLog(@"request:didLoadResponse: #records: %d", records.count);
+  //NSLog(@"request:didLoadResponse: #records: %d", records.count);
   
   [self getMovie:records];
 }
@@ -1105,7 +1104,7 @@
       NSString *pId = [dic objectForKey:@"Id"];
       // 動画URL
       NSString *pMovie = [dic objectForKey:@"URL__c"];
-      NSLog(@"movie %d", [um chkString:pMovie]);
+      //NSLog(@"movie %d", [um chkString:pMovie]);
       if(![um chkString:pMovie]) continue;
       
       // URLがある場合  URLが等しい  更新年月日チェック
@@ -1113,7 +1112,7 @@
           && [pMovie isEqualToString:[um loadProductMovieFileURL:pId] ]
           && ![um compareMovieDate:pId DBdate:[dic objectForKey:@"LastModifiedDate"]]
          ){
-        NSLog(@"### OK ###");
+        //NSLog(@"### OK ###");
       }else{
         // urlを保存
         [um saveMovieURL:pId url:pMovie];
@@ -1133,7 +1132,7 @@
                         returningResponse:&response
                         error:&error];
         
-        NSLog(@"file size %lld", [response expectedContentLength]);
+        //NSLog(@"file size %lld", [response expectedContentLength]);
         // 取得したデータ
         if(data){
           [um saveProductMovieFile:pId data:data];
@@ -1141,7 +1140,7 @@
         }
       }
       i++;
-      NSLog(@"count %d  i %d", count, i);
+      //NSLog(@"count %d  i %d", count, i);
       if(i==count){
         [self finishFiles];
       }
@@ -1185,7 +1184,7 @@
                                         NSString *url = [dic objectForKey:@"Body"];
                                         NSString *instance = [[[[[SFRestAPI sharedInstance] coordinator] credentials] instanceUrl]absoluteString];
                                         NSString *fullUrl = [instance stringByAppendingString:url];
-                                        NSLog(@"full url : %@", fullUrl);
+                                        //NSLog(@"full url : %@", fullUrl);
                                         NSURL *myURL = [NSURL URLWithString:fullUrl];
                                         NSMutableURLRequest *requestDoc = [[NSMutableURLRequest alloc]initWithURL:myURL];
                                         

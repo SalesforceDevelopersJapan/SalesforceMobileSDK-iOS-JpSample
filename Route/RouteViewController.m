@@ -22,6 +22,7 @@
  WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 #import "RouteViewController.h"
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
@@ -46,24 +47,24 @@ static const BOOL LogoLoad = YES;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-    }
-    return self;
+  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+  if (self) {
+  }
+  return self;
 }
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
+  [super viewDidLoad];
 	
 	[self.navigationController.navigationBar setHidden:NO];
-    
-    //バックグラウンド処理制御
-    isImgBackJob = YES;
+  
+  //バックグラウンド処理制御
+  isImgBackJob = YES;
 	
-    //by**のボタンを有効に
-    byJobFlg = YES;
-    
+  //by**のボタンを有効に
+  byJobFlg = YES;
+  
 	//選択ルート初期化
 	selectedRoute = [NSMutableArray array];
 	
@@ -73,31 +74,22 @@ static const BOOL LogoLoad = YES;
 	//選択モード(全部表示）
 	selectMode =  (SALES_UP) | (SALES_FLAT) | (SALES_DOWN);
 	
-	//現在地取得準備
-	locationManager = [[CLLocationManager alloc]init];
-	if ([CLLocationManager locationServicesEnabled]){
-		
-		//位置情報取得可能なら測位開始
-		[locationManager setDelegate:self];
-		[locationManager startUpdatingLocation];
-	}
-	
 	um = [UtilManager sharedInstance];
 	pData = [PublicDatas instance];
-
+  
 	self.title = [pData getDataForKey:@"DEFINE_ROUTE_TITLE"];
 	
 	//ナビバー設定
 	NSData *iData =[um navBarType];
 	if ( [((NSString*)iData) isEqualToString:@"gray"] ) {
 		[self.navigationController.navigationBar setBackgroundImage:nil
-													  forBarMetrics:UIBarMetricsDefault];
+                                                  forBarMetrics:UIBarMetricsDefault];
 		self.navigationController.navigationBar.tintColor = [UIColor grayColor];
 	}
 	
 	else if ( [((NSString*)iData) isEqualToString:@"black"] ) {
 		[self.navigationController.navigationBar setBackgroundImage:nil
-													  forBarMetrics:UIBarMetricsDefault];
+                                                  forBarMetrics:UIBarMetricsDefault];
 		self.navigationController.navigationBar.tintColor = [UIColor blackColor];
 	}
 	else {
@@ -105,7 +97,7 @@ static const BOOL LogoLoad = YES;
 		if ( iData ) {
 			UIImage *img = [UIImage imageWithData:iData];
 			[self.navigationController.navigationBar setBackgroundImage:img
-														  forBarMetrics:UIBarMetricsDefault];
+                                                    forBarMetrics:UIBarMetricsDefault];
 		}
 	}
 	
@@ -122,8 +114,8 @@ static const BOOL LogoLoad = YES;
 	
 	//地図初期位置
 	GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:0
-															longitude:0
-																 zoom:InitialZoom];
+                                                          longitude:0
+                                                               zoom:InitialZoom];
 	//地図
 	CGRect r = self.mapView.frame;
 	r.origin.y = 0;
@@ -163,7 +155,7 @@ static const BOOL LogoLoad = YES;
 	if ( iData ) {
 		salesDownImg = [UIImage imageWithData:iData];
 	}
-
+  
 	iData =[um carBtnImage];
 	if ( iData ) {
 		carImg = [UIImage imageWithData:iData];
@@ -228,24 +220,24 @@ static const BOOL LogoLoad = YES;
 	[byCarTextBtn setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
 	[byCarTextBtn addTarget:self action:@selector(byCar) forControlEvents:UIControlEventTouchUpInside];
 	[selectPanel addSubview:byCarTextBtn];
-/*
-	//電車ボタン
-	byTrainBtn = [[UIButton alloc]initWithFrame:CGRectMake(295, 5, 40, 40)];
-	[byTrainBtn setBackgroundImage:SalesDownImg forState:UIControlStateNormal];
-	[byTrainBtn addTarget:self action:@selector(byTrain) forControlEvents:UIControlEventTouchUpInside];
-	[selectPanel addSubview:byTrainBtn];
-	
-	// 電車ボタンキスト
-	ByTrainTextBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-	ByTrainTextBtn.frame = CGRectMake(340,0,100,50);
-	ByTrainTextBtn.titleLabel.font            = [UIFont systemFontOfSize: 18];
-	ByTrainTextBtn.titleLabel.textAlignment = NSTextAlignmentLeft;
-	[ByTrainTextBtn setTitle:@"電車" forState:UIControlStateNormal];
-	[ByTrainTextBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-	[ByTrainTextBtn setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
-	[ByTrainTextBtn addTarget:self action:@selector(byTrain) forControlEvents:UIControlEventTouchUpInside];
-	[selectPanel addSubview:ByTrainTextBtn];
-*/
+  /*
+   //電車ボタン
+   byTrainBtn = [[UIButton alloc]initWithFrame:CGRectMake(295, 5, 40, 40)];
+   [byTrainBtn setBackgroundImage:SalesDownImg forState:UIControlStateNormal];
+   [byTrainBtn addTarget:self action:@selector(byTrain) forControlEvents:UIControlEventTouchUpInside];
+   [selectPanel addSubview:byTrainBtn];
+   
+   // 電車ボタンキスト
+   ByTrainTextBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+   ByTrainTextBtn.frame = CGRectMake(340,0,100,50);
+   ByTrainTextBtn.titleLabel.font            = [UIFont systemFontOfSize: 18];
+   ByTrainTextBtn.titleLabel.textAlignment = NSTextAlignmentLeft;
+   [ByTrainTextBtn setTitle:@"電車" forState:UIControlStateNormal];
+   [ByTrainTextBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+   [ByTrainTextBtn setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
+   [ByTrainTextBtn addTarget:self action:@selector(byTrain) forControlEvents:UIControlEventTouchUpInside];
+   [selectPanel addSubview:ByTrainTextBtn];
+   */
 	byWalkTextBtn.opaque = YES;
 	byWalkBtn.opaque = YES;
 	byCarTextBtn.opaque = YES;
@@ -256,10 +248,10 @@ static const BOOL LogoLoad = YES;
 	selectPanel.opaque = YES;
 	selectPanel.alpha = 1.0;
 	[map addSubview:selectPanel];
-		
+  
 	// ローディングアラートを生成
 	alertView = [[UIAlertView alloc] initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_LOADING"] message:nil
-										  delegate:nil cancelButtonTitle:nil otherButtonTitles:NULL];
+                                        delegate:nil cancelButtonTitle:nil otherButtonTitles:NULL];
 	progress= [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(125, 50, 30, 30)];
 	progress.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
 	[alertView addSubview:progress];
@@ -273,16 +265,16 @@ static const BOOL LogoLoad = YES;
 	
 	// ローディングアラートを生成
 	alertView = [[UIAlertView alloc] initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_LOADING"] message:nil
-										  delegate:nil cancelButtonTitle:nil otherButtonTitles:NULL];
+                                        delegate:nil cancelButtonTitle:nil otherButtonTitles:NULL];
 	progress= [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(125, 50, 30, 30)];
 	progress.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
 	[alertView addSubview:progress];
 	[progress startAnimating];
-
+  
 	// viewWillAppear が反応しないように値をクリア
 	[self clearCenterPoint];
 	
-
+  
 	//店舗ビューからの戻りではない
 	isReturn = NO;
   
@@ -290,21 +282,33 @@ static const BOOL LogoLoad = YES;
 	rt = [[Route alloc] init];
 	[rt getRouteList];
 	
-
+  
 }
 
 -(void)viewWillAppear:(BOOL)animated
 {
-
+  firstGPS = YES;
+  
+  //現在地取得準備
+	locationManager = [[CLLocationManager alloc]init];
+	if ([CLLocationManager locationServicesEnabled]){
+		
+		//位置情報取得可能なら測位開始
+    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    //locationManager.distanceFilter = 10.0;
+    //locationManager.pausesLocationUpdatesAutomatically = NO;
+		[locationManager setDelegate:self];
+		[locationManager startUpdatingLocation];
+	}
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
 	if (![returnPos isEqual:[NSNull null]]){
-
+    
 		
 		if ( isReturn == YES ) {
-
+      
 			//[[UIApplication sharedApplication] setStatusBarOrientation:orientation animated:NO];
 			// 地図の中心を指定
 			[map setCamera:returnPos];
@@ -318,9 +322,9 @@ static const BOOL LogoLoad = YES;
 -(void)alertShow
 {
 	[NSTimer scheduledTimerWithTimeInterval:10.0f
-									 target:self
-								   selector:@selector(performDismiss:)
-								   userInfo:alertView repeats:NO];
+                                   target:self
+                                 selector:@selector(performDismiss:)
+                                 userInfo:alertView repeats:NO];
 	[alertView show];
 }
 
@@ -337,49 +341,49 @@ static const BOOL LogoLoad = YES;
 		return;
 	}
 	else if (byJobFlg ==NO) {
-        return;
-    }else{
-        byJobFlg = NO;
-        moveMethod = ENUM_MOVEBYWALK;
-        byWalkBtn.alpha = 1.0;
-        byWalkTextBtn.alpha = 1.0;
-        byCarBtn.alpha = 0.3;
-        byCarTextBtn.alpha = 0.3;
-        ByTrainTextBtn.alpha = 0.3;
-        byTrainBtn.alpha = 0.3;
-	
-        //ルート選択済みの場合は、再検索
-        if ( [selectedRoute count])
-        {
+    return;
+  }else{
+    byJobFlg = NO;
+    moveMethod = ENUM_MOVEBYWALK;
+    byWalkBtn.alpha = 1.0;
+    byWalkTextBtn.alpha = 1.0;
+    byCarBtn.alpha = 0.3;
+    byCarTextBtn.alpha = 0.3;
+    ByTrainTextBtn.alpha = 0.3;
+    byTrainBtn.alpha = 0.3;
+    
+    //ルート選択済みの場合は、再検索
+    if ( [selectedRoute count])
+    {
 			retryCount = 0;
-
+      
 			//マップクリア
-            [map clear];
-
-            //ピン追加
+      [map clear];
+      
+      //ピン追加
 			drawProgress = YES;
-            [self addCompanyPinByArray:selectedRoute];
-
-            //ルート検索
-            [self searchRoute:lastSearchFromCurrentPos];
-        }
+      [self addCompanyPinByArray:selectedRoute];
+      
+      //ルート検索
+      [self searchRoute:lastSearchFromCurrentPos];
     }
-    byJobFlg = YES;
+  }
+  byJobFlg = YES;
 }
 -(void)byTrain
 {
-    if (byJobFlg ==NO) {
-        return;
-    }else{
-        moveMethod = ENUM_MOVEBYTRAIN;
-        ByTrainTextBtn.alpha = 1.0;
-        byTrainBtn.alpha = 1.0;
-        byCarBtn.alpha = 0.3;
-        byCarTextBtn.alpha = 0.3;
-        byWalkBtn.alpha = 0.3;
-        byWalkTextBtn.alpha = 0.3;
-    }
-    byJobFlg = YES;
+  if (byJobFlg ==NO) {
+    return;
+  }else{
+    moveMethod = ENUM_MOVEBYTRAIN;
+    ByTrainTextBtn.alpha = 1.0;
+    byTrainBtn.alpha = 1.0;
+    byCarBtn.alpha = 0.3;
+    byCarTextBtn.alpha = 0.3;
+    byWalkBtn.alpha = 0.3;
+    byWalkTextBtn.alpha = 0.3;
+  }
+  byJobFlg = YES;
 }
 -(void)byCar
 {
@@ -387,33 +391,33 @@ static const BOOL LogoLoad = YES;
 		return;
 	}
 	else if (byJobFlg ==NO) {
-        return;
-    }else{
-        moveMethod = ENUM_MOVEBYCAR;
-        byCarBtn.alpha = 1.0;
-        byCarTextBtn.alpha = 1.0;
-        byWalkBtn.alpha = 0.3;
-        byWalkTextBtn.alpha = 0.3;
-        ByTrainTextBtn.alpha = 0.3;
-        byTrainBtn.alpha = 0.3;
-	
-        //ルート選択済みの場合は、再検索
-        if ( [selectedRoute count])
-        {
+    return;
+  }else{
+    moveMethod = ENUM_MOVEBYCAR;
+    byCarBtn.alpha = 1.0;
+    byCarTextBtn.alpha = 1.0;
+    byWalkBtn.alpha = 0.3;
+    byWalkTextBtn.alpha = 0.3;
+    ByTrainTextBtn.alpha = 0.3;
+    byTrainBtn.alpha = 0.3;
+    
+    //ルート選択済みの場合は、再検索
+    if ( [selectedRoute count])
+    {
 			retryCount = 0;
-
-            //マップクリア
-            [map clear];
-
-            //ピン追加
+      
+      //マップクリア
+      [map clear];
+      
+      //ピン追加
 			drawProgress = YES;
-            [self addCompanyPinByArray:selectedRoute];
-
-            //ルート検索
-            [self searchRoute:lastSearchFromCurrentPos];
-        }
-        byJobFlg = YES;
+      [self addCompanyPinByArray:selectedRoute];
+      
+      //ルート検索
+      [self searchRoute:lastSearchFromCurrentPos];
     }
+    byJobFlg = YES;
+  }
 }
 
 
@@ -435,12 +439,12 @@ static const BOOL LogoLoad = YES;
 	selectBtn.frame = CGRectMake( 0,0, 100,25);
 	[selectBtn addTarget:self action:@selector(SelectPushed) forControlEvents:UIControlEventTouchUpInside];
 	toolbar.items = [NSArray arrayWithObjects:space,[[UIBarButtonItem alloc]initWithCustomView:selectBtn], nil];
-/*
-		// リストボタンの代わりに空ボタンを作成
-		UIButton *empBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-		empBtn.frame = CGRectMake(0,0,25,25);
-		toolbar.items = [NSArray arrayWithObjects:[[UIBarButtonItem alloc]initWithCustomView:empBtn], nil];
-*/
+  /*
+   // リストボタンの代わりに空ボタンを作成
+   UIButton *empBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+   empBtn.frame = CGRectMake(0,0,25,25);
+   toolbar.items = [NSArray arrayWithObjects:[[UIBarButtonItem alloc]initWithCustomView:empBtn], nil];
+   */
 	//ツールバーをナビバーに設置
 	self.navigationItem.rightBarButtonItem = toolbarBarButtonItem;
 	
@@ -450,7 +454,7 @@ static const BOOL LogoLoad = YES;
 {
 	//ダミーデータ
 	NSMutableArray *dmy =  [rt getList];
-
+  
 	//ルート一覧をPopoverで表示
 	RouteSelectPopoverViewController *rtsV = [[RouteSelectPopoverViewController alloc]init];
 	rtsV.delegate = self;
@@ -515,86 +519,82 @@ static const BOOL LogoLoad = YES;
 		}
 		[selectedRoute addObject:tempCp];
 	}
-
+  
 	//NSString *query1 = @"SELECT Account__r.Id, Account__r.Name, Account__r.Phone, Account__r.BillingState, Account__r.BillingCity, Account__r.BillingStreet, LatNum__c, LngNum__c,  Account__r.status__c ";
 	NSString *query1 = @"SELECT Account__r.Id, Account__r.Name, Account__r.Phone, Account__r.BillingState, Account__r.BillingCity, Account__r.BillingStreet, GPS__Latitude__s, GPS__Longitude__s,  Account__r.status__c ";
 	NSString *query2 = [NSString stringWithFormat:@"FROM LatLngObj__c WHERE %@", where];
 	NSString *query = [query1 stringByAppendingString:query2];
 	
 	[[SFRestAPI sharedInstance] performSOQLQuery:query
-		//エラーハンドラ
-		failBlock:^(NSError *e) {
-			NSLog(@"FAILWHALE with error: %@", [e description] );
-		}
-		completeBlock:^(NSDictionary *results) {
-									   
-			NSLog(@"%@",results);
-									   
-			NSArray *records = [results objectForKey:@"records"];
-			for ( int i = 0; i < [records count]; i++ ) {
-			
-				NSDictionary *dict = [records objectAtIndex:i];
-				NSDictionary *dic = [dict objectForKey:@"Account__r"];
-				NSString *billingCity = [dic objectForKey:@"BillingCity"];
-				NSString *billingStreet = [dic objectForKey:@"BillingStreet"];
-				NSString *billingState = [dic objectForKey:@"BillingState"];
-				NSString *aname = [dic objectForKey:@"Name"];
-				NSString *phone = [dic objectForKey:@"Phone"];
-        NSString *address;
-        if([um chkString:billingState]){
-          address = [billingState stringByAppendingString:billingCity];
-        }else{
-          address = billingCity;
-        }
-				//double lat = [[dict objectForKey:@"LatNum__c"]floatValue];
-				//double lng = [[dict objectForKey:@"LngNum__c"]doubleValue];
-				double lat = [[dict objectForKey:@"GPS__Latitude__s"]floatValue];
-				double lng = [[dict objectForKey:@"GPS__Longitude__s"]doubleValue];
-				NSString *cpId = [dic objectForKey:@"Id"];
-
-				Company *tempCp2;
-				for ( int ii = 0; ii < [selectedRoute count]; ii++ ){
-					tempCp2 = [selectedRoute objectAtIndex:ii];
-          NSLog(@" tempCp2.company_id : %@", tempCp2.company_id);
-					if ( [tempCp2.company_id isEqualToString:cpId] ) {
-						tempCp2.Address1 = address;
-						tempCp2.Address2 = billingStreet;
-						tempCp2.phone1 = phone;
-						tempCp2.name = aname;
-						tempCp2.position = CLLocationCoordinate2DMake(lat, lng);
-						NSString *status = [dic objectForKey:@"status__c"];
-					
-						if (status != nil && ![status isEqual:[NSNull null]]) {
-							if([status isEqual:@"SalesUp"]){
-								tempCp2.salesStatus = SALES_UP;
-							}else if([status isEqual:@"SalesDown"]){
-								tempCp2.salesStatus = SALES_DOWN;
-							}else{
-								tempCp2.salesStatus = SALES_FLAT;
-							}
-						}else{
-							tempCp2.salesStatus = SALES_FLAT;
-						}
-						NSData *iData;
-						UIImage *cpimage;
-						NSString *image_key;
-						NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-						image_key = [NSString stringWithFormat:@"img_%@",tempCp2.company_id];
-						iData = [ud objectForKey:image_key];
-						cpimage = [UIImage imageWithData:iData];
-						tempCp2.image = cpimage;
-					}
-				}
-			}
-			
-			//ピン追加
-			[self addCompanyPinByArray:selectedRoute];
-			
-			//デフォルトルート検索
-			[self searchRoute:YES];
-			
-			[self performSelectorInBackground:@selector(requestCpImage) withObject:nil];
-		}
+   //エラーハンドラ
+                                     failBlock:^(NSError *e) {
+                                       NSLog(@"FAILWHALE with error: %@", [e description] );
+                                     }
+                                 completeBlock:^(NSDictionary *results) {
+                                   
+                                   NSLog(@"%@",results);
+                                   
+                                   NSArray *records = [results objectForKey:@"records"];
+                                   for ( int i = 0; i < [records count]; i++ ) {
+                                     
+                                     NSDictionary *dict = [records objectAtIndex:i];
+                                     NSDictionary *dic = [dict objectForKey:@"Account__r"];
+                                     NSString *billingCity = [um chkNullString:[dic objectForKey:@"BillingCity"]];
+                                     NSString *billingStreet = [um chkNullString:[dic objectForKey:@"BillingStreet"]];
+                                     NSString *billingState = [um chkNullString:[dic objectForKey:@"BillingState"]];
+                                     NSString *aname = [um chkNullString:[dic objectForKey:@"Name"]];
+                                     NSString *phone = [um chkNullString:[dic objectForKey:@"Phone"]];
+                                     NSString *address = [billingState stringByAppendingString:billingCity];
+                                     
+                                     //double lat = [[dict objectForKey:@"LatNum__c"]floatValue];
+                                     //double lng = [[dict objectForKey:@"LngNum__c"]doubleValue];
+                                     double lat = [[dict objectForKey:@"GPS__Latitude__s"]floatValue];
+                                     double lng = [[dict objectForKey:@"GPS__Longitude__s"]doubleValue];
+                                     NSString *cpId = [dic objectForKey:@"Id"];
+                                     
+                                     Company *tempCp2;
+                                     for ( int ii = 0; ii < [selectedRoute count]; ii++ ){
+                                       tempCp2 = [selectedRoute objectAtIndex:ii];
+                                       //NSLog(@" tempCp2.company_id : %@", tempCp2.company_id);
+                                       if ( [tempCp2.company_id isEqualToString:cpId] ) {
+                                         tempCp2.Address1 = address;
+                                         tempCp2.Address2 = billingStreet;
+                                         tempCp2.phone1 = phone;
+                                         tempCp2.name = aname;
+                                         tempCp2.position = CLLocationCoordinate2DMake(lat, lng);
+                                         NSString *status = [dic objectForKey:@"status__c"];
+                                         
+                                         if (status != nil && ![status isEqual:[NSNull null]]) {
+                                           if([status isEqual:@"SalesUp"]){
+                                             tempCp2.salesStatus = SALES_UP;
+                                           }else if([status isEqual:@"SalesDown"]){
+                                             tempCp2.salesStatus = SALES_DOWN;
+                                           }else{
+                                             tempCp2.salesStatus = SALES_FLAT;
+                                           }
+                                         }else{
+                                           tempCp2.salesStatus = SALES_FLAT;
+                                         }
+                                         NSData *iData;
+                                         UIImage *cpimage;
+                                         NSString *image_key;
+                                         NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+                                         image_key = [NSString stringWithFormat:@"img_%@",tempCp2.company_id];
+                                         iData = [ud objectForKey:image_key];
+                                         cpimage = [UIImage imageWithData:iData];
+                                         tempCp2.image = cpimage;
+                                       }
+                                     }
+                                   }
+                                   
+                                   //ピン追加
+                                   [self addCompanyPinByArray:selectedRoute];
+                                   
+                                   //デフォルトルート検索
+                                   [self searchRoute:YES];
+                                   
+                                   [self performSelectorInBackground:@selector(requestCpImage) withObject:nil];
+                                 }
 	 ];
 }
 
@@ -602,19 +602,19 @@ static const BOOL LogoLoad = YES;
 //表示用の企業ロゴを別スレッドで取得
 -(void)requestCpImage
 {
-    //画像取得　バックエンドの処理が終わっていなかったらスキップ
-    if(!isImgBackJob){
-        return;
-    }else{
-        isImgBackJob = NO;
+  //画像取得　バックエンドの処理が終わっていなかったらスキップ
+  if(!isImgBackJob){
+    return;
+  }else{
+    isImgBackJob = NO;
 		[self retriveImage:selectedRoute];
 		
-        [self performSelectorOnMainThread:@selector(requestCpImageDidFinish) withObject:nil waitUntilDone:NO];
-    }
+    [self performSelectorOnMainThread:@selector(requestCpImageDidFinish) withObject:nil waitUntilDone:NO];
+  }
 }
 
 - (void)requestCpImageDidFinish{
-    isImgBackJob = YES;
+  isImgBackJob = YES;
 }
 
 
@@ -628,22 +628,22 @@ static const BOOL LogoLoad = YES;
 	else {
 		queryedWaypt = 0;
 	}
-
+  
 	//既存のピン、ルートを消去
 	[map clear];
 	
-
+  
 	if ( defaultRoute == NO ) {
-
+    
 		//現在地からのルート
 		
 		//ルート検索
 		NSMutableArray *sortRoute = [self sortWayPoint:selectedRoute];
-
+    
 		//ピン追加
 		[self addCompanyPinByArray:sortRoute];
 		[self routeByWaypt:sortRoute index:queryedWaypt];
-        
+    
 		//現在地を含めたルートを表示
 		Company *cp = [[Company alloc]init];
 		cp.position = myPos;
@@ -652,9 +652,9 @@ static const BOOL LogoLoad = YES;
 		[self dispRoute:tmpAry];
 	}
 	else {
-
+    
 		//デフォルトルート検索（現在地を含めないルート）
-
+    
 		//ピン追加
 		[self addCompanyPinByArray:selectedRoute];
 		
@@ -669,31 +669,31 @@ static const BOOL LogoLoad = YES;
 // google map での検索
 -(void)searchGoogle:(NSString *)address
 {
-    // エンコード
-    NSString *target= address = [address stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+  // エンコード
+  NSString *target= address = [address stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	
-    // google maps api へリクエストを送信
-    NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                       [NSString stringWithFormat:@"%@", target], @"address", nil];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://maps.googleapis.com/maps/api/geocode/json"]];
-    [parameters setValue:@"true" forKey:@"sensor"];
-    [parameters setValue:[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] forKey:@"language"];
-    NSMutableArray *paramStringsArray = [NSMutableArray arrayWithCapacity:[[parameters allKeys] count]];
-    
-    for(NSString *key in [parameters allKeys]) {
+  // google maps api へリクエストを送信
+  NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                     [NSString stringWithFormat:@"%@", target], @"address", nil];
+  NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://maps.googleapis.com/maps/api/geocode/json"]];
+  [parameters setValue:@"true" forKey:@"sensor"];
+  [parameters setValue:[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] forKey:@"language"];
+  NSMutableArray *paramStringsArray = [NSMutableArray arrayWithCapacity:[[parameters allKeys] count]];
+  
+  for(NSString *key in [parameters allKeys]) {
 		NSObject *paramValue = [parameters valueForKey:key];
 		[paramStringsArray addObject:[NSString stringWithFormat:@"%@=%@", key, paramValue]];
-    }
-    
-    NSString *paramsString = [paramStringsArray componentsJoinedByString:@"&"];
-    NSString *baseAddress = request.URL.absoluteString;
-    baseAddress = [baseAddress stringByAppendingFormat:@"?%@", paramsString];
-    //NSLog(@"url %@", baseAddress);
-    [request setURL:[NSURL URLWithString:baseAddress]];
+  }
+  
+  NSString *paramsString = [paramStringsArray componentsJoinedByString:@"&"];
+  NSString *baseAddress = request.URL.absoluteString;
+  baseAddress = [baseAddress stringByAppendingFormat:@"?%@", paramsString];
+  //NSLog(@"url %@", baseAddress);
+  [request setURL:[NSURL URLWithString:baseAddress]];
 	
-    NSOperationQueue *queue = [NSOperationQueue mainQueue];
+  NSOperationQueue *queue = [NSOperationQueue mainQueue];
 	
-    [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *res, NSData *data, NSError *error) {
+  [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *res, NSData *data, NSError *error) {
 		
 		if(data){
 			NSDictionary *responseDict = [data objectFromJSONData];
@@ -723,8 +723,8 @@ static const BOOL LogoLoad = YES;
 				//検索地点にマーカー追加
 				NSNumber *type = [[NSNumber alloc]initWithInt:ENUM_PINSEARCHLOCATION];
 				NSDictionary *dat = [NSDictionary dictionaryWithObjectsAndKeys:	target , @"title",
-									 pos,@"position",
-									 type,@"type",nil];
+                             pos,@"position",
+                             type,@"type",nil];
 				//検索地点にピン追加
 				[self addMarkersToMap:dat];
 				//地点検索処理
@@ -748,7 +748,7 @@ static const BOOL LogoLoad = YES;
 	
 	// google maps api へリクエストを送信
 	NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-									   [NSString stringWithFormat:@"%@", target], @"address", nil];
+                                     [NSString stringWithFormat:@"%@", target], @"address", nil];
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://maps.googleapis.com/maps/api/geocode/json"]];
 	[parameters setValue:@"true" forKey:@"sensor"];
 	[parameters setValue:[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] forKey:@"language"];
@@ -820,8 +820,8 @@ static const BOOL LogoLoad = YES;
 				//検索地点にマーカー追加
 				NSNumber *type = [[NSNumber alloc]initWithInt:ENUM_PINSEARCHLOCATION];
 				NSDictionary *dat = [NSDictionary dictionaryWithObjectsAndKeys:	target , @"title",
-									 pos,@"position",
-									 type,@"type",nil];
+                             pos,@"position",
+                             type,@"type",nil];
 				//検索地点にピン追加
 				[self addMarkersToMap:dat];
 				//地点検索処理
@@ -912,8 +912,8 @@ static const BOOL LogoLoad = YES;
 			//検索地点にマーカー追加
 			NSNumber *type = [[NSNumber alloc]initWithInt:ENUM_PINSEARCHLOCATION];
 			NSDictionary *dat = [NSDictionary dictionaryWithObjectsAndKeys:	target , @"title",
-								 pos,@"position",
-								 type,@"type",nil];
+                           pos,@"position",
+                           type,@"type",nil];
 			//検索地点にピン追加
 			[self addMarkersToMap:dat];
 			
@@ -968,16 +968,16 @@ static const BOOL LogoLoad = YES;
 	//クエリ作成
 	//NSString *query1 = @"SELECT Account__r.Id, Account__r.Name, Account__r.Phone, Account__r.BillingState, Account__r.BillingCity, Account__r.BillingStreet, LatNum__c, LngNum__c";
 	//NSString *query2 = [NSString stringWithFormat:@"FROM LatLngObj__c WHERE LatNum__c <= %f AND LatNum__c >= %f AND LngNum__c <= %f AND LngNum__c >= %f",latmax,latmin,lngmax,lngmin];
-
+  
 	NSString *query1 = @"SELECT Account__r.Id, Account__r.Name, Account__r.Phone, Account__r.BillingState, Account__r.BillingCity, Account__r.BillingStreet, GPS__Latitude__s, GPS__Longitude__s ";
 	NSString *query2 = [NSString stringWithFormat:@"FROM LatLngObj__c WHERE GPS__Latitude__s <= %f AND GPS__Latitude__s >= %f AND GPS__Longitude__s <= %f AND GPS__Longitude__s >= %f",latmax,latmin,lngmax,lngmin];
- 
+  
   
 	NSString *query = [query1 stringByAppendingString:query2];
 	NSLog(@"%@",query);
 	SFRestRequest *request = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] send:request delegate:self];
-
+  
 }
 
 
@@ -991,7 +991,7 @@ static const BOOL LogoLoad = YES;
 	lngmax = 0;
 	latmin = 999;
 	lngmin = 999;
-
+  
 	//検索結果リストから緯度経度の最大値を求める
 	for ( int i = 0; i < [array count]; i++ ){
 		Company *cp = [array objectAtIndex:i];
@@ -1049,7 +1049,7 @@ static const BOOL LogoLoad = YES;
 			lngmin = cp.position.longitude;
 		}
 	}
-
+  
 	CLLocationCoordinate2D southWest,northEast;
 	southWest.latitude = latmax;
 	southWest.longitude = lngmin;
@@ -1061,37 +1061,20 @@ static const BOOL LogoLoad = YES;
 	
 	MKMapPoint point1 = MKMapPointForCoordinate(southWest);
 	MKMapPoint point2 = MKMapPointForCoordinate(northEast);
-
+  
 	double mapScaleWidth = mapViewWidth / fabs(point2.x - point1.x);
 	double mapScaleHeight = mapViewHeight / fabs(point2.y - point1.y);
 	double mapScale = MIN(mapScaleWidth, mapScaleHeight);
 	
-//	double zoomLevel = 20 + log2(mapScale);
+  //	double zoomLevel = 20 + log2(mapScale);
 	double zoomLevel = 19.9 + log2(mapScale);
 	
 	GMSCameraPosition *camera = [GMSCameraPosition
-								 cameraWithLatitude: center.latitude
-								 longitude: center.longitude
-								 zoom: zoomLevel];
+                               cameraWithLatitude: center.latitude
+                               longitude: center.longitude
+                               zoom: zoomLevel];
 	
 	[map setCamera:camera];
-}
-
-//受け取ったオブジェクトがNSString以外なら空のNSStringを返す
--(NSString*)chkString:(id)tgt
-{
-  @try {
-    NSString *cls = NSStringFromClass([tgt class]);
-    if ( ![cls isEqualToString:@"__NSCFString"]) {
-      return @"";
-    }
-    else {
-      return tgt;
-    }
-  }@catch (NSException *exception) {
-    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
-    return @"";
-  }
 }
 
 //複数地点のルート検索
@@ -1110,9 +1093,9 @@ static const BOOL LogoLoad = YES;
 	Company *tempcp;
 	CLLocationCoordinate2D org;
 	CLLocationCoordinate2D dst;
-		
+  
 	tempcp = [ary objectAtIndex:0];
-
+  
 	//最初の地点から検索の場合は、現在地をスタート地点とする
 	if ( index == 0 ) {
 		org = myPos;
@@ -1138,7 +1121,7 @@ static const BOOL LogoLoad = YES;
 	NSString *origin = [NSString stringWithFormat:@"origin=%f,%f",org.latitude, org.longitude];
 	NSString *destination = [NSString stringWithFormat:@"&destination=%f,%f",dst.latitude, dst.longitude];
 	NSString *sens = @"&sensor=false";
-
+  
 	if (( org.latitude == dst.latitude ) && ( org.longitude == dst.longitude )){
 		if (( [selectedRoute count] - 1 ) > queryedWaypt ){
 			[self routeByWaypt:selectedRoute index:++queryedWaypt];
@@ -1170,7 +1153,7 @@ static const BOOL LogoLoad = YES;
 			moveMode = @"&mode=driving";
 			break;
 	}
-
+  
 	NSString *param = [[[origin stringByAppendingString:destination]stringByAppendingString:sens]stringByAppendingString:moveMode];
 	NSString *reqStr = [NSString stringWithFormat:@"http://maps.googleapis.com/maps/api/directions/json?%@",param];
 	reqStr = [reqStr stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
@@ -1186,7 +1169,7 @@ static const BOOL LogoLoad = YES;
 {
 	for( int i = 0; i < [ary count]; i++){
 		Company *cp = [ary objectAtIndex:i];
-        cp.sortKey2 = i+1;
+    cp.sortKey2 = i+1;
 		[self addCompanyPin:[ary objectAtIndex:i]];
 	}
 }
@@ -1196,14 +1179,14 @@ static const BOOL LogoLoad = YES;
 {
 	GMSCameraPosition *pos = [GMSCameraPosition cameraWithTarget:cp.position zoom:InitialZoom];
 	NSString *title = cp.name;
-    NSNumber *sortkey = [[NSNumber alloc]initWithInt:cp.sortKey2];
+  NSNumber *sortkey = [[NSNumber alloc]initWithInt:cp.sortKey2];
 	NSNumber *type = [[NSNumber alloc]initWithInt:ENUM_PINCOMPANY];
 	NSDictionary *dic = [NSDictionary dictionaryWithObjectsAndKeys:	pos,@"position",
-						 title,@"title",
-						 type,@"type",
-						 cp,@"company",
-                         sortkey,@"sortkey",
-						 nil];
+                       title,@"title",
+                       type,@"type",
+                       cp,@"company",
+                       sortkey,@"sortkey",
+                       nil];
 	
 	[self addMarkersToMap:dic];
 }
@@ -1211,20 +1194,20 @@ static const BOOL LogoLoad = YES;
 //マーカーピン追加
 - (void)addMarkersToMap:(NSDictionary*)dic
 {
-    UIImage *pinImage;
+  UIImage *pinImage;
 	
 	GMSMarkerOptions *op = [[GMSMarkerOptions alloc] init];
 	GMSCameraPosition *pos = [dic objectForKey:@"position"];
 	op.position = pos.target;
-	op.title = [dic objectForKey:@"title"];
+	op.title = [um chkNullString:[dic objectForKey:@"title"]];
 	op.userData = dic;
 	op.groundAnchor = CGPointMake(0.5, 1.0);
 	
 	//ピンの画像指定
 	NSNumber *num = [dic objectForKey:@"type"];
-    NSNumber *sortkey = 0;
-    NSString *cpimg = @"";
-    
+  NSNumber *sortkey = 0;
+  NSString *cpimg = @"";
+  
 	switch ([num intValue]) {
 		case ENUM_PINSEARCHLOCATION:
 		case ENUM_PINCURRENTLOCATION:
@@ -1236,20 +1219,20 @@ static const BOOL LogoLoad = YES;
 			break;
 			
 		case ENUM_PINCOMPANY:
-  
-            sortkey = [dic objectForKey:@"sortkey"];
-            cpimg = [NSString stringWithFormat:@"cp_img_%@.png",sortkey];
-            pinImage = [UIImage imageNamed:cpimg];
-            
+      
+      sortkey = [dic objectForKey:@"sortkey"];
+      cpimg = [NSString stringWithFormat:@"cp_img_%@.png",sortkey];
+      pinImage = [UIImage imageNamed:cpimg];
+      
 			op.icon = pinImage;
-             
+      
 			break;
 			
 		default:
 			break;
 	}
 	[map addMarkerWithOptions:op];
-
+  
 }
 
 //コールアウト作成
@@ -1380,14 +1363,14 @@ static const BOOL LogoLoad = YES;
 	
 	CLLocationCoordinate2D anchor = marker.position;
 	CGPoint point = [mapView.projection pointForCoordinate:anchor];
-    CGRect calloutRect = CGRectZero;
-    calloutRect.origin = point;
-    calloutRect.size = CGSizeZero;
-    [self.calloutView presentCalloutFromRect:calloutRect
-                                      inView:mapView
-                           constrainedToView:mapView
-                    permittedArrowDirections:SMCalloutArrowDirectionDown
-                                    animated:YES];
+  CGRect calloutRect = CGRectZero;
+  calloutRect.origin = point;
+  calloutRect.size = CGSizeZero;
+  [self.calloutView presentCalloutFromRect:calloutRect
+                                    inView:mapView
+                         constrainedToView:mapView
+                  permittedArrowDirections:SMCalloutArrowDirectionDown
+                                  animated:YES];
 	
 	// マップ内にinfowindowが収まる処理
 	// 左に行き過ぎた
@@ -1414,7 +1397,7 @@ static const BOOL LogoLoad = YES;
 		// ずらした座標から新しい緯度経度を取得してマップの中心に指定
 		CLLocationCoordinate2D cd = [mapView.projection coordinateForPoint:newpoint];
 		GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:cd.latitude longitude:cd.longitude zoom:mapView.camera.zoom];
-
+    
 		if (( cd.latitude != 0.0f) && ( cd.longitude != 0.0f )){
 			[map setCamera:pos];
 		}
@@ -1423,35 +1406,45 @@ static const BOOL LogoLoad = YES;
 	// 中心地点を記憶
 	[self saveCenterPoint];
 	
-    return self.emptyCalloutView;
+  return self.emptyCalloutView;
 }
 
 
 - (void)mapView:(GMSMapView *)mapView didTapAtCoordinate:(CLLocationCoordinate2D)coordinate {
-    self.calloutView.hidden = YES;
+  self.calloutView.hidden = YES;
 }
 
 
 //コールアウトビューのボタンタップ時処理 StoreViewに遷移
 - (void)calloutAccessoryButtonTapped:(id)sender {
-    if (map.selectedMarker) {
-        
+  if (map.selectedMarker) {
+    
 		[pop dismissPopoverAnimated:NO];
 		
-        id<GMSMarker> marker = map.selectedMarker;
-        NSDictionary  *userData = marker.userData;
+    id<GMSMarker> marker = map.selectedMarker;
+    NSDictionary  *userData = marker.userData;
 		Company *cp = [userData objectForKey:@"company"];
 		NSLog(@"ID:%@",cp.company_id);
-
+    
 		//戻り先を記録
 		pData = [PublicDatas instance];
 		[pData setData:@"MAP" forKey:@"ReturnScreen"];
-
+    
 		// 中心地点を記憶
 		[self saveCenterPoint];
-
+    
 		isReturn = YES;
 		
+    @try{
+      //if ([CLLocationManager locationServicesEnabled]){
+      //位置情報取得停止
+      [locationManager setDelegate:nil];
+      [locationManager stopUpdatingLocation];
+      //}
+    }@catch (NSException *exception) {
+      NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+    }
+    
 		//店舗ビューに遷移
 		MetricsViewController *metVC = [[MetricsViewController alloc]initWithNibName:@"Metrics" bundle:[NSBundle mainBundle]company:cp];
 		[self.navigationController pushViewController:metVC animated:YES];
@@ -1462,23 +1455,23 @@ static const BOOL LogoLoad = YES;
 -(id)resizeImage:(UIImage*)img Rect:(CGRect)rect
 {
 	if (( img.size.height > rect.size.height) ||
-		( img.size.width > rect.size.width)) {
-        
-        float asp;
-        int height = rect.size.height;
-        int width  = rect.size.width;
-        int x = 0;
-        int y = 0;
-        
-        if (img.size.height > img.size.width) {
-            asp = img.size.width / img.size.height;
-            width = width * asp;
-            x = (rect.size.width - width)/2;
-        }else{
-            asp = img.size.height / img.size.width;
-            height = height * asp;
-            y = (rect.size.height - height)/2;
-        }
+      ( img.size.width > rect.size.width)) {
+    
+    float asp;
+    int height = rect.size.height;
+    int width  = rect.size.width;
+    int x = 0;
+    int y = 0;
+    
+    if (img.size.height > img.size.width) {
+      asp = img.size.width / img.size.height;
+      width = width * asp;
+      x = (rect.size.width - width)/2;
+    }else{
+      asp = img.size.height / img.size.width;
+      height = height * asp;
+      y = (rect.size.height - height)/2;
+    }
 		
 		UIGraphicsBeginImageContext(rect.size);
 		[img drawInRect:CGRectMake(x,y,width,height)];
@@ -1491,20 +1484,20 @@ static const BOOL LogoLoad = YES;
 - (void)mapView:(GMSMapView *)pMapView didChangeCameraPosition:(GMSCameraPosition *)position
 {
 	
-    /* move callout with map drag */
-    if (pMapView.selectedMarker != nil && !self.calloutView.hidden) {
-        CLLocationCoordinate2D anchor = [pMapView.selectedMarker position];
-        
-        CGPoint arrowPt = self.calloutView.backgroundView.arrowPoint;
-        
-        CGPoint pt = [pMapView.projection pointForCoordinate:anchor];
-        pt.x -= arrowPt.x;
-        pt.y -= arrowPt.y + CalloutYOffset;
-        
-        self.calloutView.frame = (CGRect) {.origin = pt, .size = self.calloutView.frame.size };
-    } else {
-        self.calloutView.hidden = YES;
-    }
+  /* move callout with map drag */
+  if (pMapView.selectedMarker != nil && !self.calloutView.hidden) {
+    CLLocationCoordinate2D anchor = [pMapView.selectedMarker position];
+    
+    CGPoint arrowPt = self.calloutView.backgroundView.arrowPoint;
+    
+    CGPoint pt = [pMapView.projection pointForCoordinate:anchor];
+    pt.x -= arrowPt.x;
+    pt.y -= arrowPt.y + CalloutYOffset;
+    
+    self.calloutView.frame = (CGRect) {.origin = pt, .size = self.calloutView.frame.size };
+  } else {
+    self.calloutView.hidden = YES;
+  }
 	
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
@@ -1512,31 +1505,35 @@ static const BOOL LogoLoad = YES;
 //位置取得時処理
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-	CLLocation *location;
-	
-	//初回の位置取得時のみ地図を移動（自身の位置追跡しない）
-	location = [locations objectAtIndex:0];
-	if ( moveCurrentPos == YES) {
-		
-		
-		GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:location.coordinate.latitude longitude:location.coordinate.longitude zoom:InitialZoom];
-		[map setCamera:pos];
-		moveCurrentPos = NO;
-
-		/*
-		 //現在地にピンを立てる
-		 NSString *title = @"現在地";
-		 NSNumber *type = [[NSNumber alloc]initWithInt:PIN_CURRENTLOCATION];
-		 NSDictionary *dic = [NSDictionary dictionaryWithObjectsAndKeys:pos,@"position",
-		 title,@"title",
-		 type,@"type",
-		 nil];
-		 [self addMarkersToMap:dic];
-		 */
-	}
-	myPos = location.coordinate;
-
-	[locationManager startUpdatingLocation];
+  if(firstGPS==YES || [um getCurrentSecond]==0){
+    NSLog(@"location up");
+    CLLocation *location;
+    
+    //初回の位置取得時のみ地図を移動（自身の位置追跡しない）
+    location = [locations objectAtIndex:0];
+    if ( moveCurrentPos == YES) {
+      
+      
+      GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:location.coordinate.latitude longitude:location.coordinate.longitude zoom:InitialZoom];
+      [map setCamera:pos];
+      moveCurrentPos = NO;
+      
+      /*
+       //現在地にピンを立てる
+       NSString *title = @"現在地";
+       NSNumber *type = [[NSNumber alloc]initWithInt:PIN_CURRENTLOCATION];
+       NSDictionary *dic = [NSDictionary dictionaryWithObjectsAndKeys:pos,@"position",
+       title,@"title",
+       type,@"type",
+       nil];
+       [self addMarkersToMap:dic];
+       */
+    }
+    myPos = location.coordinate;
+    
+    [locationManager startUpdatingLocation];
+    firstGPS = NO;
+  }
 }
 
 //位置取得時処理 ios 5
@@ -1544,38 +1541,51 @@ static const BOOL LogoLoad = YES;
     didUpdateToLocation:(CLLocation *)newLocation
            fromLocation:(CLLocation *)oldLocation
 {
-	NSLog(@"location up");
-	
-	// 位置情報を取り出す
-	myPos = newLocation.coordinate;
-	
-	if ( moveCurrentPos == YES) {
-		// ローディング
-		[self alertShow];
-		moveCurrentPos = NO;
-		GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:myPos.latitude longitude:myPos.longitude zoom:InitialZoom];
-		[map setCamera:pos];
-		
-		/*
-		 //現在地にピンを立てる
-		 NSString *title = @"現在地";
-		 NSNumber *type = [[NSNumber alloc]initWithInt:PIN_CURRENTLOCATION];
-		 NSDictionary *dic = [NSDictionary dictionaryWithObjectsAndKeys:pos,@"position",
-		 title,@"title",
-		 type,@"type",
-		 nil];
-		 [self addMarkersToMap:dic];
-		 */
-		//地点検索処理
-//		[self searchAround:myPos];
-		//[locationManager stopUpdatingLocation];
-	}
+  if(firstGPS==YES || [um getCurrentSecond]==0){
+    NSLog(@"location up");
+    
+    // 位置情報を取り出す
+    myPos = newLocation.coordinate;
+    
+    if ( moveCurrentPos == YES) {
+      // ローディング
+      [self alertShow];
+      moveCurrentPos = NO;
+      GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:myPos.latitude longitude:myPos.longitude zoom:InitialZoom];
+      [map setCamera:pos];
+      
+      /*
+       //現在地にピンを立てる
+       NSString *title = @"現在地";
+       NSNumber *type = [[NSNumber alloc]initWithInt:PIN_CURRENTLOCATION];
+       NSDictionary *dic = [NSDictionary dictionaryWithObjectsAndKeys:pos,@"position",
+       title,@"title",
+       type,@"type",
+       nil];
+       [self addMarkersToMap:dic];
+       */
+      //地点検索処理
+      //		[self searchAround:myPos];
+      //[locationManager stopUpdatingLocation];
+    }
+    firstGPS = NO;
+  }
 }
 
 
 //ナビゲーションバーの「戻る」ボタン処理
 -(void)back
 {
+  @try{
+    //if ([CLLocationManager locationServicesEnabled]){
+    //位置情報取得停止
+    [locationManager setDelegate:nil];
+    [locationManager stopUpdatingLocation];
+    //}
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
+	
 	[pop dismissPopoverAnimated:YES];
 	//ナビゲーションバー　設定
 	[self.navigationController.navigationBar setHidden:YES];
@@ -1609,15 +1619,17 @@ static const BOOL LogoLoad = YES;
 //現在地ボタン押下（ルート検索）
 -(void)currentPos
 {
+  firstGPS = YES;
+  
 	pData = [PublicDatas instance];
-
+  
 	if ( ![selectedRoute count]) {
 		routeAlertView = [[UIAlertView alloc]
-					  initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_NOTSELECTEDTITLE"]
-					  message:[pData getDataForKey:@"DEFINE_ROUTE_NOTSELECTEDMSG"]
-					  delegate:nil
-					  cancelButtonTitle:nil
-					  otherButtonTitles:@"OK", nil ];
+                      initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_NOTSELECTEDTITLE"]
+                      message:[pData getDataForKey:@"DEFINE_ROUTE_NOTSELECTEDMSG"]
+                      delegate:nil
+                      cancelButtonTitle:nil
+                      otherButtonTitles:@"OK", nil ];
 		[routeAlertView show];
 		return;
 	}
@@ -1638,10 +1650,10 @@ static const BOOL LogoLoad = YES;
 		// ローディング
 		[self alertShow];
 		
-//		moveCurrentPos = YES;
+    //		moveCurrentPos = YES;
 		GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:myPos.latitude longitude:myPos.longitude zoom:InitialZoom];
 		[map setCamera:pos];
-
+    
 		//ピン追加
 		[self addCompanyPinByArray:selectedRoute];
 		
@@ -1704,15 +1716,15 @@ static const BOOL LogoLoad = YES;
 	NSError *error=nil;
 	
 	NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:rcvData options:NSJSONReadingAllowFragments error:&error];
-//	NSLog(@"%@",jsonObject);
+  //	NSLog(@"%@",jsonObject);
 	
 	NSString *status = [jsonObject valueForKey:@"status"];
   NSLog(@"status : %@", status);
 	if ([status isEqualToString:@"ZERO_RESULTS"])  {
-
+    
 		if ( retryCount++ < 2 ){
 			//再検索
-            [self searchRoute:lastSearchFromCurrentPos];
+      [self searchRoute:lastSearchFromCurrentPos];
 		}
 		else {
 			// アラートを閉じる
@@ -1721,45 +1733,45 @@ static const BOOL LogoLoad = YES;
 			pData = [PublicDatas instance];
 			NSLog(@"ERROR:%@",status);
 			routeAlertView = [[UIAlertView alloc]
-							  initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_SEARCHERRTITLE"]
-							  message:[pData getDataForKey:@"DEFINE_ROUTE_NOVALIDROUTE"]
-							  delegate:nil
-							  cancelButtonTitle:nil
-							  otherButtonTitles:[pData getDataForKey:@"DEFINE_ROUTE_ALERTOK"], nil ];
+                        initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_SEARCHERRTITLE"]
+                        message:[pData getDataForKey:@"DEFINE_ROUTE_NOVALIDROUTE"]
+                        delegate:nil
+                        cancelButtonTitle:nil
+                        otherButtonTitles:[pData getDataForKey:@"DEFINE_ROUTE_ALERTOK"], nil ];
 			[routeAlertView show];
 		}
 		return;
 	}
 	else
-	if ( ![status isEqualToString:@"OK"])  {
-		NSLog(@"ERROR:%@",status);
-
-		
-		if ( retryCount++ < 2 ){
-			//再検索
-            [self searchRoute:lastSearchFromCurrentPos];
-		}
-		else {
-			// アラートを閉じる
-			drawProgress = NO;
-			if(alertView.visible) [alertView dismissWithClickedButtonIndex:0 animated:NO];
-
-			routeAlertView = [[UIAlertView alloc]
-							 initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_SEARCHERRTITLE"]
-							 message:[NSString stringWithFormat:@"%@\n(%@)",[pData getDataForKey:@"DEFINE_ROUTE_SEARCHFAILED"] ,status]
-							 delegate:nil
-							 cancelButtonTitle:nil
-							 otherButtonTitles:[pData getDataForKey:@"DEFINE_ROUTE_ALERTOK"], nil ];
-			[routeAlertView show];
-		}
-		return;
-	}
+    if ( ![status isEqualToString:@"OK"])  {
+      NSLog(@"ERROR:%@",status);
+      
+      
+      if ( retryCount++ < 2 ){
+        //再検索
+        [self searchRoute:lastSearchFromCurrentPos];
+      }
+      else {
+        // アラートを閉じる
+        drawProgress = NO;
+        if(alertView.visible) [alertView dismissWithClickedButtonIndex:0 animated:NO];
+        
+        routeAlertView = [[UIAlertView alloc]
+                          initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_SEARCHERRTITLE"]
+                          message:[NSString stringWithFormat:@"%@\n(%@)",[pData getDataForKey:@"DEFINE_ROUTE_SEARCHFAILED"] ,status]
+                          delegate:nil
+                          cancelButtonTitle:nil
+                          otherButtonTitles:[pData getDataForKey:@"DEFINE_ROUTE_ALERTOK"], nil ];
+        [routeAlertView show];
+      }
+      return;
+    }
 	NSDictionary *routes = [jsonObject valueForKeyPath:@"routes"];
-//	NSArray *legs = [routes valueForKeyPath:@"legs"];
+  //	NSArray *legs = [routes valueForKeyPath:@"legs"];
 	NSArray *overView = [routes valueForKeyPath:@"overview_polyline"];
 	NSDictionary *dic = [overView objectAtIndex:0];
 	NSString *point = [dic objectForKey:@"points"];
-//	NSLog(@"%@",point);
+  //	NSLog(@"%@",point);
 	
 	//PolyLine表示
 	options = [GMSPolylineOptions options];
@@ -1785,45 +1797,45 @@ static const BOOL LogoLoad = YES;
 //Google Direction APIから取得したPoint情報をエンコードし、PolyLine表示する
 -(void)polylineWithEncodedString:(NSString *)encodedString {
 	
-    const char *bytes = [encodedString UTF8String];
-    NSUInteger length = [encodedString lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
-    NSUInteger idx = 0;
+  const char *bytes = [encodedString UTF8String];
+  NSUInteger length = [encodedString lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+  NSUInteger idx = 0;
 	
-    float latitude = 0;
-    float longitude = 0;
+  float latitude = 0;
+  float longitude = 0;
 	
-    while (idx < length) {
-        char byte = 0;
-        int res = 0;
-        char shift = 0;
-				
-        do {
-            byte = bytes[idx++] - 63;
-            res |= (byte & 0x1F) << shift;
-            shift += 5;
-        } while (byte >= 0x20);
+  while (idx < length) {
+    char byte = 0;
+    int res = 0;
+    char shift = 0;
+    
+    do {
+      byte = bytes[idx++] - 63;
+      res |= (byte & 0x1F) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
 		
-        float deltaLat = ((res & 1) ? ~(res >> 1) : (res >> 1));
-        latitude += deltaLat;
+    float deltaLat = ((res & 1) ? ~(res >> 1) : (res >> 1));
+    latitude += deltaLat;
 		
-        shift = 0;
-        res = 0;
+    shift = 0;
+    res = 0;
 		
-        do {
-            byte = bytes[idx++] - 0x3F;
-            res |= (byte & 0x1F) << shift;
-            shift += 5;
-        } while (byte >= 0x20);
+    do {
+      byte = bytes[idx++] - 0x3F;
+      res |= (byte & 0x1F) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
 		
-        float deltaLon = ((res & 1) ? ~(res >> 1) : (res >> 1));
-        longitude += deltaLon;
+    float deltaLon = ((res & 1) ? ~(res >> 1) : (res >> 1));
+    longitude += deltaLon;
 		
-        float finalLat = latitude * 1E-5;
-        float finalLon = longitude * 1E-5;
+    float finalLat = latitude * 1E-5;
+    float finalLon = longitude * 1E-5;
 		
-        CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(finalLat, finalLon);
+    CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(finalLat, finalLon);
 		[path addCoordinate:coord];
-    }
+  }
 }
 
 -(NSMutableArray*)sortWayPoint:(NSMutableArray*)ary
@@ -1832,12 +1844,12 @@ static const BOOL LogoLoad = YES;
 	
 	int cnt = 0;
 	int index = 0 ;
-//	int lmax = [src count];
+  //	int lmax = [src count];
 	Company *moveObj = [[Company alloc]init];
 	CLLocationDistance wrkDist;
 	CLLocation *lc = [[CLLocation alloc]initWithLatitude:myPos.latitude longitude:myPos.longitude];
-	#pragma unused(moveObj)
-    
+#pragma unused(moveObj)
+  
 	wrkDist = DBL_MAX;
 	for ( int i = 0; i< [src count]; i++ ) {
 		Company *cp = [src objectAtIndex:i];
@@ -1869,7 +1881,7 @@ static const BOOL LogoLoad = YES;
 	NSArray *sortArray = [src mutableCopy];
 	NSArray *sorttempArray = [sortArray sortedArrayUsingDescriptors:sortDescArray];
 	return [sorttempArray mutableCopy];
-
+  
 }
 
 // 中心を記憶するメソッド
@@ -1906,14 +1918,14 @@ static const BOOL LogoLoad = YES;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    // エラー情報を表示する。
-    NSLog(@"Connection failed! Error - %@ %@",
-		  [error localizedDescription],
-		  [[error userInfo] objectForKey:NSURLErrorFailingURLStringErrorKey]);
+  // エラー情報を表示する。
+  NSLog(@"Connection failed! Error - %@ %@",
+        [error localizedDescription],
+        [[error userInfo] objectForKey:NSURLErrorFailingURLStringErrorKey]);
 }
 - (void)didReceiveMemoryWarning
 {
-    [super didReceiveMemoryWarning];
+  [super didReceiveMemoryWarning];
 	
 }
 
@@ -1940,124 +1952,137 @@ static const BOOL LogoLoad = YES;
 	}
 	
 	NSString *where =@"";
-	int loopMax = [cpnyArray count];
-	int loopCnt = 0;
+  NSMutableArray *whereArray = [[NSMutableArray alloc] init];
+	//int loopMax = [cpnyArray count];
+	//int loopCnt = 0;
+  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+
 	for ( Company *tempCp in cpnyArray ) {
+    
+    NSString *image_key = [NSString stringWithFormat:@"img_%@",tempCp.company_id];
+    //NSLog(@"%d ud image %@", __LINE__, [ud objectForKey:image_key]);
+    if([ud objectForKey:image_key]) continue;
+    
+    [whereArray addObject:[NSString stringWithFormat:@"ParentId='%@' ", tempCp.company_id ]];
+    /*
 		where = [where stringByAppendingString:[NSString stringWithFormat:@"ParentId='%@'", tempCp.company_id ]];
 		if ( loopCnt++ != loopMax - 1 ){
 			where = [where stringByAppendingString:@" OR "];
 		}
+     */
 	}
-	pData = [PublicDatas instance];
-	
-	NSString *query = [NSString stringWithFormat:@"SELECT ParentId, Name,Body,BodyLength FROM Attachment WHERE %@ ",where];
-
-	SFRestRequest *req = [[SFRestAPI sharedInstance] requestForQuery:query];
-	[[SFRestAPI sharedInstance] sendRESTRequest:req
-		failBlock:^(NSError *e) {
-			NSLog(@"FAILWHALE with error: %@", [e description] );
-			alertView = [[UIAlertView alloc]
-            initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_IMGREADERRTITLE"]
-            message:[pData getDataForKey:@"DEFINE_ROUTE_IMAREADERRMSG"]
-            delegate:nil
-            cancelButtonTitle:nil
-            otherButtonTitles:[pData getDataForKey:@"DEFINE_ROUTE_ALERTOK"], nil ];
-			[alertView show];
-		}
-		completeBlock:^(id jsonResponse){
-			NSDictionary *dict = (NSDictionary *)jsonResponse;
-            NSLog(@"%@",dict);
-									  
-			//アラート表示
- //         [self alertShow];
-            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-									  
-            //受信データクリア
-            rcvData = [[NSMutableData alloc]init];
-            NSString *image_key;
-            NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-            NSArray *records = [dict objectForKey:@"records"];
-			NSLog(@"%@",records);
-				for ( int i = 0; i< [records count]; i++ ){
-					NSDictionary *rec = [records objectAtIndex:i];
-                    NSString *url = [rec objectForKey:@"Body"];
-                    NSString *name = [rec objectForKey:@"Name"];
-                    NSString *bodyLength = [rec objectForKey:@"BodyLength"];
-					NSString *cpId = [rec objectForKey:@"ParentId"];
-                    int bSize = [bodyLength intValue];
- 					
-					Company *tempCp = [[Company alloc]init];
-					for ( int ii = 0; ii < [selectedRoute count]; ii++ ){
-						tempCp = [selectedRoute objectAtIndex:ii];
-						if ([tempCp.company_id isEqualToString:cpId]) {
-							break;
-						}
-					}
-					
-                    //ロゴ画像を読み込み
-                    if ([self isInclude:[name uppercaseString]cmp:@"LOGO."] == YES ) {
-                                              
-						//画像サイズが閾値より大きい場合は読み込まない
-						if ( MaxLoadingSize <= bSize ) {
-							continue;
-						}
-											  
-						//リクエスト作成
-						NSString *instance = [[[[[SFRestAPI sharedInstance] coordinator] credentials] instanceUrl]absoluteString];
-						NSString *fullUrl = [instance stringByAppendingString:url];
-						NSURL *myURL = [NSURL URLWithString:fullUrl];
-						NSMutableURLRequest *requestDoc = [[NSMutableURLRequest alloc]initWithURL:myURL];
-											  
-						//OAuth認証情報をヘッダーに追加
-						NSString *token = [@"OAuth " stringByAppendingString:[[[[SFRestAPI sharedInstance]coordinator]credentials]	accessToken]];
-						[requestDoc addValue:token forHTTPHeaderField:@"Authorization"];
-											  
-						NSURLResponse *resp;
-						NSError *err;
-                                              
-						NSData *rcvTmpData = [NSURLConnection sendSynchronousRequest:requestDoc returningResponse:&resp error:&err];
-						rcvData = [rcvTmpData mutableCopy];
-          									  
-						//共用データのインスタンス取得
-						pData = [PublicDatas instance];
-						if ( !err ){
-							UIImage *img = [[UIImage alloc]initWithData:rcvData];
-							tempCp.image = img;
-                                                  
-							NSData *imageData = UIImagePNGRepresentation(img);
-							image_key = [NSString stringWithFormat:@"img_%@",tempCp.company_id];
-							[ud setObject:imageData forKey:image_key];
-							[ud synchronize];
-                                                  
-						}
-						else {
-							// アラートを閉じる
-							//if(alertView.visible) [alertView dismissWithClickedButtonIndex:0 animated:NO];
-												  
-							NSLog(@"FAILWHALE with error: %@", [err description] );
-							alertView = [[UIAlertView alloc]
-												initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_IMGREADERRTITLE"]
-												message:[pData getDataForKey:@"DEFINE_ROUTE_IMGREADERRMSG"]
-												delegate:nil
-												cancelButtonTitle:nil
-												otherButtonTitles:[pData getDataForKey:@"DEFINE_ROUTE_ALERTOK"], nil ];
-							[alertView show];
-						}
-					}
-				}
-			}
-		];
+  
+  where = [whereArray componentsJoinedByString:@" OR "];
+  
+  if([where isEqualToString:@""]){
+    return;
+  }
+  
+	@try {
+    pData = [PublicDatas instance];
+    
+    NSString *query = [NSString stringWithFormat:@"SELECT ParentId, Name,Body,BodyLength FROM Attachment WHERE %@ ",where];
+    
+    SFRestRequest *req = [[SFRestAPI sharedInstance] requestForQuery:query];
+    [[SFRestAPI sharedInstance] sendRESTRequest:req
+                                      failBlock:^(NSError *e) {
+                                        NSLog(@"FAILWHALE with error: %@", [e description] );
+                                        alertView = [[UIAlertView alloc]
+                                                     initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_IMGREADERRTITLE"]
+                                                     message:[pData getDataForKey:@"DEFINE_ROUTE_IMAREADERRMSG"]
+                                                     delegate:nil
+                                                     cancelButtonTitle:nil
+                                                     otherButtonTitles:[pData getDataForKey:@"DEFINE_ROUTE_ALERTOK"], nil ];
+                                        [alertView show];
+                                      }
+                                  completeBlock:^(id jsonResponse){
+                                    NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                    NSLog(@"%@",dict);
+                                    
+                                    //アラート表示
+                                    //         [self alertShow];
+                                    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+                                    
+                                    //受信データクリア
+                                    rcvData = [[NSMutableData alloc]init];
+                                    NSString *image_key;
+                                    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+                                    NSArray *records = [dict objectForKey:@"records"];
+                                    NSLog(@"%@",records);
+                                    for ( int i = 0; i< [records count]; i++ ){
+                                      NSDictionary *rec = [records objectAtIndex:i];
+                                      NSString *url = [rec objectForKey:@"Body"];
+                                      NSString *name = [rec objectForKey:@"Name"];
+                                      NSString *bodyLength = [rec objectForKey:@"BodyLength"];
+                                      NSString *cpId = [rec objectForKey:@"ParentId"];
+                                      int bSize = [bodyLength intValue];
+                                      
+                                      Company *tempCp = [[Company alloc]init];
+                                      for ( int ii = 0; ii < [selectedRoute count]; ii++ ){
+                                        tempCp = [selectedRoute objectAtIndex:ii];
+                                        if ([tempCp.company_id isEqualToString:cpId]) {
+                                          break;
+                                        }
+                                      }
+                                      
+                                      //ロゴ画像を読み込み
+                                      if ([um isInclude:[name uppercaseString]cmp:@"LOGO."] == YES ) {
+                                        
+                                        //画像サイズが閾値より大きい場合は読み込まない
+                                        if ( MaxLoadingSize <= bSize ) {
+                                          continue;
+                                        }
+                                        
+                                        //リクエスト作成
+                                        NSString *instance = [[[[[SFRestAPI sharedInstance] coordinator] credentials] instanceUrl]absoluteString];
+                                        NSString *fullUrl = [instance stringByAppendingString:url];
+                                        NSURL *myURL = [NSURL URLWithString:fullUrl];
+                                        NSMutableURLRequest *requestDoc = [[NSMutableURLRequest alloc]initWithURL:myURL];
+                                        
+                                        //OAuth認証情報をヘッダーに追加
+                                        NSString *token = [@"OAuth " stringByAppendingString:[[[[SFRestAPI sharedInstance]coordinator]credentials]	accessToken]];
+                                        [requestDoc addValue:token forHTTPHeaderField:@"Authorization"];
+                                        
+                                        NSURLResponse *resp;
+                                        NSError *err;
+                                        
+                                        NSData *rcvTmpData = [NSURLConnection sendSynchronousRequest:requestDoc returningResponse:&resp error:&err];
+                                        rcvData = [rcvTmpData mutableCopy];
+                                        
+                                        //共用データのインスタンス取得
+                                        pData = [PublicDatas instance];
+                                        if ( !err ){
+                                          UIImage *img = [[UIImage alloc]initWithData:rcvData];
+                                          tempCp.image = img;
+                                          
+                                          NSData *imageData = UIImagePNGRepresentation(img);
+                                          image_key = [NSString stringWithFormat:@"img_%@",tempCp.company_id];
+                                          [ud setObject:imageData forKey:image_key];
+                                          [ud synchronize];
+                                          
+                                        }
+                                        else {
+                                          // アラートを閉じる
+                                          //if(alertView.visible) [alertView dismissWithClickedButtonIndex:0 animated:NO];
+                                          
+                                          NSLog(@"FAILWHALE with error: %@", [err description] );
+                                          alertView = [[UIAlertView alloc]
+                                                       initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_IMGREADERRTITLE"]
+                                                       message:[pData getDataForKey:@"DEFINE_ROUTE_IMGREADERRMSG"]
+                                                       delegate:nil
+                                                       cancelButtonTitle:nil
+                                                       otherButtonTitles:[pData getDataForKey:@"DEFINE_ROUTE_ALERTOK"], nil ];
+                                          [alertView show];
+                                        }
+                                      }
+                                    }
+                                  }
+     ];
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
 }
 
-//str1がstr2を含む場合はYESを返す
--(BOOL)isInclude:(NSString*)str1 cmp:(NSString*)cmp
-{
-	NSRange result = [str1 rangeOfString:cmp];
-	if (result.location == NSNotFound){
-		return NO;
-	}
-	return  YES;
-}
 
 -(void)viewDidUnload
 {

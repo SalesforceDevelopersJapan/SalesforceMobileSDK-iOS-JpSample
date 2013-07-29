@@ -243,7 +243,6 @@
   
   // トークンを取得
   NSString *access_token = [[[[SFRestAPI sharedInstance]coordinator]credentials]accessToken];
-  NSLog(@"access_token %@", access_token);
   
   // URLを指定してHTTPリクエストを生成 プロフィール画像　トークンが必要
   NSString *str = [NSString stringWithFormat:@"%@?oauth_token=%@",[sm.idData.pictureUrl absoluteString], access_token];
@@ -337,14 +336,14 @@
   //NSLog(@"%@", jsonResponse);
   // グループ groupsを解析
   NSArray *groups = [jsonResponse objectForKey:@"groups"];
-  NSLog(@"request:didLoadResponse: #groups: %d", groups.count);
+  //NSLog(@"request:didLoadResponse: #groups: %d", groups.count);
   
   // グループ groupsのフィードを解析
   NSArray *items = [jsonResponse objectForKey:@"items"];
-  NSLog(@"request:didLoadResponse: #items: %d", items.count);
+  //NSLog(@"request:didLoadResponse: #items: %d", items.count);
   
   NSArray *records = [jsonResponse objectForKey:@"records"];
-  NSLog(@"request:didLoadResponse: #records: %d", records.count);
+  //NSLog(@"request:didLoadResponse: #records: %d", records.count);
   
   // グループ情報の場合
   if(groups>0){
@@ -416,21 +415,25 @@
   
   CGPoint tapPoint = [sender locationInView:self.view];
   
-  //PopOverを消す
-  if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
-  
-  UINavigationController *nav = [[UINavigationController alloc] init];
-  
-  DashBoardNaviMenuViewController *menu = [[DashBoardNaviMenuViewController alloc] init];
-  menu.delegate = self;
-  
-  [nav pushViewController:menu animated:YES];
-  nav.view.frame = CGRectMake(0, 0, 300, 400);
-  
-	//リストをPopoverで表示
-	pop = [[UIPopoverController alloc]initWithContentViewController:nav];
-	pop.delegate = self;
-	[pop presentPopoverFromRect:CGRectMake(tapPoint.x, tapPoint.y, 0, 0) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+  @try{
+    //PopOverを消す
+    if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+    
+    UINavigationController *nav = [[UINavigationController alloc] init];
+    
+    DashBoardNaviMenuViewController *menu = [[DashBoardNaviMenuViewController alloc] init];
+    menu.delegate = self;
+    
+    [nav pushViewController:menu animated:YES];
+    nav.view.frame = CGRectMake(0, 0, 300, 400);
+    
+    //リストをPopoverで表示
+    pop = [[UIPopoverController alloc]initWithContentViewController:nav];
+    pop.delegate = self;
+    [pop presentPopoverFromRect:CGRectMake(tapPoint.x, tapPoint.y, 0, 0) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
 }
 
 // OKボタン 円グラフ

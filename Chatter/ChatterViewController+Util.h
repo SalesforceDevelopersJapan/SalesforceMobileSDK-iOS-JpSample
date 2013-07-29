@@ -29,6 +29,7 @@
 
 -(void)alertShow;
 -(void)performDismiss:(NSTimer *)theTimer;
+-(void)alertClose;
 -(void)keyboardWillBeHidden:(NSNotification*)aNotification;
 -(void)keyboardWillShow:(NSNotification*)notification;
 

@@ -22,7 +22,6 @@
  WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #import "ChatterViewController+Preview.h"
 
 @implementation ChatterViewController (Preview)
@@ -58,10 +57,11 @@
 		rect.origin.y = 0;
 		iv.frame = rect;
 		iv.image = img;
-   
+    
 		[btnBuilder dismissMenu];
 		PreviewViewController *pv = [[PreviewViewController alloc]init];
 		pv.delegate = self;
+		pv.tag = wrkBtn.tag;
 		[pv setWithCancelBtn:YES];
 		[pv setContents:iv];
 		

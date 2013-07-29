@@ -22,6 +22,8 @@
  WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
+
 #import "OrderViewController+DetailScreen.h"
 #import "OrderDefine.h"
 #import "PDFSelectPopUpViewController.h"
@@ -69,25 +71,10 @@ static NSString *const movieFileName = @"movie.mp4";
 	[orderDetailScreen.detailWindowView.layer setBorderWidth:1.0f];
 	[orderDetailScreen.detailWindowView.layer setShadowColor:[[UIColor blackColor]CGColor]];
 	[orderDetailScreen.detailWindowView.layer setShadowOpacity:0.5f];
-  [orderDetailScreen.subView1.layer setBorderWidth:1.0f];
-	[orderDetailScreen.subView2.layer setBorderWidth:1.0f];
-	[orderDetailScreen.subView3.layer setBorderWidth:1.0f];
-	orderDetailScreen.subView1.layer.cornerRadius = 5;
-	orderDetailScreen.subView2.layer.cornerRadius = 5;
-	orderDetailScreen.subView3.layer.cornerRadius = 5;
-	orderDetailScreen.subView1.layer.borderColor = [[UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f]CGColor];
-	orderDetailScreen.subView2.layer.borderColor = [[UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f]CGColor];
-	orderDetailScreen.subView3.layer.borderColor = [[UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f]CGColor];
   
-  /*
-	orderDetailScreen.detailPrimaryImage.frame = CGRectMake(35, 45+10, 291, 241);
-	orderDetailScreen.detailSubImage1.frame = CGRectMake((291 + 10 + 30)+54,45,291,241);
-  orderDetailScreen.detailSubImage1.frame = CGRectMake((291 + 10 )+54,45,323,241);
-   */
 	orderDetailScreen.detailPrimaryImage.frame = CGRectMake(20, 49, 390, 334);
 	orderDetailScreen.detailSubImage1.frame = CGRectMake(422, 49, 390, 334);
   
-  //  [orderDetailScreen.photosLabel setText:[pData getDataForKey:@"DEFINE_STORORDER_LABEL_PHOTO"]];
 	
 	[orderDetailScreen.titleLbl setText:[pData getDataForKey:@"DEFINE_STORORDER_LABEL_INFO"]];
   
@@ -98,14 +85,13 @@ static NSString *const movieFileName = @"movie.mp4";
 	[orderDetailScreen.detailmovieBtn setTitle:[pData getDataForKey:@"DEFINE_STORORDER_LABEL_MOVIE"] forState:UIControlStateHighlighted];
   //	[orderDetailScreen.detailmovieBtn addTarget:self action:@selector(movieBtnPushed) forControlEvents:UIControlEventTouchUpInside];
 	
-  //	[orderDetailScreen.detailmovieIconBtn addTarget:self action:@selector(movieBtnPushed) forControlEvents:UIControlEventTouchUpInside];
   
 	orderDetailScreen.detailDescriptionBack.backgroundColor = [UIColor colorWithRed:0.46f green:0.78f blue:0.90f alpha:1.0f];
 	
 	// 角丸
   orderDetailScreen.detailDescriptionBack.layer.cornerRadius = 5;
 	
-	if (![self isNull:prd.movieURL] ) {
+	if ([um chkString:prd.movieURL] ) {
 		playBtn.enabled = YES;
 		selectedMovieURL = prd.movieURL;
 	}
@@ -149,7 +135,7 @@ static NSString *const movieFileName = @"movie.mp4";
   
 	
 	//Description設定
-	if (![self isNull:prd.description]) {
+	if ([um chkString:prd.description]) {
 		orderDetailScreen.detailDescription.text = prd.description;
 	}
 	//orderDetailScreen.detailDescription.userInteractionEnabled = NO;
@@ -305,7 +291,7 @@ static NSString *const movieFileName = @"movie.mp4";
 		orderDetailScreen.detailSubImage1.frame = [self allignCenter:subImageOrgFrame size:resize.size];
     //orderDetailScreen.detailSubImage1.userInteractionEnabled = YES;
     //[orderDetailScreen.detailSubImage1 addGestureRecognizer: [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(playPushed)]];
-
+    
 		//ローカル保存された動画URL
 		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
 		NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -331,7 +317,7 @@ static NSString *const movieFileName = @"movie.mp4";
 		[orderDetailScreen bringSubviewToFront:playBtn];
     //orderDetailScreen.detailSubImage1.userInteractionEnabled = YES;
     //[orderDetailScreen.detailSubImage1 addGestureRecognizer: [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(playPushed)]];
-
+    
 	}
 	else {
 		//動画URLが設定されていない場合
@@ -494,9 +480,6 @@ static NSString *const movieFileName = @"movie.mp4";
 -(void)getProductImage:(NSString*)url index:(int)index last:(bool)last
 {
 	if([url isEqual: @"sizeover"]) {
-		//if ( last == YES ){
-		//	[self setUpCarousel];
-		//}
 		return;
 	}
   
@@ -517,9 +500,6 @@ static NSString *const movieFileName = @"movie.mp4";
   
   // 配列の中から該当するindexを取得
   NSUInteger indexURL = [imgURLArray indexOfObjectPassingTest:^BOOL (id obj, NSUInteger idx, BOOL *stop) {
-	  //if ( last == YES ){
-		//  [self setUpCarousel];
-	  //}
     return [[imgURLArray objectAtIndex:idx] isEqualToString:url];
   }];
   NSString *imgName = [imgNameArray objectAtIndex:indexURL];
@@ -554,9 +534,6 @@ static NSString *const movieFileName = @"movie.mp4";
 		
 		//画像サイズが閾値より大きい場合は読み込まない
 		if ( MAXLOADINGSIZE <=  bytesize) {
-			if ( last == YES ){
-				[self setUpCarousel];
-			}
 			return;
 		}
 		
@@ -569,41 +546,6 @@ static NSString *const movieFileName = @"movie.mp4";
     
 		sTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(imgTapDetect:)];
 		sTap.numberOfTapsRequired = 1;
-    
-		if ( last == YES ){
-			[self setUpCarousel];
-		}
-    
-		/*
-     switch (index) {
-     case 0:
-     resize = [um getResizeProductFile:productId name:imgId img:img rect:orderDetailScreen.detailSubImage1.frame];
-     orderDetailScreen.detailSubImage1.frame = [self allignCenter:orderDetailScreen.detailSubImage1.frame size:resize.size];
-     orderDetailScreen.detailSubImage1.image = resize;
-     [orderDetailScreen.detailSubImage1 addGestureRecognizer:sTap];
-     orderDetailScreen.detailSubImage1.userInteractionEnabled = YES;
-     break;
-     
-     case 1:
-     resize = [um getResizeProductFile:productId name:imgId img:img rect:orderDetailScreen.detailSubImage2.frame];
-     orderDetailScreen.detailSubImage2.frame = [self allignCenter:orderDetailScreen.detailSubImage2.frame size:resize.size];
-     orderDetailScreen.detailSubImage2.image = resize;
-     [orderDetailScreen.detailSubImage2 addGestureRecognizer:sTap];
-     orderDetailScreen.detailSubImage2.userInteractionEnabled = YES;
-     break;
-     
-     case 2:
-     resize = [um getResizeProductFile:productId name:imgId img:img rect:orderDetailScreen.detailSubImage3.frame];
-     orderDetailScreen.detailSubImage3.frame = [self allignCenter:orderDetailScreen.detailSubImage3.frame size:resize.size];
-     orderDetailScreen.detailSubImage3.image = resize;
-     [orderDetailScreen.detailSubImage3 addGestureRecognizer:sTap];
-     orderDetailScreen.detailSubImage3.userInteractionEnabled = YES;
-     break;
-     
-     default:
-     break;
-     }
-     */
 	}
 	else {
 		
@@ -645,14 +587,6 @@ static NSString *const movieFileName = @"movie.mp4";
 	container.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
 	[container setBackgroundColor:[UIColor whiteColor]];
 	
-  /*
-	UILabel *label = [[UILabel alloc] initWithFrame:CGRectInset(container.bounds, 10, 10)];
-	label.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-	[label setFont:[UIFont boldSystemFontOfSize:84]];
-	//[label setTextAlignment:UITextAlignmentCenter];
-	[label setTextColor:[UIColor lightTextColor]];
-	label.text = [NSString stringWithFormat:@"%d", index + 1];
-	*/
   int num = [imgArray count];
   int idx = index % num;
   
@@ -691,28 +625,20 @@ static NSString *const movieFileName = @"movie.mp4";
 
 -(void)swipeUp:(id)sender
 {
-  NSLog(@"up");
   swipeIndex++;
-  NSLog(@"val %d", swipeIndex);
   [self imageChanged:swipeIndex];
 }
 
 -(void)swipeDown:(id)sender
 {
-  NSLog(@"down");
   swipeIndex--;
-  NSLog(@"val %d", swipeIndex);
   [self imageChanged:swipeIndex];
 }
 
 - (void)imageChanged:(int)val {
-  NSLog(@"subview %@", [orderDetailScreen.detailPrimaryImage subviews]);
 	UIView *previousView = [[orderDetailScreen.detailPrimaryImage subviews] objectAtIndex:0];
 	UIView *nextView = [self getLabelForIndex:val];
 	BOOL forwards = nextView.tag > previousView.tag;
-  
-  NSLog(@"nextView.tag : %d", nextView.tag);
-  NSLog(@"previousView.tag : %d", previousView.tag);
   
   [MPFoldTransition transitionFromView:previousView
                                 toView:nextView
@@ -722,7 +648,7 @@ static NSString *const movieFileName = @"movie.mp4";
                             completion:^(BOOL finished) {}
    
    ];
-
+  
 }
 
 - (void)doInit
@@ -732,159 +658,6 @@ static NSString *const movieFileName = @"movie.mp4";
 	flipStyle = MPFlipStyleDefault;
   swipeIndex = [imgArray count] * 1000;
 }
-
-
-
-
-// 画像スライド表示用メソッド
--(void) setUpCarousel
-{
-	/*
-   // カバーフローセットアップ
-   carousel2 = [[iCarousel alloc]initWithFrame:CGRectMake(0,0, 340, 241)];
-   //	carousel2 = [[iCarousel alloc]initWithFrame:CGRectMake(0,0, orderDetailScreen.detailPrimaryImage.frame.size.width,orderDetailScreen.detailPrimaryImage.frame.size.height)];
-   
-   NSLog(@" orderDetailScreen.detailPrimaryImage.frame.size.width : %f", orderDetailScreen.detailPrimaryImage.frame.size.width);
-   NSLog(@" orderDetailScreen.detailPrimaryImage.frame.size.height : %f", orderDetailScreen.detailPrimaryImage.frame.size.height);
-   
-   carousel2.delegate = self;
-   carousel2.dataSource = self;
-   //	carousel2.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-   carousel2.contentMode = UIViewContentModeScaleAspectFit;
-   carousel2.type = iCarouselTypeLinear;
-   //	carousel2.type = iCarouselTypeCustom;
-   carousel2.clipsToBounds = YES;
-   carousel2.backgroundColor = [UIColor whiteColor];
-   [orderDetailScreen.detailPrimaryImage  addSubview:carousel2];
-   */
-  /*
-  [detailScrl removeFromSuperview];
-  [rightBtn removeFromSuperview];
-  [leftBtn removeFromSuperview];
-  
-  detailScrl = [[UIScrollView alloc ]initWithFrame:CGRectMake(0, 0, 291, 241)];
-  detailScrl.pagingEnabled = YES;
-  detailScrl.contentSize = CGSizeMake(291*[imgArray count],241);
-  detailScrl.scrollsToTop = YES;
-  detailScrl.scrollEnabled = NO;
-  
-  for(int i=0; i<[imgArray count]; i++){
-    UIView *iv = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 291, 241)];
-    iv.backgroundColor = [UIColor whiteColor];
-    UIImage *tmpimg = [ self resizeImage:[imgArray objectForKey:[NSString stringWithFormat:@"%d",i]] Rect:CGRectMake(0,0,291,241)];
-		UIImageView *tmpiv = [[UIImageView alloc]initWithImage:tmpimg];
-    tmpiv.center = iv.center;
-    [iv addSubview:tmpiv];
-    iv.frame = CGRectMake(291*i, 0, 291, 241);
-    [detailScrl addSubview:iv];
-  }
-  [orderDetailScreen.detailPrimaryImage addSubview:detailScrl];
-  
-  // 初回は左ボタンはOFF
-  leftBtn = [[UIButton alloc]
-             initWithFrame:CGRectMake(10, 160, 24, 24)];
-  [leftBtn setBackgroundImage:[UIImage imageNamed:@"LeftArrawOff.png"] forState:UIControlStateNormal];
-  leftBtn.enabled = NO;
-  [orderDetailScreen addSubview:leftBtn];
-  [leftBtn addTarget:self action:@selector(leftBtnPush:) forControlEvents:UIControlEventTouchUpInside];
-  
-  rightBtn = [[UIButton alloc]
-              initWithFrame:CGRectMake(326, 160, 24, 24)];
-  [rightBtn setBackgroundImage:[UIImage imageNamed:@"RightArrawOff.png"] forState:UIControlStateNormal];
-  rightBtn.enabled = NO;
-  [orderDetailScreen addSubview:rightBtn];
-  [rightBtn addTarget:self action:@selector(rightBtnPush:) forControlEvents:UIControlEventTouchUpInside];
-  
-  // メッセージが1つのときは右ボタンをOFF
-  if([imgArray count]==1){
-    rightBtn.enabled = NO;
-  }else{
-    [rightBtn setBackgroundImage:[UIImage imageNamed:@"RightArrawOn.png"] forState:UIControlStateNormal];
-    rightBtn.enabled = YES;
-  }
-   */
-  imgIndex = 0;
-}
-
-/*
-// 左ボタン
--(void)leftBtnPush:(id)sender{
-  @try {
-    if (imgIndex<1) {
-      imgIndex = 0;
-      return;
-    }
-    imgIndex--;
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDelegate:self];
-    [UIView setAnimationDuration:0.5];
-    [detailScrl setContentOffset:CGPointMake(291*imgIndex, 0)];
-    [UIView commitAnimations];
-    
-    [rightBtn setBackgroundImage:[UIImage imageNamed:@"RightArrawOn.png"] forState:UIControlStateNormal];
-    rightBtn.enabled = YES;
-    
-    if(imgIndex<=0){
-      [leftBtn setBackgroundImage:[UIImage imageNamed:@"LeftArrawOn.png"] forState:UIControlStateNormal];
-      leftBtn.enabled = NO;
-    }
-  }@catch (NSException *exception) {
-    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
-    imgIndex=0;
-    [detailScrl setContentOffset:CGPointMake(291*imgIndex, 0)];
-    // 初回は左ボタンはOFF
-    [leftBtn setBackgroundImage:[UIImage imageNamed:@"LeftArrawOn.png"] forState:UIControlStateNormal];
-    leftBtn.enabled = NO;
-    // メッセージが1つのときは右ボタンをOFF
-    if([imgArray count]==1){
-      [rightBtn setBackgroundImage:[UIImage imageNamed:@"RightArrawOff.png"] forState:UIControlStateNormal];
-      rightBtn.enabled = NO;
-    }else{
-      rightBtn.enabled = YES;
-    }
-  }
-}
-
-// 右ボタン
--(void)rightBtnPush:(id)sender{
-  @try {
-    if (imgIndex>[imgArray count]-1) {
-      imgIndex = [imgArray count]-1;
-      return;
-    }
-    imgIndex++;
-    if(imgIndex<=[imgArray count]-1){
-      
-      [UIView beginAnimations:nil context:nil];
-      [UIView setAnimationDelegate:self];
-      [UIView setAnimationDuration:0.5];
-      [detailScrl setContentOffset:CGPointMake(291*imgIndex, 0)];
-      [UIView commitAnimations];
-      
-      [leftBtn setBackgroundImage:[UIImage imageNamed:@"LeftArrawOn.png"] forState:UIControlStateNormal];
-      leftBtn.enabled = YES;
-    }
-    if(imgIndex>=[imgArray count]-1){
-      [rightBtn setBackgroundImage:[UIImage imageNamed:@"RightArrawOff.png"] forState:UIControlStateNormal];
-      rightBtn.enabled = NO;
-    }
-  }@catch (NSException *exception) {
-    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
-    imgIndex=0;
-    [detailScrl setContentOffset:CGPointMake(291*imgIndex, 0)];
-    // 初回は左ボタンはOFF
-    [leftBtn setBackgroundImage:[UIImage imageNamed:@"LeftArrawOff.png"] forState:UIControlStateNormal];
-    leftBtn.enabled = NO;
-    // メッセージが1つのときは右ボタンをOFF
-    if([imgArray count]==1){
-      [rightBtn setBackgroundImage:[UIImage imageNamed:@"RightArrawOff.png"] forState:UIControlStateNormal];
-      rightBtn.enabled = NO;
-    }else{
-      rightBtn.enabled = YES;
-    }
-  }
-}
-*/
 
 // 詳細画面を戻す
 -(void)closePushed

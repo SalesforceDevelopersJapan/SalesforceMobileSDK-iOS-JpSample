@@ -23,6 +23,7 @@
  */
 
 #import "OrderViewController.h"
+#import "ItemBadge.h"
 
 @interface OrderViewController (OrderScreen)
 -(void)buildOrderScreen;

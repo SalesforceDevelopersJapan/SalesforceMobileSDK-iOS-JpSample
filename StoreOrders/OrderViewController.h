@@ -44,6 +44,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "MPFoldTransition.h"
 #import "MPFlipTransition.h"
+#import "MemoViewController.h"
 
 @class ItemBadge;
 
@@ -52,10 +53,9 @@ enum {
 	MPTransitionModeFlip
 } typedef MPTransitionMode;
 
-@interface OrderViewController : UIViewController <SignDelegate, CompanyProfileDelegate,SelectViewDelegate,UIPopoverControllerDelegate,QuantyPopoverDelegate,ViewerViewContorllerDelegate,ChangeFunctionDelegate, iCarouselDataSource, iCarouselDelegate, CacheFileDelegate>
+@interface OrderViewController : UIViewController <SignDelegate, CompanyProfileDelegate,SelectViewDelegate,UIPopoverControllerDelegate,QuantyPopoverDelegate,ViewerViewContorllerDelegate,ChangeFunctionDelegate, iCarouselDataSource, iCarouselDelegate, MemoViewControllerDelegate>
 {
 	PublicDatas				*pData;
-	UIScrollView			*scrl;
 	UIPopoverController		*pop;
 	QuantyPopOverViewController *qv;
 	Company					*cp;
@@ -91,9 +91,9 @@ enum {
 	UtilManager				*um;
 	BuildNavButtons			*btnBuilder;
 	UIImage					*btnImg;
-
+  
 	
-    //以下詳細画面用
+  //以下詳細画面用
 	NSMutableDictionary		*imgArray;
 	CGRect					primaryImageOrgFrame;
 	CGRect					subImageOrgFrame;
@@ -131,17 +131,10 @@ enum {
   UIImageView *currentImgview;
   CGRect currentImgrect;
   
-  UIScrollView *detailScrl;
-  UIButton			*leftBtn;
-  UIButton			*rightBtn;
-  int					imgIndex;
-  
-  
   MPTransitionMode mode;
   NSUInteger style;
   MPFoldStyle foldStyle;
   MPFlipStyle flipStyle;
-  BOOL isFold;
   int swipeIndex;
   UISwipeGestureRecognizer* rightGesture;
   UISwipeGestureRecognizer* leftGesture;
@@ -149,6 +142,10 @@ enum {
   NSData *clearData;
   UIView *clearImgView;
   UIImage *clearImg;
+  
+  MemoViewController *memoVC;
+  int orderNum;
+  int orderCompNum;
 }
 
 @property (strong, nonatomic) IBOutlet UIView *orderHeader;
@@ -158,24 +155,19 @@ enum {
 @property (nonatomic,strong) UIImage *product1;
 @property (strong, nonatomic) IBOutlet UIButton *orderBtn;
 @property (strong, nonatomic) IBOutlet UIButton *histroyBtn;
-
 @property (strong, nonatomic)  UIView			*orderWindow;
 @property (strong, nonatomic)  SignBoard		*sign;
-
 @property (strong, nonatomic)  UIView			*historyWindow;
-
 
 
 - (IBAction)orderPushed:(id)sender;
 - (IBAction)historyPushed:(id)sender;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil company:(Company*)cp;
--(BOOL)isNull:(id)tgt;
 -(void)alertShow;
 -(CGRect)allignCenter:(CGRect)rect1 size:(CGSize)siz;
 -(id)resizeImage:(UIImage*)img Rect:(CGRect)rect;
 -(id)forceResizeImage:(UIImage*)img Rect:(CGRect)rect;
--(id)searchBtn:(int)tag;
 -(void)dispGraphs:(Product*)prd;
-
+-(id)searchBtn:(int)tag;
 
 @end

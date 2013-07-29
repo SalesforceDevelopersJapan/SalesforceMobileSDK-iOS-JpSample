@@ -43,7 +43,7 @@ static inline float radians(double degrees) { return degrees * M_PI / 180.0; }
 	CGFloat x,y,xx,yy;
 
 	//背景色
-	self.backgroundColor = [UIColor whiteColor];
+	self.backgroundColor = [UIColor clearColor];
 	
 	//グラフ色
 	UIColor *col[26] = {

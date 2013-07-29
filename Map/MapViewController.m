@@ -73,8 +73,8 @@ static const double MinDimeter = 30;
   
 	//初期モード
 	dispType = ENUM_DISPNORMAL; //Sales UP/ DOWN / FLAT
-//	dispType = ENUM_DISPVISIT; //訪問回数
-//	dispType = ENUM_DISPOPP; //商談件数
+  //	dispType = ENUM_DISPVISIT; //訪問回数
+  //	dispType = ENUM_DISPOPP; //商談件数
 	
   isImgBackJob = YES;
 	isLstBtnDisp = YES;
@@ -88,17 +88,6 @@ static const double MinDimeter = 30;
 	
 	//選択モード(全部表示）
 	selectMode =  (SALES_UP) | (SALES_FLAT) | (SALES_DOWN | (BUILDING));
-	
-	//現在地取得準備
-	locationManager = [[CLLocationManager alloc]init];
-	if ([CLLocationManager locationServicesEnabled]){
-		
-		//位置情報取得可能なら測位開始
-		[locationManager setDelegate:self];
-		[locationManager startUpdatingLocation];
-	}
-  //NSLog(@" gps enable %d", [CLLocationManager locationServicesEnabled]);
-  //NSLog(@"appli gps enable %d", [CLLocationManager authorizationStatus]);
   
 	pData = [PublicDatas instance];
 	self.title = [pData getDataForKey:@"DEFINE_MAP_TITLE"];
@@ -136,8 +125,8 @@ static const double MinDimeter = 30;
 	label.textAlignment = NSTextAlignmentCenter;
 	label.textColor = [UIColor whiteColor]; // change this color
 	self.navigationItem.titleView = label;
-//	label.text =self.title;
-//	[label sizeToFit];
+  //	label.text =self.title;
+  //	[label sizeToFit];
 	[self setNavbartitle];
 	
 	// GPS利用チェック
@@ -213,7 +202,7 @@ static const double MinDimeter = 30;
 	
 	// ローディングアラートを生成
 	alertView = [[UIAlertView alloc] initWithTitle:[pData getDataForKey:@"DEFINE_ROUTE_LOADING"] message:nil
-										  delegate:nil cancelButtonTitle:nil otherButtonTitles:NULL];
+                                        delegate:nil cancelButtonTitle:nil otherButtonTitles:NULL];
 	progress= [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(125, 50, 30, 30)];
 	progress.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
 	[alertView addSubview:progress];
@@ -240,7 +229,6 @@ static const double MinDimeter = 30;
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 }
 
-
 -(void)buildSelectPanel:(BOOL)builDisp
 {
 	
@@ -255,7 +243,7 @@ static const double MinDimeter = 30;
 	selectPanel = [[UIView alloc]initWithFrame:CGRectMake(410 + trimX,645, 605 - trimX, 50)];
 	selectPanel.layer.cornerRadius = 6;
 	[selectPanel setBackgroundColor:[UIColor colorWithPatternImage:panelBackImg]];
-
+  
 	
 	//SalesUpボタン
 	salesUpBtn = [[UIButton alloc]initWithFrame:CGRectMake(10, 5, 40, 40)];
@@ -309,14 +297,14 @@ static const double MinDimeter = 30;
 	[selectPanel addSubview:salesDownTextBtn];
   
 	if ( builDisp == true){
-
+    
 		//Buildingボタン
 		buildingImg = [UIImage imageNamed:@"Building.png"];
 		buildingBtn = [[UIButton alloc]initWithFrame:CGRectMake(465, 5, 40, 40)];
 		[buildingBtn setBackgroundImage:buildingImg forState:UIControlStateNormal];
 		[buildingBtn addTarget:self action:@selector(buildingPushed) forControlEvents:UIControlEventTouchUpInside];
 		[selectPanel addSubview:buildingBtn];
-  
+    
 		// Buildingボタンテキスト
 		buildingTextBtn = [UIButton buttonWithType:UIButtonTypeCustom];
 		buildingTextBtn.frame = CGRectMake(505,0,100,50);
@@ -328,7 +316,7 @@ static const double MinDimeter = 30;
 		[buildingTextBtn addTarget:self action:@selector(buildingPushed) forControlEvents:UIControlEventTouchUpInside];
 		[selectPanel addSubview:buildingTextBtn];
 	}
-
+  
 	if ( selectMode & SALES_UP){
 		salesUpBtn.opaque = NO;
 		salesUpBtn.alpha = 1;
@@ -390,7 +378,19 @@ static const double MinDimeter = 30;
 
 - (void)viewWillAppear:(BOOL)animated
 {
+  firstGPS = YES;
   
+  //現在地取得準備
+	locationManager = [[CLLocationManager alloc]init];
+	if ([CLLocationManager locationServicesEnabled]){
+		
+		//位置情報取得可能なら測位開始
+    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    //locationManager.distanceFilter = 10.0;
+    //locationManager.pausesLocationUpdatesAutomatically = NO;
+		[locationManager setDelegate:self];
+		[locationManager startUpdatingLocation];
+	}
 }
 
 -(void) keyboardWillShow:(NSNotification*)notification
@@ -452,7 +452,7 @@ static const double MinDimeter = 30;
   }
   
 	//ツールバー（検索窓とリストボタンを設置）
-//	UIToolbar *toolbar = [[MyToolBar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 300.0f, 40.0f)];
+  //	UIToolbar *toolbar = [[MyToolBar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 300.0f, 40.0f)];
 	UIToolbar *toolbar = [[MyToolBar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 370.0f, 40.0f)];
 	toolbar.backgroundColor = [UIColor clearColor];
 	toolbar.autoresizingMask = UIViewAutoresizingFlexibleHeight;
@@ -473,20 +473,20 @@ static const double MinDimeter = 30;
 		[listBtn setBackgroundImage:listBtnImg forState:UIControlStateNormal];
 		listBtn.frame = CGRectMake(0,0, 25,25);
 		[listBtn addTarget:self action:@selector(listPushed) forControlEvents:UIControlEventTouchUpInside];
-//		toolbar.items = [NSArray arrayWithObjects:[[UIBarButtonItem alloc]initWithCustomView:listBtn],[[UIBarButtonItem alloc]initWithCustomView:_sBar], nil];
+    //		toolbar.items = [NSArray arrayWithObjects:[[UIBarButtonItem alloc]initWithCustomView:listBtn],[[UIBarButtonItem alloc]initWithCustomView:_sBar], nil];
 		toolbar.items = [NSArray arrayWithObjects:	[[UIBarButtonItem alloc]initWithCustomView:modeBtn],
-													[[UIBarButtonItem alloc]initWithCustomView:listBtn],
-													[[UIBarButtonItem alloc]initWithCustomView:_sBar], nil];
+                     [[UIBarButtonItem alloc]initWithCustomView:listBtn],
+                     [[UIBarButtonItem alloc]initWithCustomView:_sBar], nil];
 	}
 	else {
 		// リストボタンの代わりに空ボタンを作成
 		UIButton *empBtn = [UIButton buttonWithType:UIButtonTypeCustom];
 		empBtn.frame = CGRectMake(0,0,25,25);
     
-//		toolbar.items = [NSArray arrayWithObjects:[[UIBarButtonItem alloc]initWithCustomView:empBtn],[[UIBarButtonItem alloc]initWithCustomView:_sBar], nil];
+    //		toolbar.items = [NSArray arrayWithObjects:[[UIBarButtonItem alloc]initWithCustomView:empBtn],[[UIBarButtonItem alloc]initWithCustomView:_sBar], nil];
 		toolbar.items = [NSArray arrayWithObjects:	[[UIBarButtonItem alloc]initWithCustomView:empBtn],
-													[[UIBarButtonItem alloc]initWithCustomView:modeBtn],
-													[[UIBarButtonItem alloc]initWithCustomView:_sBar], nil];
+                     [[UIBarButtonItem alloc]initWithCustomView:modeBtn],
+                     [[UIBarButtonItem alloc]initWithCustomView:_sBar], nil];
 	}
 	
   // 検索ワードを設定
@@ -494,8 +494,8 @@ static const double MinDimeter = 30;
   
 	//ツールバーをナビバーに設置
 	self.navigationItem.rightBarButtonItem = toolbarBarButtonItem;
-  	isLstBtnDisp = lstBtn;
-
+  isLstBtnDisp = lstBtn;
+  
 }
 
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
@@ -523,15 +523,18 @@ static const double MinDimeter = 30;
   //PopOverを消す
   if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
   
-	//リストをPopoverで表示
-	SearchPopoverViewController *srch = [[SearchPopoverViewController alloc]init];
-	[srch setCompanyList:selectedList];
-	srch.delegate = self;
-	pop = [[UIPopoverController alloc]initWithContentViewController:srch];
-	pop.delegate = self;
-	pop.popoverContentSize = srch.view.frame.size;
-	[pop presentPopoverFromRect:CGRectMake(740, 0, 0, 0) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-  
+  @try{
+    //リストをPopoverで表示
+    SearchPopoverViewController *srch = [[SearchPopoverViewController alloc]init];
+    [srch setCompanyList:selectedList];
+    srch.delegate = self;
+    pop = [[UIPopoverController alloc]initWithContentViewController:srch];
+    pop.delegate = self;
+    pop.popoverContentSize = srch.view.frame.size;
+    [pop presentPopoverFromRect:CGRectMake(740, 0, 0, 0) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
 }
 
 //検索Popoverでセルタップ時のデリゲート
@@ -545,7 +548,17 @@ static const double MinDimeter = 30;
   //PopOverを消す
   if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
 	
-	//戻り先を記録
+  @try{
+    //if ([CLLocationManager locationServicesEnabled]){
+    //位置情報取得停止
+    [locationManager setDelegate:nil];
+    [locationManager stopUpdatingLocation];
+    //}
+  }@catch (NSException *exception) {
+      NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
+
+//戻り先を記録
 	pData = [PublicDatas instance];
 	[pData setData:@"MAP" forKey:@"ReturnScreen"];
 	
@@ -560,14 +573,18 @@ static const double MinDimeter = 30;
   //PopOverを消す
   if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
   
-  //リストをPopoverで表示
-	WordPopoverViewController *wordPop = [[WordPopoverViewController alloc]init];
-	[wordPop setSearchWordList:um.searchWordList];
-	wordPop.delegate = self;
-	pop = [[UIPopoverController alloc]initWithContentViewController:wordPop];
-	pop.delegate = self;
-	pop.popoverContentSize = wordPop.view.frame.size;
-	[pop presentPopoverFromRect:CGRectMake(980, 0, 0, 0) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+  @try{
+    //リストをPopoverで表示
+    WordPopoverViewController *wordPop = [[WordPopoverViewController alloc]init];
+    [wordPop setSearchWordList:um.searchWordList];
+    wordPop.delegate = self;
+    pop = [[UIPopoverController alloc]initWithContentViewController:wordPop];
+    pop.delegate = self;
+    pop.popoverContentSize = wordPop.view.frame.size;
+    [pop presentPopoverFromRect:CGRectMake(980, 0, 0, 0) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
 }
 
 // 履歴セルタップ時
@@ -1250,7 +1267,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	NSString *query2 = [NSString stringWithFormat:@"FROM LatLngObj__c WHERE GPS__Latitude__s <= %f AND GPS__Latitude__s >= %f AND GPS__Longitude__s <= %f AND GPS__Longitude__s >= %f",latmax,latmin,lngmax,lngmin];
   
 	NSString *query = [query1 stringByAppendingString:query2];
-	NSLog(@"%@",query);
+	//NSLog(@"%@",query);
 	requestArround = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] send:requestArround delegate:self];
   
@@ -1267,7 +1284,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	NSString *query2 = [NSString stringWithFormat:@"FROM Building__c WHERE GPS__Latitude__s <= %f AND GPS__Latitude__s >= %f AND GPS__Longitude__s <= %f AND GPS__Longitude__s >= %f",latmax,latmin,lngmax,lngmin];
 	
 	NSString *query = [query1 stringByAppendingString:query2];
-	NSLog(@"%@",query);
+	//NSLog(@"%@",query);
 	requestbuilding = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] send:requestbuilding delegate:self];
 	
@@ -1277,7 +1294,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 -(void)rcvBuilding:(id)jsonResponse
 {
 	NSArray *records = [jsonResponse objectForKey:@"records"];
-  NSLog(@"request:didLoadResponse: #records: %d", records.count);
+  //NSLog(@"request:didLoadResponse: #records: %d", records.count);
 	
 	buildingList = [NSMutableArray array];
 	
@@ -1285,8 +1302,8 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 		CLLocationCoordinate2D point;
 		point.latitude = [[obj objectForKey:@"GPS__Latitude__s"] doubleValue];
 		point.longitude = [[obj objectForKey:@"GPS__Longitude__s"] doubleValue];
-		NSString *name = [obj objectForKey:@"Name"];
-		NSString *bId = [obj objectForKey:@"Id"];
+		NSString *name = [um chkNullString:[obj objectForKey:@"Name"]];
+		NSString *bId = [um chkNullString:[obj objectForKey:@"Id"]];
 		NSNumber *maxFloor = [obj objectForKey:@"floor__c"];
 		building *tmpBd = [[building alloc]init];
 		
@@ -1302,7 +1319,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 		[aryForZoom addObject:tempcp];
 	}
 	[self getFloorInfo:buildingList];
-
+  
 	if (( selectMode & BUILDING)&&(dispType==ENUM_DISPNORMAL)){
 		[self addBulindingPinByArray:buildingList];
 	}
@@ -1331,7 +1348,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	//クエリ作成
 	NSString *query = [NSString stringWithFormat:@"SELECT Building__c, account__c, floor__c FROM B_Account__c WHERE %@ ORDER BY floor__c DESC",where];
 	
-	NSLog(@"%@",query);
+	//NSLog(@"%@",query);
 	requestFloor = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] send:requestFloor delegate:self];
 }
@@ -1340,15 +1357,15 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 //ビルに含まれる取引先を受信
 -(void)rcvFoor:(id)jsonResponse
 {
-	NSLog(@"%@",jsonResponse);
+	//NSLog(@"%@",jsonResponse);
 	NSArray *records = [jsonResponse objectForKey:@"records"];
-  NSLog(@"request:didLoadResponse: #records: %d", records.count);
+  //NSLog(@"request:didLoadResponse: #records: %d", records.count);
 	
 	for ( int i = 0 ; i< [records count]; i++) {
 		NSDictionary *dic = [records objectAtIndex:i];
-		NSString *bId = [dic objectForKey:@"Building__c"];
+		NSString *bId = [um chkNullString:[dic objectForKey:@"Building__c"]];
 		NSNumber *flrNum = [dic objectForKey:@"floor__c"];
-		NSString *cpId = [dic objectForKey:@"account__c"];
+		NSString *cpId = [um chkNullString:[dic objectForKey:@"account__c"]];
 		Company *tempcp = [[Company alloc]init];
 		NSMutableDictionary *flrDict = [NSMutableDictionary dictionary];
     
@@ -1378,9 +1395,9 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 //ビルに含まれる取引先名を受信
 -(void)rcvCpName:(id)jsonResponse
 {
-	NSLog(@"%@",jsonResponse);
+	//NSLog(@"%@",jsonResponse);
 	NSArray *records = [jsonResponse objectForKey:@"records"];
-  NSLog(@"request:didLoadResponse: #records: %d", records.count);
+  //NSLog(@"request:didLoadResponse: #records: %d", records.count);
 	
 	for ( int i = 0 ; i< [records count]; i++) {
 		NSDictionary *dic = [records objectAtIndex:i];
@@ -1392,11 +1409,11 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 			point.longitude = [[dic objectForKey:@"GPS__Longitude__s"] doubleValue];
 			NSString *cpName = [customObj objectForKey:@"Name"];
 			NSString *cpId = [customObj objectForKey:@"Id"];
-			NSString *state = [self chkString:[customObj objectForKey:@"BillingState"]];
-			NSString *city = [self chkString:[customObj objectForKey:@"BillingCity"]];
-			NSString *street = [self chkString:[customObj objectForKey:@"BillingStreet"]];
-			NSString *phone = [self chkString:[customObj objectForKey:@"Phone"]];
-			NSString *status = [self chkString:[customObj objectForKey:@"status__c"]];
+			NSString *state = [um chkNullString:[customObj objectForKey:@"BillingState"]];
+			NSString *city = [um chkNullString:[customObj objectForKey:@"BillingCity"]];
+			NSString *street = [um chkNullString:[customObj objectForKey:@"BillingStreet"]];
+			NSString *phone = [um chkNullString:[customObj objectForKey:@"Phone"]];
+			NSString *status = [um chkNullString:[customObj objectForKey:@"status__c"]];
       
 			for ( int i = 0 ; i < [buildingList count]; i++){
 				building *tempbd = [buildingList objectAtIndex:i];
@@ -1469,7 +1486,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
   
 	NSString *query = [query1 stringByAppendingString:query2];
 	
-	NSLog(@"%@",query);
+	//NSLog(@"%@",query);
 	requestCpName = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] send:requestCpName delegate:self];
   
@@ -1493,13 +1510,13 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	}
 	
   // 初回の受信時のみクリアに
-  NSLog(@"searchFlg : %d", searchFlg);
+  //NSLog(@"searchFlg : %d", searchFlg);
   if(!searchFlg){
     companyList = [NSMutableArray array];
 	}
   
   NSArray *records = [jsonResponse objectForKey:@"records"];
-  NSLog(@"request:didLoadResponse: #records: %d", records.count);
+  //NSLog(@"request:didLoadResponse: #records: %d", records.count);
 	
 	// アラートを閉じる
 	if(alertView.visible) [alertView dismissWithClickedButtonIndex:0 animated:NO];
@@ -1514,13 +1531,13 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
     
 		if ([obj objectForKey:@"Account__r"] != [NSNull null]){
 			NSDictionary *customObj = [obj objectForKey:@"Account__r"];
-			NSString *title = [self chkString:[customObj objectForKey:@"Name"]];
-			NSString *cid = [self chkString:[customObj objectForKey:@"Id"]];
-			NSString *state = [self chkString:[customObj objectForKey:@"BillingState"]];
-			NSString *city = [self chkString:[customObj objectForKey:@"BillingCity"]];
-			NSString *street = [self chkString:[customObj objectForKey:@"BillingStreet"]];
-			NSString *phone = [self chkString:[customObj objectForKey:@"Phone"]];
-			NSString *status = [self chkString:[customObj objectForKey:@"status__c"]];
+			NSString *title = [um chkNullString:[customObj objectForKey:@"Name"]];
+			NSString *cid = [um chkNullString:[customObj objectForKey:@"Id"]];
+			NSString *state = [um chkNullString:[customObj objectForKey:@"BillingState"]];
+			NSString *city = [um chkNullString:[customObj objectForKey:@"BillingCity"]];
+			NSString *street = [um chkNullString:[customObj objectForKey:@"BillingStreet"]];
+			NSString *phone = [um chkNullString:[customObj objectForKey:@"Phone"]];
+			NSString *status = [um chkNullString:[customObj objectForKey:@"status__c"]];
 			
 			Company *tempcp = [[Company alloc]init];
 			tempcp.company_id = cid;
@@ -1541,7 +1558,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 			}else{
 				tempcp.salesStatus = SALES_FLAT;
 			}
-   
+      
 			NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
 			NSData *iData;
 			UIImage *cpimage;
@@ -1557,7 +1574,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 		}
 	}
 	//[self getBuildingInfo];
-
+  
 	//売上/従業員数を求める
 	[self getEmployee:companyList];
 	
@@ -1571,11 +1588,11 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 		
 		//フィルタリング処理
 		selectedList = [self applyFiller:selectMode src:sortedList];
-	
+    
 		if ( dispType == ENUM_DISPNORMAL) {
 			//ピン追加
 			[self addCompanyPinByArray:selectedList];
-		
+      
 			//マップサイズ調整
 			[self mapZoom:searchPos points:aryForZoom];
 		}
@@ -1600,8 +1617,8 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 //マップの表示範囲調整
 -(void)mapZoom:(CLLocationCoordinate2D)center points:(NSMutableArray*)array
 {
-  NSLog(@"aryForZoom : %@", aryForZoom);
-  NSLog(@"aryForZoom count : %d", [aryForZoom count]);
+  //NSLog(@"aryForZoom : %@", aryForZoom);
+  //NSLog(@"aryForZoom count : %d", [aryForZoom count]);
   if([aryForZoom count]==0)return;
   
 	double	latmax_,latmin_,
@@ -1694,17 +1711,6 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	
 }
 
-//受け取ったオブジェクトがNSString以外なら空のNSStringを返す
--(NSString*)chkString:(id)tgt
-{
-	NSString *cls = NSStringFromClass([tgt class]);
-	if ( ![cls isEqualToString:@"__NSCFString"]) {
-		return @"";
-	}
-	else {
-		return tgt;
-	}
-}
 
 //Buildingの配列を受け取り、ピンを追加
 -(void)addBulindingPinByArray:(NSMutableArray*)ary
@@ -1757,12 +1763,12 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 //UIViewをUIImageに変換する
 - (UIImage*)createUIImageFromUIView:(UIView*)view
 {
-    UIGraphicsBeginImageContext( CGSizeMake( view.bounds.size.width, view.bounds.size.height ) );
-    CGContextScaleCTM( UIGraphicsGetCurrentContext(), 1.0f, 1.0f );
-    [view.layer renderInContext:UIGraphicsGetCurrentContext()];
-    UIImage* viewImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return viewImage;
+  UIGraphicsBeginImageContext( CGSizeMake( view.bounds.size.width, view.bounds.size.height ) );
+  CGContextScaleCTM( UIGraphicsGetCurrentContext(), 1.0f, 1.0f );
+  [view.layer renderInContext:UIGraphicsGetCurrentContext()];
+  UIImage* viewImage = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  return viewImage;
 }
 
 -(UIImage*)makeCircleMarker:(float)dimeter badge:(int)badge color:(UIColor*)color
@@ -1777,16 +1783,16 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	[strLabel setLineBreakMode:UILineBreakModeWordWrap];
 	[strLabel sizeToFit];
 	CGSize bSize = strLabel.frame.size;
-
+  
 	//バッジ作成
 	CGRect r = CGRectMake(0, 0, bSize.width+10, bSize.height);
 	ItemBadge* bagdeView = [[ItemBadge alloc] initWithFrame:r];
 	bagdeView.textLabel.text = [NSString stringWithFormat:@"%d", badge];
-
+  
 	//ピンマーカーの円を作成
 	CGRect rect = CGRectMake(0, 0, dimeter, dimeter);
-    UIGraphicsBeginImageContext(rect.size);
-    CGContextRef contextRef = UIGraphicsGetCurrentContext();
+  UIGraphicsBeginImageContext(rect.size);
+  CGContextRef contextRef = UIGraphicsGetCurrentContext();
 	
 	//FillColor
 	CGContextSetFillColorWithColor(contextRef, color.CGColor);
@@ -1794,25 +1800,25 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	//DrawColor
 	CGContextSetStrokeColorWithColor(contextRef,  [[UIColor clearColor]CGColor]);
 	
-    //円を描画
+  //円を描画
 	CGContextFillEllipseInRect(contextRef, CGRectMake(0, 0, dimeter, dimeter));
 	UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
 	UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, img.size.width, img.size.height)];
 	imgV.image = img;
-
+  
 	//ベースビューに円のイメージを貼る
 	//マーカタップ時に吹き出しが真ん中から出るように全体の横幅を調整する
 	CGRect viewRect;
 	if ( bagdeView.frame.size.width*2 > dimeter) {
 		viewRect = CGRectMake(0, 0, (bagdeView.frame.size.width+(dimeter/5))*2, bagdeView.frame.size.height/2 + dimeter );
 		CGPoint center = imgV.center;
-//		center.x = bagdeView.frame.size.width;
+    //		center.x = bagdeView.frame.size.width;
 		center.x = bagdeView.frame.size.width+(dimeter/5);
 		center.y += bagdeView.frame.size.height / 2;
 		imgV.center = center;
-
+    
 		CGRect badgeRect = bagdeView.frame;
-//		badgeRect.origin.x = center.x;
+    //		badgeRect.origin.x = center.x;
 		badgeRect.origin.x = center.x+(dimeter/5);
 		badgeRect.origin.y = 0;
 		bagdeView.frame = badgeRect;
@@ -1821,38 +1827,41 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 		viewRect = CGRectMake(0, 0, (dimeter+(dimeter/5)*2), bagdeView.frame.size.height/2 + dimeter );
 		CGPoint center = imgV.center;
 		center.y += bagdeView.frame.size.height / 2;
-//		center.y += bagdeView.frame.size.height+50;
+    //		center.y += bagdeView.frame.size.height+50;
 		center.x += +(dimeter/5);
 		imgV.center = center;
-
+    
 		CGRect badgeRect = bagdeView.frame;
-//		badgeRect.origin.x = dimeter/2;
+    //		badgeRect.origin.x = dimeter/2;
 		badgeRect.origin.x = dimeter/2+(dimeter/5)+(dimeter/5);
 		badgeRect.origin.y = 0;
 		bagdeView.frame = badgeRect;
 	}
 	
-	UIView *baseView = [[UIView alloc]initWithFrame:viewRect];
+	//UIView *baseView = [[UIView alloc]initWithFrame:viewRect];
+  UIView *baseView = [[UIView alloc]initWithFrame:CGRectMake(viewRect.origin.x-10, viewRect.origin.y-10, viewRect.size.width+10, viewRect.size.height+10)];
 	[baseView setBackgroundColor:[UIColor clearColor]];
+  imgV.center = CGPointMake(imgV.center.x+5, imgV.center.y+5);
 	[baseView addSubview:imgV];
+  bagdeView.center = CGPointMake(bagdeView.center.x+5, bagdeView.center.y+5);
 	[baseView addSubview:bagdeView];
-
+  
 	return [self createUIImageFromUIView:baseView];
- }
+}
 
 
 //円マーカーを追加
 -(void)addCircleMarkerToMap:(NSDictionary*)dic
 {
-    UIImage *pinImage;
+  UIImage *pinImage;
 	double dimeter = 0;
 	UIColor *color;
-
+  
 	GMSMarkerOptions *op = [[GMSMarkerOptions alloc] init];
 	GMSCameraPosition *pos = [dic objectForKey:@"position"];
 	Company *cp = [dic objectForKey:@"company"];
 	op.position = pos.target;
-	op.title = [dic objectForKey:@"title"];
+	op.title = [um chkNullString:[dic objectForKey:@"title"]];
 	op.userData = dic;
 	op.groundAnchor = CGPointMake(0.5, 0);
 	
@@ -1870,7 +1879,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 			break;
 			
 		case ENUM_PINCOMPANY:
-
+      
 			//マーカーピンの色を求める
 			if ( cp.salesStatus == SALES_UP) {
 				color = [UIColor colorWithRed:0.45 green:0.71 blue:0.43 alpha:0.7];
@@ -1881,16 +1890,16 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 			else {
 				color = [UIColor colorWithRed:0.73 green:0.30 blue:0.32 alpha:0.7];
 			}
-/*
-			//マーカピンの直径を求める
-			dimeter = (cp.yearSales +1)* (cp.employee+1) / 10000;
-			if ( dimeter > MaxDimeter ) {
-				dimeter = MaxDimeter;
-			}
-			if ( dimeter < MinDimeter ) {
-				dimeter = MinDimeter;
-			}
-*/
+      /*
+       //マーカピンの直径を求める
+       dimeter = (cp.yearSales +1)* (cp.employee+1) / 10000;
+       if ( dimeter > MaxDimeter ) {
+       dimeter = MaxDimeter;
+       }
+       if ( dimeter < MinDimeter ) {
+       dimeter = MinDimeter;
+       }
+       */
 			dimeter = [self getRadius:cp];
 			
 			int badgeVal = 0;
@@ -1902,15 +1911,15 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 				//バッジに商談数を表示
 				badgeVal = cp.opportunityCount;
 			}
-//			dimeter = 200;
-//			badgeVal = 100000;
+      //			dimeter = 200;
+      //			badgeVal = 100000;
 			op.icon = [self makeCircleMarker:dimeter badge:badgeVal color:color];
 			op.groundAnchor = CGPointMake(0.5, [self getTrimVal:dimeter]);
-//			op.icon = [self makeCircleMarker:200 badge:100 color:color];
-//			op.groundAnchor = CGPointMake(0.5, 0.67);
-
+      //			op.icon = [self makeCircleMarker:200 badge:100 color:color];
+      //			op.groundAnchor = CGPointMake(0.5, 0.67);
+      
 			break;
-
+      
 		case ENUM_PINBUILDING:
 			pinImage = [UIImage imageNamed:@"Building.png"];
 			op.icon = pinImage;
@@ -1940,7 +1949,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	 180:0.69
 	 190:0.68
 	 200:0.67
-*/
+   */
 	
 	if (dimeter <= 30 )return 1.2f;
 	if (dimeter <= 40 )return 1.1f;
@@ -1960,7 +1969,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	if (dimeter <= 180 )return 0.69f;
 	if (dimeter <= 190 )return 0.68f;
 	if (dimeter <= 200 )return 0.67f;
-
+  
 	return 0.66f;
 }
 //マーカーピン追加
@@ -1971,7 +1980,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 		[self addCircleMarkerToMap:dic];
 		return;
 	}
-    UIImage *pinImage;
+  UIImage *pinImage;
 	Company *cp;
   
 	GMSMarkerOptions *op = [[GMSMarkerOptions alloc] init];
@@ -2023,7 +2032,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	
 	CLLocationCoordinate2D anchor = marker.position;
 	CGPoint point = [mapView.projection pointForCoordinate:anchor];
-	NSLog(@"%f:%f",point.x, point.y);
+	//NSLog(@"%f:%f",point.x, point.y);
 	CGRect startRect;
 	startRect.origin =CGPointMake(point.x - 50, point.y - 100 );
   //	startRect.size = CGSizeZero;
@@ -2098,6 +2107,16 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 //ビルのフロアをタップした時のデリゲート
 -(void)didTapFloor:(Company *)cp
 {
+  @try{
+    //if ([CLLocationManager locationServicesEnabled]){
+    //位置情報取得停止
+    [locationManager setDelegate:nil];
+    [locationManager stopUpdatingLocation];
+    //}
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
+
 	//戻り先を記録
 	pData = [PublicDatas instance];
 	[pData setData:@"MAP" forKey:@"ReturnScreen"];
@@ -2301,6 +2320,16 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
   
   if (map.selectedMarker) {
     
+    @try{
+      //if ([CLLocationManager locationServicesEnabled]){
+      //位置情報取得停止
+      [locationManager setDelegate:nil];
+      [locationManager stopUpdatingLocation];
+      //}
+    }@catch (NSException *exception) {
+      NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+    }
+    
     id<GMSMarker> marker = map.selectedMarker;
     NSDictionary  *userData = marker.userData;
 		Company *cp = [userData objectForKey:@"company"];
@@ -2381,41 +2410,48 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 //位置取得時処理
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-	CLLocation *location;
-	
-	//初回の位置取得時のみ地図を移動（自身の位置追跡しない）
-	location = [locations objectAtIndex:0];
-  
-  /*
-   //デバッグ用に渋谷の位置を登録
-   CLLocationCoordinate2D loc;
-   loc.latitude  = 35.658273;
-   loc.longitude = 139.701024;
-   location = [[CLLocation alloc]initWithLatitude:loc.latitude longitude:loc.longitude];
-   */
-	
-	if ( moveCurrentPos == YES) {
-		
-		
-		GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:location.coordinate.latitude longitude:location.coordinate.longitude zoom:InitialZoom];
-		[map setCamera:pos];
-		moveCurrentPos = NO;
+  if(firstGPS==YES || [um getCurrentSecond]==0){
+    
+    NSLog(@"location up");
+    
+    CLLocation *location;
+    
+    //初回の位置取得時のみ地図を移動（自身の位置追跡しない）
+    location = [locations objectAtIndex:0];
+    
     /*
-     //現在地にピンを立てる
-     NSString *title = @"現在地";
-     NSNumber *type = [[NSNumber alloc]initWithInt:PIN_CURRENTLOCATION];
-     NSDictionary *dic = [NSDictionary dictionaryWithObjectsAndKeys:pos,@"position",
-     title,@"title",
-     type,@"type",
-     nil];
-     [self addMarkersToMap:dic];
+     //デバッグ用に渋谷の位置を登録
+     CLLocationCoordinate2D loc;
+     loc.latitude  = 35.658273;
+     loc.longitude = 139.701024;
+     location = [[CLLocation alloc]initWithLatitude:loc.latitude longitude:loc.longitude];
      */
-		
-		//地点検索処理
-		[self searchAround:location.coordinate];
-	}
-	myPos = location.coordinate;
-	[locationManager startUpdatingLocation];
+    
+    if ( moveCurrentPos == YES) {
+      
+      
+      GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:location.coordinate.latitude longitude:location.coordinate.longitude zoom:InitialZoom];
+      [map setCamera:pos];
+      moveCurrentPos = NO;
+      /*
+       //現在地にピンを立てる
+       NSString *title = @"現在地";
+       NSNumber *type = [[NSNumber alloc]initWithInt:PIN_CURRENTLOCATION];
+       NSDictionary *dic = [NSDictionary dictionaryWithObjectsAndKeys:pos,@"position",
+       title,@"title",
+       type,@"type",
+       nil];
+       [self addMarkersToMap:dic];
+       */
+      
+      //地点検索処理
+      [self searchAround:location.coordinate];
+    }
+    myPos = location.coordinate;
+    [locationManager startUpdatingLocation];
+    
+    firstGPS = NO;
+  }
 }
 
 //位置取得時処理 ios 5
@@ -2423,29 +2459,34 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
     didUpdateToLocation:(CLLocation *)newLocation
            fromLocation:(CLLocation *)oldLocation
 {
-  // 位置情報を取り出す
-  myPos = newLocation.coordinate;
-  
-  if ( moveCurrentPos == YES) {
-    // ローディング
-    [self alertShow];
-    moveCurrentPos = NO;
-    GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:myPos.latitude longitude:myPos.longitude zoom:InitialZoom];
-    [map setCamera:pos];
+  if(firstGPS==YES || [um getCurrentSecond]==0){
+    NSLog(@"location up");
     
-    /*
-     //現在地にピンを立てる
-     NSString *title = @"現在地";
-     NSNumber *type = [[NSNumber alloc]initWithInt:PIN_CURRENTLOCATION];
-     NSDictionary *dic = [NSDictionary dictionaryWithObjectsAndKeys:pos,@"position",
-     title,@"title",
-     type,@"type",
-     nil];
-     [self addMarkersToMap:dic];
-     */
-    //地点検索処理
-    [self searchAround:myPos];
-    //[locationManager stopUpdatingLocation];
+    // 位置情報を取り出す
+    myPos = newLocation.coordinate;
+    
+    if ( moveCurrentPos == YES) {
+      // ローディング
+      [self alertShow];
+      moveCurrentPos = NO;
+      GMSCameraPosition *pos = [GMSCameraPosition cameraWithLatitude:myPos.latitude longitude:myPos.longitude zoom:InitialZoom];
+      [map setCamera:pos];
+      
+      /*
+       //現在地にピンを立てる
+       NSString *title = @"現在地";
+       NSNumber *type = [[NSNumber alloc]initWithInt:PIN_CURRENTLOCATION];
+       NSDictionary *dic = [NSDictionary dictionaryWithObjectsAndKeys:pos,@"position",
+       title,@"title",
+       type,@"type",
+       nil];
+       [self addMarkersToMap:dic];
+       */
+      //地点検索処理
+      [self searchAround:myPos];
+      //[locationManager stopUpdatingLocation];
+    }
+    firstGPS = NO;
   }
 }
 
@@ -2458,6 +2499,16 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	}
   //PopOverを消す
   if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+  
+  @try{
+    //if ([CLLocationManager locationServicesEnabled]){
+    //位置情報取得停止
+    [locationManager setDelegate:nil];
+    [locationManager stopUpdatingLocation];
+    //}
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
   
 	//ナビゲーションバー　設定
 	[self.navigationController.navigationBar setHidden:YES];
@@ -2492,6 +2543,8 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 //現在地ボタン押下
 -(void)currentPos
 {
+  firstGPS = YES;
+  
   //PopOverを消す
   if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
   
@@ -2668,105 +2721,38 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 		return;
 	}
 	
+  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+  
 	NSString *where =@"";
+  NSMutableArray *whereArray = [[NSMutableArray alloc] init];
 	int loopMax = [cpnyAry count];
 	for ( int i = 0; i < loopMax; i++) {
 		Company *tempCp = [cpnyAry objectAtIndex:i];
+
+    NSString *image_key = [NSString stringWithFormat:@"img_%@",tempCp.company_id];
+    //NSLog(@"%d ud image %@", __LINE__, [ud objectForKey:image_key]);
+    if([ud objectForKey:image_key]) continue;
+    
+    [whereArray addObject:[NSString stringWithFormat:@"ParentId='%@' ", tempCp.company_id ]];
+    /*
 		where = [where stringByAppendingString:[NSString stringWithFormat:@"ParentId='%@' ", tempCp.company_id ]];
 		if ( i != loopMax - 1 ){
 			where = [where stringByAppendingString:@" OR "];
-		}
+		}*/
 	}
 	
-	NSLog(@"%@",where);
-	
-	NSString *query = [NSString stringWithFormat:@"SELECT ParentId, Name,Body,BodyLength FROM Attachment WHERE %@ ORDER BY CreatedDate DESC",where];
-	SFRestRequest *req = [[SFRestAPI sharedInstance] requestForQuery:query];
-	[[SFRestAPI sharedInstance] sendRESTRequest:req
-                                    failBlock:^(NSError *e) {
-                                      NSLog(@"FAILWHALE with error: %@", [e description] );
-                                      alertView = [[UIAlertView alloc]
-                                                   initWithTitle:[pData getDataForKey:@"DEFINE_MAP_IMGREADERRTITLE"]
-                                                   message:[pData getDataForKey:@"DEFINE_MAP_IMAREADERRMSG"]
-                                                   delegate:nil
-                                                   cancelButtonTitle:nil
-                                                   otherButtonTitles:[pData getDataForKey:@"DEFINE_MAP_ALERTOK"], nil ];
-                                      [alertView show];
-                                    }
-                                completeBlock:^(id jsonResponse){
-                                  NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"%@",dict);
-                                  
-                                  //アラート表示
-                                  //			[self alertShow];
-                                  [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-                                  
-                                  //受信データクリア
-                                  rcvData = [[NSMutableData alloc]init];
-                                  NSString *image_key;
-                                  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-                                  
-                                  NSArray *records = [dict objectForKey:@"records"];
-                                  for ( int i = 0; i< [records count]; i++ ){
-                                    NSDictionary *rec = [records objectAtIndex:i];
-                                    NSString *url = [rec objectForKey:@"Body"];
-                                    NSString *name = [rec objectForKey:@"Name"];
-                                    NSString *bodyLength = [rec objectForKey:@"BodyLength"];
-                                    NSString *cpId = [rec objectForKey:@"ParentId"];
-                                    
-                                    Company *cpny;
-                                    for ( int i = 0; i < [cpnyAry count]; i++ ){
-                                      cpny = [cpnyAry objectAtIndex:i];
-                                      if ( [cpny.company_id isEqualToString:cpId] ){
-                                        break;
-                                      }
-                                    }
-                                    
-                                    int bSize = [bodyLength intValue];
-                                    NSLog(@"%@",url);
-                                    
-                                    //ロゴ画像を読み込み
-                                    if ([self isInclude:[name uppercaseString]cmp:@"LOGO."] == YES ) {
-                                      
-                                      //画像サイズが閾値より大きい場合は読み込まない
-                                      if ( MaxLoadingSize <= bSize ) {
-                                        continue;
-                                      }
-                                      
-                                      //リクエスト作成
-                                      NSString *instance = [[[[[SFRestAPI sharedInstance] coordinator] credentials] instanceUrl]absoluteString];
-                                      NSString *fullUrl = [instance stringByAppendingString:url];
-                                      NSURL *myURL = [NSURL URLWithString:fullUrl];
-                                      NSMutableURLRequest *requestDoc = [[NSMutableURLRequest alloc]initWithURL:myURL];
-                                      
-                                      //OAuth認証情報をヘッダーに追加
-                                      NSString *token = [@"OAuth " stringByAppendingString:[[[[SFRestAPI sharedInstance]coordinator]credentials]	accessToken]];
-                                      [requestDoc addValue:token forHTTPHeaderField:@"Authorization"];
-                                      
-                                      //					[NSURLConnection connectionWithRequest:requestDoc delegate:self];
-                                      NSURLResponse *resp;
-                                      NSError *err;
-                                      
-                                      NSData *rcvTmpData = [NSURLConnection sendSynchronousRequest:requestDoc returningResponse:&resp error:&err];
-                                      rcvData = [rcvTmpData mutableCopy];
-                                      
-                                      
-                                      //共用データのインスタンス取得
-                                      pData = [PublicDatas instance];
-                                      if ( !err ){
-                                        UIImage *img = [[UIImage alloc]initWithData:rcvData];
-                                        cpny.image = img;
-                                        
-                                        NSData *imageData = UIImagePNGRepresentation(img);
-                                        image_key = [NSString stringWithFormat:@"img_%@",cpny.company_id];
-                                        [ud setObject:imageData forKey:image_key];
-                                        [ud synchronize];
-                                      }
-                                      else {
-                                        // アラートを閉じる
-                                        //						if(alertView.visible) [alertView dismissWithClickedButtonIndex:0 animated:NO];
-                                        
-                                        NSLog(@"FAILWHALE with error: %@", [err description] );
+  where = [whereArray componentsJoinedByString:@" OR "];
+  
+  if([where isEqualToString:@""]){
+    return;
+  }
+  
+	@try {
+    NSString *query = [NSString stringWithFormat:@"SELECT ParentId, Name,Body,BodyLength FROM Attachment WHERE %@ ORDER BY CreatedDate DESC",where];
+    SFRestRequest *req = [[SFRestAPI sharedInstance] requestForQuery:query];
+    [[SFRestAPI sharedInstance] sendRESTRequest:req
+                                      failBlock:^(NSError *e) {
+                                        NSLog(@"FAILWHALE with error: %@", [e description] );
                                         alertView = [[UIAlertView alloc]
                                                      initWithTitle:[pData getDataForKey:@"DEFINE_MAP_IMGREADERRTITLE"]
                                                      message:[pData getDataForKey:@"DEFINE_MAP_IMAREADERRMSG"]
@@ -2775,10 +2761,95 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
                                                      otherButtonTitles:[pData getDataForKey:@"DEFINE_MAP_ALERTOK"], nil ];
                                         [alertView show];
                                       }
+                                  completeBlock:^(id jsonResponse){
+                                    NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                    //NSLog(@"%@",dict);
+                                    
+                                    //アラート表示
+                                    //			[self alertShow];
+                                    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+                                    
+                                    //受信データクリア
+                                    rcvData = [[NSMutableData alloc]init];
+                                    NSString *image_key;
+                                    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+                                    
+                                    NSArray *records = [dict objectForKey:@"records"];
+                                    for ( int i = 0; i< [records count]; i++ ){
+                                      NSDictionary *rec = [records objectAtIndex:i];
+                                      NSString *url = [rec objectForKey:@"Body"];
+                                      NSString *name = [rec objectForKey:@"Name"];
+                                      NSString *bodyLength = [rec objectForKey:@"BodyLength"];
+                                      NSString *cpId = [rec objectForKey:@"ParentId"];
+                                      
+                                      Company *cpny;
+                                      for ( int i = 0; i < [cpnyAry count]; i++ ){
+                                        cpny = [cpnyAry objectAtIndex:i];
+                                        if ( [cpny.company_id isEqualToString:cpId] ){
+                                          break;
+                                        }
+                                      }
+                                      
+                                      int bSize = [bodyLength intValue];
+                                      //NSLog(@"%@",url);
+                                      
+                                      //ロゴ画像を読み込み
+                                      if ([um isInclude:[name uppercaseString]cmp:@"LOGO."] == YES ) {
+                                        
+                                        //画像サイズが閾値より大きい場合は読み込まない
+                                        if ( MaxLoadingSize <= bSize ) {
+                                          continue;
+                                        }
+                                        
+                                        //リクエスト作成
+                                        NSString *instance = [[[[[SFRestAPI sharedInstance] coordinator] credentials] instanceUrl]absoluteString];
+                                        NSString *fullUrl = [instance stringByAppendingString:url];
+                                        NSURL *myURL = [NSURL URLWithString:fullUrl];
+                                        NSMutableURLRequest *requestDoc = [[NSMutableURLRequest alloc]initWithURL:myURL];
+                                        
+                                        //OAuth認証情報をヘッダーに追加
+                                        NSString *token = [@"OAuth " stringByAppendingString:[[[[SFRestAPI sharedInstance]coordinator]credentials]	accessToken]];
+                                        [requestDoc addValue:token forHTTPHeaderField:@"Authorization"];
+                                        
+                                        //					[NSURLConnection connectionWithRequest:requestDoc delegate:self];
+                                        NSURLResponse *resp;
+                                        NSError *err;
+                                        
+                                        NSData *rcvTmpData = [NSURLConnection sendSynchronousRequest:requestDoc returningResponse:&resp error:&err];
+                                        rcvData = [rcvTmpData mutableCopy];
+                                        
+                                        
+                                        //共用データのインスタンス取得
+                                        pData = [PublicDatas instance];
+                                        if ( !err ){
+                                          UIImage *img = [[UIImage alloc]initWithData:rcvData];
+                                          cpny.image = img;
+                                          
+                                          NSData *imageData = UIImagePNGRepresentation(img);
+                                          image_key = [NSString stringWithFormat:@"img_%@",cpny.company_id];
+                                          [ud setObject:imageData forKey:image_key];
+                                          [ud synchronize];
+                                        }
+                                        else {
+                                          // アラートを閉じる
+                                          //						if(alertView.visible) [alertView dismissWithClickedButtonIndex:0 animated:NO];
+                                          
+                                          //NSLog(@"FAILWHALE with error: %@", [err description] );
+                                          alertView = [[UIAlertView alloc]
+                                                       initWithTitle:[pData getDataForKey:@"DEFINE_MAP_IMGREADERRTITLE"]
+                                                       message:[pData getDataForKey:@"DEFINE_MAP_IMAREADERRMSG"]
+                                                       delegate:nil
+                                                       cancelButtonTitle:nil
+                                                       otherButtonTitles:[pData getDataForKey:@"DEFINE_MAP_ALERTOK"], nil ];
+                                          [alertView show];
+                                        }
+                                      }
                                     }
                                   }
-                                }
-	 ];
+     ];
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
 }
 
 - (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar
@@ -2786,15 +2857,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	[bdView dismissView];
 	return YES;
 }
-//str1がcmpを含む場合はYESを返す
--(BOOL)isInclude:(NSString*)str1 cmp:(NSString*)cmp
-{
-	NSRange result = [str1 rangeOfString:cmp];
-	if (result.location == NSNotFound){
-		return NO;
-	}
-	return  YES;
-}
+
 
 -(void)getSales:(NSMutableArray*)cpList
 {
@@ -2816,7 +2879,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 		month++;
 		year--;
 	}
-
+  
 	int loopMax = [cpList count];
 	int loopCnt = 0;
 	NSString *where=@"";
@@ -2829,45 +2892,45 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	
 	NSString *dateStr = [NSString stringWithFormat:@"%d-%02d-%02d",year,month,day];
 	NSString *query = [NSString stringWithFormat:@"SELECT CreatedDate,TotalPrice,status__c ,Opportunity.CloseDate ,Opportunity.AccountId FROM OpportunityLineItem  WHERE Opportunity.CloseDate >= %@ AND (%@) ORDER BY Opportunity.CloseDate DESC",dateStr,where];
-	NSLog(@"%@",query);
+	//NSLog(@"%@",query);
 	SFRestRequest *req = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] sendRESTRequest:req
-									  failBlock:^(NSError *e) {
-										  NSLog(@"FAILWHALE with error: %@", [e description] );
-										  alertView = [[UIAlertView alloc]
-													   initWithTitle:[pData getDataForKey:@"DEFINE_MAP_SALES_RCVERRTITLE"]
-													   message:[pData getDataForKey:@"DEFINE_MAP_SALES_RCVERRMSG"]
-													   delegate:nil
-													   cancelButtonTitle:nil
-													   otherButtonTitles:[pData getDataForKey:@"DEFINE_MAP_SALES_RCVERROK"], nil ];
-										  [alertView show];
-									  }
+                                    failBlock:^(NSError *e) {
+                                      NSLog(@"FAILWHALE with error: %@", [e description] );
+                                      alertView = [[UIAlertView alloc]
+                                                   initWithTitle:[pData getDataForKey:@"DEFINE_MAP_SALES_RCVERRTITLE"]
+                                                   message:[pData getDataForKey:@"DEFINE_MAP_SALES_RCVERRMSG"]
+                                                   delegate:nil
+                                                   cancelButtonTitle:nil
+                                                   otherButtonTitles:[pData getDataForKey:@"DEFINE_MAP_SALES_RCVERROK"], nil ];
+                                      [alertView show];
+                                    }
 	 
-								  completeBlock:^(id jsonResponse){
-									  NSDictionary *dict = (NSDictionary *)jsonResponse;
-									  NSLog(@"%@",dict);
-									  NSArray *records = [dict objectForKey:@"records"];
-									  for ( int i = 0; i< [records count]; i++ ){
-										  NSDictionary *rec = [records objectAtIndex:i];
-										  NSDictionary *opportunity = [rec objectForKey:@"Opportunity"];
-										  NSString *cpId = [opportunity objectForKey:@"AccountId"];
-										  NSNumber *sales = [rec objectForKey:@"TotalPrice"];
-										  
-										  for ( Company *tempCp in cpList){
-											  if ([cpId isEqualToString:tempCp.company_id]){
-												  if (![sales isEqual:[NSNull null]]){
-													  tempCp.yearSales += [sales doubleValue];
-													  break;
-												  }
-											  }
-										  }
-									  }
-									  for ( Company *tempCp in cpList){
-										  NSLog(@"%@:%f",tempCp.name,tempCp.yearSales);
-									  }
-									  [self getEmployee:cpList];
-									  
-								  }
+                                completeBlock:^(id jsonResponse){
+                                  NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                  //NSLog(@"%@",dict);
+                                  NSArray *records = [dict objectForKey:@"records"];
+                                  for ( int i = 0; i< [records count]; i++ ){
+                                    NSDictionary *rec = [records objectAtIndex:i];
+                                    NSDictionary *opportunity = [rec objectForKey:@"Opportunity"];
+                                    NSString *cpId = [opportunity objectForKey:@"AccountId"];
+                                    NSNumber *sales = [rec objectForKey:@"TotalPrice"];
+                                    
+                                    for ( Company *tempCp in cpList){
+                                      if ([cpId isEqualToString:tempCp.company_id]){
+                                        if (![sales isEqual:[NSNull null]]){
+                                          tempCp.yearSales += [sales doubleValue];
+                                          break;
+                                        }
+                                      }
+                                    }
+                                  }
+                                  for ( Company *tempCp in cpList){
+                                    NSLog(@"%@:%f",tempCp.name,tempCp.yearSales);
+                                  }
+                                  [self getEmployee:cpList];
+                                  
+                                }
 	 ];
 }
 
@@ -2887,60 +2950,60 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	}
 	
 	NSString *query = [NSString stringWithFormat:@"SELECT Id, AnnualRevenue,NumberOfEmployees,activity__c,oppcount__c FROM Account WHERE (%@) ",where];
-	NSLog(@"%@",query);
+	//NSLog(@"%@",query);
 	SFRestRequest *req = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] sendRESTRequest:req
-									  failBlock:^(NSError *e) {
-										  NSLog(@"FAILWHALE with error: %@", [e description] );
-										  alertView = [[UIAlertView alloc]
-													   initWithTitle:[pData getDataForKey:@"DEFINE_MAP_EMPLY_RCVERRTITLE"]
-													   message:[pData getDataForKey:@"DEFINE_MAP_EMPLY_RCVERRMSG"]
-													   delegate:nil
-													   cancelButtonTitle:nil
-													   otherButtonTitles:[pData getDataForKey:@"DEFINE_MAP_EMPLY_RCVERROK"], nil ];
-										  [alertView show];
-									  }
+                                    failBlock:^(NSError *e) {
+                                      NSLog(@"FAILWHALE with error: %@", [e description] );
+                                      alertView = [[UIAlertView alloc]
+                                                   initWithTitle:[pData getDataForKey:@"DEFINE_MAP_EMPLY_RCVERRTITLE"]
+                                                   message:[pData getDataForKey:@"DEFINE_MAP_EMPLY_RCVERRMSG"]
+                                                   delegate:nil
+                                                   cancelButtonTitle:nil
+                                                   otherButtonTitles:[pData getDataForKey:@"DEFINE_MAP_EMPLY_RCVERROK"], nil ];
+                                      [alertView show];
+                                    }
 	 
-								  completeBlock:^(id jsonResponse){
-									  NSDictionary *dict = (NSDictionary *)jsonResponse;
-									  NSLog(@"%@",dict);
-									  NSArray *records = [dict objectForKey:@"records"];
-									  for ( int i = 0; i< [records count]; i++ ){
-										  NSDictionary *rec = [records objectAtIndex:i];
-										  NSString *cpId = [rec objectForKey:@"Id"];
-										  NSNumber *emp = [rec objectForKey:@"NumberOfEmployees"];
-										  NSNumber *act = [rec objectForKey:@"activity__c"];
-										  NSNumber *opp = [rec objectForKey:@"oppcount__c"];
-										  NSNumber *sales = [rec objectForKey:@"AnnualRevenue"];
-										  for ( Company *tempCp in cpList){
-											  if ([cpId isEqualToString:tempCp.company_id]){
-												  if (![emp isEqual:[NSNull null]]){
-													  tempCp.employee =[emp intValue];
-												  }
-												  if (![act isEqual:[NSNull null]]){
-													  tempCp.visitCount =[act intValue];
-												  }
-												  if (![opp isEqual:[NSNull null]]){
-													  tempCp.opportunityCount =[opp intValue];
-												  }
-												  if (![sales isEqual:[NSNull null]]){
-													  tempCp.yearSales =[sales doubleValue];
-												  }
-											  }
-										  }
-									  }
-									  for ( Company *tempCp in cpList){
-										  NSLog(@"%@:従業員数:%d 売上:%f 訪問数:%d 商談数%d",tempCp.name,tempCp.employee ,
-												tempCp.yearSales ,tempCp.visitCount, tempCp.opportunityCount);
-									  }
-									  //ピン追加
-									  [self addCompanyPinByArray:selectedList];
-									  
-									  //マップサイズ調整
-									  [self mapZoom:searchPos points:aryForZoom];
-								  }
+                                completeBlock:^(id jsonResponse){
+                                  NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                  //NSLog(@"%@",dict);
+                                  NSArray *records = [dict objectForKey:@"records"];
+                                  for ( int i = 0; i< [records count]; i++ ){
+                                    NSDictionary *rec = [records objectAtIndex:i];
+                                    NSString *cpId = [rec objectForKey:@"Id"];
+                                    NSNumber *emp = [rec objectForKey:@"NumberOfEmployees"];
+                                    NSNumber *act = [rec objectForKey:@"activity__c"];
+                                    NSNumber *opp = [rec objectForKey:@"oppcount__c"];
+                                    NSNumber *sales = [rec objectForKey:@"AnnualRevenue"];
+                                    for ( Company *tempCp in cpList){
+                                      if ([cpId isEqualToString:tempCp.company_id]){
+                                        if (![emp isEqual:[NSNull null]]){
+                                          tempCp.employee =[emp intValue];
+                                        }
+                                        if (![act isEqual:[NSNull null]]){
+                                          tempCp.visitCount =[act intValue];
+                                        }
+                                        if (![opp isEqual:[NSNull null]]){
+                                          tempCp.opportunityCount =[opp intValue];
+                                        }
+                                        if (![sales isEqual:[NSNull null]]){
+                                          tempCp.yearSales =[sales doubleValue];
+                                        }
+                                      }
+                                    }
+                                  }
+                                  for ( Company *tempCp in cpList){
+                                    NSLog(@"%@:従業員数:%d 売上:%f 訪問数:%d 商談数%d",tempCp.name,tempCp.employee ,
+                                          tempCp.yearSales ,tempCp.visitCount, tempCp.opportunityCount);
+                                  }
+                                  //ピン追加
+                                  [self addCompanyPinByArray:selectedList];
+                                  
+                                  //マップサイズ調整
+                                  [self mapZoom:searchPos points:aryForZoom];
+                                }
 	 ];
-
+  
 	
 }
 -(void)modePushed
@@ -2953,8 +3016,8 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
 	
 	NSMutableArray *modeList = [[NSMutableArray alloc]initWithObjects:[pData getDataForKey:@"DEFINE_MAP_MODE_NORMAL"],
-								[pData getDataForKey:@"DEFINE_MAP_MODE_VISIT"],
-								[pData getDataForKey:@"DEFINE_MAP_MODE_OPP"], nil];
+                              [pData getDataForKey:@"DEFINE_MAP_MODE_VISIT"],
+                              [pData getDataForKey:@"DEFINE_MAP_MODE_OPP"], nil];
 	
 	
 	//リストをPopoverで表示
@@ -3020,7 +3083,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 		label.text = [NSString stringWithFormat:@"%@ - %@",title,self.title];
 	}
 	[label sizeToFit];
-
+  
 }
 
 -(double)getRadius:(Company*)tempCp
@@ -3036,7 +3099,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	else if ( tempCp.employee < 99 ) empVal = (double)2;
 	else if ( tempCp.employee < 999 ) empVal = (double)3;
 	else if ( tempCp.employee >= 1000 ) empVal = (double)4;
-
+  
 	tempSalesVal = tempCp.yearSales / (double)10000;
 	if ( tempSalesVal <= (double)0) salesVal = (double)0;
 	else if ( tempSalesVal <= (double)99) salesVal = (double)1;
@@ -3052,7 +3115,7 @@ NSComparisonResult listCompare (id obj1, id obj2, void* context)
 	if ( radius > MaxDimeter ) radius = MaxDimeter;
 	if ( radius < MinDimeter ) radius = MinDimeter;
 	
-	return  radius;
+	return  radius/2;
 	
 }
 

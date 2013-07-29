@@ -76,6 +76,13 @@ NSString *hasImgPickerStatus = @"NO";
 	upFileEXTArray = [NSMutableDictionary dictionary];
 	upFileNameArray = [NSMutableDictionary dictionary];
   
+  // mention用ラベル
+  mentionInputLabelDictionary = [NSMutableDictionary dictionary];
+  mentionIdDictionary = [NSMutableDictionary dictionary];
+  subViewDictionary = [NSMutableDictionary dictionary];
+  mentionExist = NO;
+  commmentFlagDictionary =[NSMutableDictionary dictionary];
+  
 	//タイムライン保存用配列初期化
 	myTimeLine = [NSDictionary dictionary];
 	
@@ -160,7 +167,7 @@ NSString *hasImgPickerStatus = @"NO";
 	
 	//背景設定
 	um = [UtilManager sharedInstance];
-
+  
 	iData =[um backType];
 	if ( [((NSString*)iData) isEqualToString:@"gray"] ) {
 		self.view.backgroundColor = [UIColor grayColor];
@@ -175,19 +182,89 @@ NSString *hasImgPickerStatus = @"NO";
 			self.view.backgroundColor = [UIColor colorWithPatternImage:img];
 		}
 	}
+
+  // 枠
+  UIView *view = [[UITextView alloc]initWithFrame:CGRectMake(10,5, self.postView.frame.size.width - 20, 85)];
+  view.backgroundColor = [UIColor clearColor];
+  view.layer.borderWidth = 1;
+  view.layer.cornerRadius = 4;
+	view.layer.borderColor = [[UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f]CGColor];
+  [self.postView addSubview:view];
+  
+  //メンション用TextViewとボタンを追加
+	mentionScrView = [[UIScrollView alloc]initWithFrame:CGRectMake(10,05, self.postView.frame.size.width - 20, 30)];
+  //mentionScrView.layer.borderWidth = 1;
+  //mentionScrView.layer.cornerRadius = 4;
+	//mentionScrView.layer.borderColor = [[UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f]CGColor];
+  mentionScrView.tag = 65535 + 1000;
+  
+  // 角丸
+  //CGSize rsize = CGSizeMake(10.0, 10.0);
+  //[um makeViewRound:mentionScrView corners:UIRectCornerTopLeft|UIRectCornerTopRight size:&rsize];
+	[self.postView addSubview:mentionScrView];
+  
+  mentionView = [[UIView alloc]initWithFrame:CGRectMake(10,05, self.postView.frame.size.width - 20, 30)];
+  mentionView.tag = 65535 + 2000;
+  
+  mTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(focusMention:)];
+  mTap.numberOfTapsRequired = 1;
+  //[mentionView addGestureRecognizer:mTap];
+  
+  // 入力用
+  mentionInputArray = [[NSMutableArray alloc] init];
+  mentionInputLabelArray = [[NSMutableArray alloc] init];
+  mentionIdList = [[NSMutableArray alloc] init];
+  
+  mentionLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 50, 20)];
+  mentionLabel.text = [NSString stringWithFormat:@"@ : "];
+  mentionLabel.font = [UIFont boldSystemFontOfSize:16];
+  [mentionLabel sizeToFit];
+  mentionLabel.textColor = [UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f];
+  mentionLabel.textAlignment = NSTextAlignmentLeft;
+  [mentionLabel sizeToFit];
+  mentionLabel.tag = 65535+5000;
+  [mentionView addSubview:mentionLabel];
+  
+  mentionInput = [[UITextField alloc]initWithFrame:CGRectMake(30,0, self.postView.frame.size.width - 20, 20)];
+  mentionInput.font = [UIFont systemFontOfSize:14.0];
+  mentionInput.text = @"";
+	mentionInput.tag = 65535+4000;
+	mentionInput.layer.borderWidth = 0;
+	//mentionInput.layer.cornerRadius = 4;
+	mentionInput.delegate = self;
+  [mentionInput addTarget:self action:@selector(textFieldEditingChanged:) forControlEvents:UIControlEventEditingChanged];
+  [mentionView addSubview:mentionInput];
+  
+  
+  mentionAddButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
+  mentionAddButton.frame = CGRectMake(self.postView.frame.size.width- mentionAddButton.bounds.size.width-35, -4, mentionAddButton.bounds.size.width, mentionAddButton.bounds.size.height);
+  //[mentionAddButton addTarget:self action:@selector(selectMention:) forControlEvents:UIControlEventTouchUpInside];
+//  [mentionView addSubview:mentionAddButton];
+  [mentionAddButton addTarget:self action:@selector(selectMention:) forControlEvents:UIControlEventTouchUpInside];
+  mentionAddButton.tag = 65535 + 3000;
+  
+  mentionScrView.contentSize = mentionScrView.bounds.size;
+  [mentionScrView addSubview:mentionView];
+  
+  [mentionInputLabelDictionary setObject:[[NSMutableArray alloc] initWithCapacity:0]  forKey:@"65535"];
+  [mentionIdDictionary setObject:[[NSMutableArray alloc] initWithCapacity:0] forKey:@"65535"];
   
 	//投稿用TextViewとボタンを追加
-	postInput = [[UITextView alloc]initWithFrame:CGRectMake(10,5, self.postView.frame.size.width - 20, 55)];
+	postInput = [[UITextView alloc]initWithFrame:CGRectMake(12,35, self.postView.frame.size.width - 24, 53)];
 	postInput.tag = 65535;
-	postInput.layer.borderWidth = 1;
-	postInput.layer.cornerRadius = 4;
+	//postInput.layer.borderWidth = 1;
+	//postInput.layer.cornerRadius = 4;
 	postInput.delegate = self;
-	postInput.layer.borderColor = [[UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f]CGColor];
+	//postInput.layer.borderColor = [[UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f]CGColor];
 	[self.postView addSubview:postInput];
-	
+
+  UIView *line = [[UITextView alloc]initWithFrame:CGRectMake(10,35, self.postView.frame.size.width - 20, 1)];
+	line.backgroundColor = [UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f];
+  [self.postView addSubview:line];
+  
 	//投稿ボタン
 	UIButton *postBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-	postBtn.frame = CGRectMake((postInput.frame.origin.x + postInput.frame.size.width) - 100, 65, 100, 30);
+	postBtn.frame = CGRectMake((postInput.frame.origin.x + postInput.frame.size.width) - 100, 95, 100, 30);
 	[postBtn setTitle:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_SHARE"] forState:UIControlStateNormal];
 	font = [UIFont boldSystemFontOfSize:16];
 	[postBtn.titleLabel setFont:font];
@@ -201,7 +278,7 @@ NSString *hasImgPickerStatus = @"NO";
   
 	//ファイル添付ボタン
 	UIImage *attachImg = [UIImage imageNamed:@"attachfileicon.png"];
-	UIButton *attachBtn = [[UIButton alloc]initWithFrame:CGRectMake(postInput.frame.origin.x + 30, 70, 23, 21)];
+	UIButton *attachBtn = [[UIButton alloc]initWithFrame:CGRectMake(postInput.frame.origin.x + 30, 105, 23, 21)];
 	[attachBtn setBackgroundImage:attachImg forState:UIControlStateNormal];
 	attachBtn.tag = 65535;
 	[attachBtn addTarget:self action:@selector(attachFile:) forControlEvents:UIControlEventTouchUpInside];
@@ -262,130 +339,540 @@ NSString *hasImgPickerStatus = @"NO";
   if(textView.tag>40) return;
   scrl.contentOffset = CGPointMake(0, textView.frame.origin.y-100);
 }
+- (void)textFieldDidBeginEditing:(UITextField *)textField{
+  UITextView *textView;
+  for (UIView* view in [scrl subviews]){
+    // 種類を判定
+    if ([view isKindOfClass:[UITextView class]] && view.tag==textField.tag-4000) {
+      textView = (UITextView*)view;
+      scrl.contentOffset = CGPointMake(0, textView.frame.origin.y-23);
+      break;
+    }
+  }
+}
+
+// button
+-(void) selectMention:(id)sender
+{
+  // buttonは+3000のため
+  UIButton *button = (UIButton*)sender;
+  NSString *_tag = [NSString stringWithFormat:@"%d", button.tag-3000];
+  [pData setData:_tag forKey:@"tag"];
+  
+  @try{
+    //PopOverを消す
+    if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+    
+    //MentionをPopoverで表示
+    MentionPopoverViewController *mentionPopoverViewController = [[MentionPopoverViewController alloc] init];
+    mentionPopoverViewController.word = @"";
+    mentionPopoverViewController.delegate = self;
+    pop = [[UIPopoverController alloc]initWithContentViewController:mentionPopoverViewController];
+    pop.delegate = self;
+    pop.popoverContentSize = mentionPopoverViewController.view.frame.size;
+    [pop presentPopoverFromRect:
+     CGRectMake(self.postView.frame.origin.x + self.postView.frame.size.width-30, self.postView.frame.origin.y+20,0,0)
+                         inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+    
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
+}
+
+// フォーカス
+-(void) focusMention:(id)sender
+{
+  [mentionInput becomeFirstResponder];
+}
+
+// メンション用
+// テキスト入力が変更された際の処理
+
+-(void)textFieldEditingChanged:(id)sender
+{
+  UITextField *textField = (UITextField *)sender;
+  
+  // textfieldは+4000してあるため
+  NSString *_tag = [NSString stringWithFormat:@"%d", textField.tag-4000];
+
+  // List the subviews of subview
+  //if([subViewDictionary count]==0)
+  [self listSubviewsOfView:self.view];
+  
+  // textField はtag + 4000
+  // ベースのスクロールビュー
+  int scrTag = [_tag intValue]+1000;
+  int viewTag = [_tag intValue]+2000;
+  
+  UIScrollView *scrollView = (UIScrollView *)[subViewDictionary objectForKey:[NSString stringWithFormat:@"%d", scrTag]];
+  UIView *baseView = (UIView *)[subViewDictionary objectForKey:[NSString stringWithFormat:@"%d", viewTag]];
+  
+  NSMutableArray *array = [mentionInputLabelDictionary objectForKey:_tag];
+  NSMutableArray *idArray = [mentionIdDictionary objectForKey:_tag];
+  
+  [pData setData:_tag forKey:@"tag"];
+  
+  if([array count]==0 || [textField.text length]>=2 )
+  {
+    NSLog(@" textField.text : %@", textField.text);
+    NSLog(@" textField.text length : %d", [textField.text length]);
+    
+    @try{
+      //PopOverを消す
+      if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+      
+      NSMutableArray *tmpList = [[NSMutableArray alloc] init];
+      NSMutableArray *tmpIdList = [[NSMutableArray alloc] init];
+      NSMutableArray *tmpImageUrlList = [[NSMutableArray alloc] init];
+      
+      NSString *word = [textField.text stringByTrimmingCharactersInSet:
+                       [NSCharacterSet whitespaceCharacterSet]];
+      NSLog(@" textField.text word : %@", word);
+      NSLog(@" textField.text word length : %d", [word length]);
+      
+      // 空欄の場合は最初の条件に戻す
+      if([word length]==0){
+        //PopOverを消す
+        if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+        mentionExist = NO;
+        return;
+      }
+      
+      for (int i=0; i<[mentionList count]; i++){
+        NSString *str = [mentionList objectAtIndex:i];
+        if ([str rangeOfString:word].location != NSNotFound) {
+          [tmpList addObject:str];
+          [tmpIdList addObject:[mentionIdList objectAtIndex:i]];
+          [tmpImageUrlList addObject:[mentionImageUrlList objectAtIndex:i]];
+        }
+      }
+      
+      // 候補がなければ中止
+      if(!mentionExist && [tmpList count]==0){
+        //mentionExist = YES;
+        return;
+      }
+      
+      mentionExist = YES;
+      
+      if([tmpList count]==0){
+        MentionInfoViewController *infoViewController = [[MentionInfoViewController alloc]initWithNibName:@"MentionInfoViewController" bundle:[NSBundle mainBundle]];
+        infoViewController.delegate = self;
+        
+        pop = [[UIPopoverController alloc]initWithContentViewController:infoViewController];
+        pop.delegate = self;
+        pop.popoverContentSize = infoViewController.view.frame.size;
+        if([_tag intValue]==65535 ){
+          [pop presentPopoverFromRect:CGRectMake(self.postView.frame.origin.x + textField.frame.origin.x+30, mentionInput.bounds.origin.y+70,0,0) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+        }else{
+          UITextView *textView;
+          for (UIView* view in [scrl subviews]){
+            // 種類を判定
+            if ([view isKindOfClass:[UITextView class]] && view.tag==[_tag intValue]) {
+              textView = (UITextView*)view;
+              break;
+            }
+          }
+          [pop presentPopoverFromRect:
+           CGRectMake(textView.frame.origin.x+textField.frame.origin.x+30 , textView.frame.origin.y-30,0,0)
+                               inView:scrl permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+        }
+      }else{
+        //Mentionの候補をPopoverで表示
+        MentionPopoverViewController *mentionPopoverViewController = [[MentionPopoverViewController alloc] init];
+        mentionPopoverViewController.delegate = self;
+        mentionPopoverViewController.word = textField.text;
+        [mentionPopoverViewController setMentionList:tmpList];
+        [mentionPopoverViewController setMentionIdList:tmpIdList];
+        [mentionPopoverViewController setMentionImageUrlList:tmpImageUrlList];
+        
+        //[mentionPopoverViewController searchMention:textField.text];
+        
+        [mentionPopoverViewController.resultTable reloadData];
+        
+        pop = [[UIPopoverController alloc]initWithContentViewController:mentionPopoverViewController];
+        pop.delegate = self;
+        pop.popoverContentSize = mentionPopoverViewController.view.frame.size;
+        if([_tag intValue]==65535 ){
+          [pop presentPopoverFromRect:CGRectMake(self.postView.frame.origin.x + textField.frame.origin.x+30, mentionInput.bounds.origin.y+70,0,0) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+        }else{
+          UITextView *textView;
+          for (UIView* view in [scrl subviews]){
+            // 種類を判定
+            if ([view isKindOfClass:[UITextView class]] && view.tag==[_tag intValue]) {
+              textView = (UITextView*)view;
+              break;
+            }
+          }
+          [pop presentPopoverFromRect:
+           CGRectMake(textView.frame.origin.x+textField.frame.origin.x+30 , textView.frame.origin.y-30,0,0)
+                               inView:scrl permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+        }
+      }
+    }@catch (NSException *exception) {
+      NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+    }
+  }
+  // 削除前確認
+  else if([textField.text length]==1){
+    UILabel *label = [array lastObject];
+    label.textColor = [UIColor whiteColor];
+    label.backgroundColor = [UIColor grayColor];
+  }
+  // 削除
+  else if([textField.text length]==0){
+    if([array count]){
+      UILabel *label = [array lastObject];
+      
+      float _x = label.frame.origin.x;
+      float _y = label.frame.origin.y;
+      
+      // 削除
+      [label removeFromSuperview];
+      // ラベル
+      [array removeLastObject];
+      [mentionInputLabelDictionary setObject:array forKey:_tag];
+      // メンションID
+      [idArray removeLastObject];
+      [mentionIdDictionary setObject:idArray forKey:_tag];
+      
+      if(_x+200>scrollView.frame.size.width - 20){
+        _x = 0.0;
+        _y = _y+20;
+        baseView.frame = CGRectMake(10,05, scrollView.frame.size.width - 20, 20*(_y+1));
+      }
+      textField.frame = CGRectMake(5+_x, _y, 100, 20);
+      textField.font = [UIFont systemFontOfSize:14.0];
+      if([array count])textField.text = @"  ";
+      textField.backgroundColor = [UIColor clearColor];
+      textField.tag = [_tag intValue]+4000;
+      [textField addTarget:self action:@selector(textFieldEditingChanged:) forControlEvents:UIControlEventEditingChanged];
+      [subViewDictionary setObject:textField forKey:[NSString stringWithFormat:@"%d", textField.tag]];
+    }
+  }
+}
+
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+  // 確定がなされた場合
+  if([textField.text length] && range.length && [string length]){
+    //PopOverを消す
+    if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+    
+    NSString *word = [textField.text stringByTrimmingCharactersInSet:
+                      [NSCharacterSet whitespaceCharacterSet]];
+    
+    // 空欄の場合は最初の条件に戻す
+    if([word length]==0){
+      //PopOverを消す
+      if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+      mentionExist = NO;
+      return YES;
+    }
+    
+    // 入力済みとする
+    mentionExist = YES;
+  }
+  return YES;
+}
+
+- (void)listSubviewsOfView:(UIView *)view {
+  
+  // Get the subviews of the view
+  NSArray *subviews = [view subviews];
+  // Return if there are no subviews
+  if ([subviews count] == 0) return;
+  
+  for (UIView *subview in subviews) {
+    if(subview.tag>0){
+      [subViewDictionary setObject:subview forKey:[NSString stringWithFormat:@"%d", subview.tag]];
+    }
+    // List the subviews of subview
+    [self listSubviewsOfView:subview];
+  }
+}
+
+// delegate
+-(void)didSelectMention:(NSString*)uId;
+{
+  mentionExist = NO;
+  
+  // view用のタグ
+  NSString *_tag = [pData getDataForKey:@"tag"];
+  
+  // List the subviews of subview
+  if([subViewDictionary count]==0) [self listSubviewsOfView:self.view];
+   
+  // textField はtag + 4000
+  // ベースのスクロールビュー
+  int scrTag = [_tag intValue]+1000;
+  int viewTag = [_tag intValue]+2000;
+  int buttonTag = [_tag intValue]+3000;
+  int textFieldTag = [_tag intValue]+4000;
+  int labelTag = [_tag intValue]+5000;
+  
+  UIScrollView *scrollView = (UIScrollView *)[subViewDictionary objectForKey:[NSString stringWithFormat:@"%d", scrTag]];
+  UIView *baseView = (UIView *)[subViewDictionary objectForKey:[NSString stringWithFormat:@"%d", viewTag]];
+  UIButton *button = (UIButton *)[subViewDictionary objectForKey:[NSString stringWithFormat:@"%d", buttonTag]];
+  UITextField *textField = (UITextField *)[subViewDictionary objectForKey:[NSString stringWithFormat:@"%d", textFieldTag]];
+  UILabel *label = (UILabel *)[subViewDictionary objectForKey:[NSString stringWithFormat:@"%d", labelTag]];
+  
+  NSMutableArray *idArray = [mentionIdDictionary objectForKey:_tag];
+  NSMutableArray *labelArray = [mentionInputLabelDictionary objectForKey:_tag];
+  
+  if ([idArray count] == 0) idArray = [[NSMutableArray alloc] init];
+  if ([labelArray count] == 0) labelArray = [[NSMutableArray alloc] init];
+  
+  // 既に選択済みならここで終える
+  if([idArray containsObject:uId]){
+    [pData removeDataForKey:@"mention"];
+    if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+    
+    // キーボードを消さない
+    [textField becomeFirstResponder];
+    if([labelArray count])textField.text = @"  ";
+    return;
+  }
+  
+  float _x = 3.0;
+  float _y = 0.0;
+
+  //使用フォント
+	UIFont *font = [UIFont systemFontOfSize:14.0];
+  
+  // ラベルオブジェクトのみを作成
+  UILabel *_label = [[UILabel alloc]  initWithFrame:CGRectMake(0, 0, 320, 30)];
+  _label.text = [NSString stringWithFormat:@" %@ ",[pData getDataForKey:@"mention"]];
+  _label.font = font;
+  [_label sizeToFit];
+  _label.textAlignment = NSTextAlignmentLeft;
+  _label.layer.borderColor = [UIColor blueColor].CGColor;
+  _label.layer.borderWidth = 0.0;
+  [_label.layer setCornerRadius:10.0];
+  [_label setClipsToBounds:YES];
+  [_label drawTextInRect:_label.bounds];
+  
+  [labelArray addObject:_label];
+  
+  // メンションのリストを表示
+  [baseView removeFromSuperview];
+  
+  _x = 3.0 + 30.0;
+  _y = 0;
+  for(int i=0; i<[labelArray count]; i++){
+    UILabel *_label = [labelArray objectAtIndex:i];
+    if(_x+_label.bounds.size.width>=baseView.frame.size.width - 40){
+      _x = 0.0;
+      _y++;
+    }
+    _label.frame = CGRectMake(_x, 20*_y, _label.bounds.size.width, 20);
+    _x = _x + _label.bounds.size.width + 2;
+    [labelArray replaceObjectAtIndex:i withObject:_label];
+  }
+  
+  // 表示領域を再定義
+  baseView = [[UIView alloc] initWithFrame:CGRectMake(10,05, scrollView.frame.size.width - 20, 20*(_y+1))];
+  baseView.tag = viewTag;
+  
+  // @ : 
+  [baseView addSubview:label];
+  // メンション宛先
+  for(UILabel *_label in labelArray){
+    _label.textColor = [UIColor grayColor];
+    _label.backgroundColor = [UIColor colorWithHex:@"#e6e6fa"];
+    [baseView addSubview:_label];
+  }
+  
+  // 入力欄
+  [textField removeFromSuperview];
+  if(_x+100>scrollView.frame.size.width - 20){
+    _x = 0.0;
+    _y++;
+    if([_tag intValue]==65535 ){
+      baseView.frame = CGRectMake(10,05, baseView.frame.size.width - 20, 20*(_y+1));
+    }else{
+      baseView.frame = CGRectMake(10,05, baseView.frame.size.width, 20*(_y+1));
+    }
+  }
+  
+  // スクロールのサイズ
+  scrollView.contentSize = baseView.bounds.size;
+  
+  textField = [[UITextField alloc]initWithFrame:CGRectMake(5+_x, 20*_y, 100, 20)];
+  textField.tag = textFieldTag;
+  textField.backgroundColor = [UIColor clearColor];
+  textField.font = [UIFont systemFontOfSize:14.0];
+  textField.delegate = self;
+  textField.text = @"  ";
+  [textField addTarget:self action:@selector(textFieldEditingChanged:) forControlEvents:UIControlEventEditingChanged];
+  [subViewDictionary setObject:textField forKey:[NSString stringWithFormat:@"%d", textFieldTag]];
+  
+  [baseView addSubview:textField];
+  baseView.backgroundColor = [UIColor whiteColor];
+  
+  [subViewDictionary setObject:baseView forKey:[NSString stringWithFormat:@"%d", viewTag]];
+  
+  button.tag = buttonTag;
+  //[baseView addSubview:button];
+  // view
+  [scrollView addSubview:baseView];
+  
+  //[mentionInputArray addObject:[NSString stringWithFormat:@"%@ ",[pData getDataForKey:@"mention"]]];
+  [idArray addObject:uId];
+  [mentionIdDictionary setObject:idArray forKey:_tag];
+  [mentionInputLabelDictionary setObject:labelArray forKey:_tag];
+  
+  NSLog(@"%d mentionIdDictionary : %@",__LINE__, mentionIdDictionary);
+  NSLog(@"%d mentionInputLabelDictionary : %@",__LINE__,mentionInputLabelDictionary);
+  
+  [pData removeDataForKey:@"mention"];
+  if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+  
+  // キーボードを消さない
+  [textField becomeFirstResponder];
+}
+
+// delegate
+-(void)didCloseMention:(id)sender
+{
+  //PopOverを消す
+  if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+}
+
+// delegate
+-(void)didCloseInfo:(id)sender
+{
+  //PopOverを消す
+  if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+}
 
 -(void)viewWillAppear:(BOOL)animated
 {
 	feedCount = 0;
 	
 	NSLog(@"self.chatterType %d", self.chatterType);
-
+	NSLog(@"isFIrst:%d",isFirst );
+  
 	[self buildButton];
 	
   // TOPから初回
-	if ( self.chatterType == ENUM_CHATTERME ) {
-    
-		//グループ取得
-		[self getMyGroup];
-		
-		[[NSUserDefaults standardUserDefaults]setObject:nil forKey:@"selectGroup"];
-		
-		toolbar.items = [NSArray arrayWithObjects:space,[[UIBarButtonItem alloc]initWithCustomView:groupBtn],[[UIBarButtonItem alloc]initWithCustomView:reloadBtn], nil];
-    
-		//ツールバーをナビバーに設置
-		self.navigationItem.rightBarButtonItem = toolbarBarButtonItem;
- 
-		// Chatterのデフォルト表示を「自分がフォローするもの」に
-		[self getFirstMyTimeLine:0 url:@"v27.0/chatter/feeds/news/me/feed-items?pageSize=15"];
-
-//		[self getMyTimeLine:0 url:nil]; DEFINE_CHATTER_TITLE_CONNECT
-//		isFirst = NO;
-		NSString *ttl = [[[pData getDataForKey:@"DEFINE_CHATTER_LABEL_FOLLOW"]
-						 stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"]]
-						  stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
-		[titleLabel setText:ttl];
-		[titleLabel sizeToFit];
-		
-		//自分の画像を取得
-		[self getMyImage];
-		
-		//自分のIDを取得
-		[self getMyId];
-    
-	}
-	else if ( self.chatterType == ENUM_CHATTERCLIENT ) {
-    
-		//取引先責任者のチャター
-    
-		[self setInitialId];
-    
-		//取引先・取引先責任者のSubscriptionIDを取得 (nilの場合はフォローしていない状態)
-		[self getSubscriptionId];
-		
-		//画面タイトル設定
-		NSString *ttl = [[[[_initialName stringByAppendingString:@" "]
-							stringByAppendingString:_initialCompnay.name]
-							stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"]]
-							stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
-		[titleLabel setText:ttl];
-		[titleLabel sizeToFit];
-    
-		//ロゴ表示
-		UIImage *resize = [self resizeImage:_initialCompnay.image Rect:self.groupImageView.frame];
-		self.groupImageView.image = resize;
-		CGRect rect = self.groupImageView.frame;
-		rect.size = resize.size;
-		rect.origin.x = (( self.groupImageView.frame.origin.x + self.groupImageView.frame.size.width ) / 2 ) - ( resize.size.width / 2 );
-		self.groupImageView.frame = rect;
-    
-		//Description Label位置調整
-		rect= self.descriptionLabel.frame;
-		rect.origin.y = self.groupImageView.frame.origin.y + self.groupImageView.frame.size.height+20;
-		self.descriptionLabel.frame = rect;
-		
-		//Description設定
-		NSString *desc = [[[_initialCompnay.name stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_LABEL_NO"]]stringByAppendingString:_initialName]stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_LABEL_ABOUT"]];
-		self.descriptionTextView.text = [self stringReplacement:desc];
-		rect = self.descriptionTextView.frame;
-		rect.origin.y = self.descriptionLabel.frame.origin.y + self.descriptionLabel.frame.size.height + 10;
-		self.descriptionTextView.frame = rect;
-    
-		//Members => Followers に変更する
-		[memberLabel setText:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_FOLLOWERS"]];
-    
-		//自分のIDを取得
-		[self getMyId];
-    
-	}
-	else {
-		
-		//取引先のチャター
-		
-    [self setInitialId];
-    
-		//取引先・取引先責任者のSubscriptionIDを取得 (nilの場合はフォローしていない状態)
-		[self getSubscriptionId];
-    
-		//画面タイトル設定
-		NSString *ttl = [[_initialCompnay.name stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"]]stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
-		[titleLabel setText:ttl];
-		[titleLabel sizeToFit];
-    
-		//ロゴ表示
-		UIImage *resize = [self resizeImage:_initialCompnay.image Rect:self.groupImageView.frame];
-		self.groupImageView.image = resize;
-		CGRect rect = self.groupImageView.frame;
-		rect.size = resize.size;
-		rect.origin.x = (( self.groupImageView.frame.origin.x + self.groupImageView.frame.size.width ) / 2 ) - ( resize.size.width / 2 );
-		self.groupImageView.frame = rect;
-    
-		//Description Label位置調整
-		rect= self.descriptionLabel.frame;
-		rect.origin.y = self.groupImageView.frame.origin.y + self.groupImageView.frame.size.height+20;
-		self.descriptionLabel.frame = rect;
-		
-		//Description設定
-		NSString *desc = [_initialCompnay.name stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_LABEL_ABOUTCAHT"]];
-		self.descriptionTextView.text = [self stringReplacement:desc];
-		rect = self.descriptionTextView.frame;
-		rect.origin.y = self.descriptionLabel.frame.origin.y + self.descriptionLabel.frame.size.height + 10;
-		self.descriptionTextView.frame = rect;
-		
-		//Members => Followers に変更する
-		[memberLabel setText:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_FOLLOWERS"]];
-    
-		//自分のIDを取得
-		[self getMyId];
-	}
+  if ( isFirst == YES) {
+    if ( self.chatterType == ENUM_CHATTERME ) {
+      
+      //グループ取得
+      [self getMyGroup];
+      
+      [[NSUserDefaults standardUserDefaults]setObject:nil forKey:@"selectGroup"];
+      
+      toolbar.items = [NSArray arrayWithObjects:space,[[UIBarButtonItem alloc]initWithCustomView:groupBtn],[[UIBarButtonItem alloc]initWithCustomView:reloadBtn], nil];
+      
+      //ツールバーをナビバーに設置
+      self.navigationItem.rightBarButtonItem = toolbarBarButtonItem;
+      
+      // Chatterのデフォルト表示を「自分がフォローするもの」に
+      [self getFirstMyTimeLine:0 url:@"v27.0/chatter/feeds/news/me/feed-items?pageSize=15"];
+      
+      //		[self getMyTimeLine:0 url:nil]; DEFINE_CHATTER_TITLE_CONNECT
+      //		isFirst = NO;
+      NSString *ttl = [[[pData getDataForKey:@"DEFINE_CHATTER_LABEL_FOLLOW"]
+                        stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"]]
+                       stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
+      [titleLabel setText:ttl];
+      [titleLabel sizeToFit];
+      
+      //自分の画像を取得
+      [self getMyImage];
+      
+      //自分のIDを取得
+      [self getMyId];
+      
+    }
+    else if ( self.chatterType == ENUM_CHATTERCLIENT ) {
+      
+      //取引先責任者のチャター
+      
+      [self setInitialId];
+      
+      //取引先・取引先責任者のSubscriptionIDを取得 (nilの場合はフォローしていない状態)
+      [self getSubscriptionId];
+      
+      //画面タイトル設定
+      NSString *ttl = [[[[_initialName stringByAppendingString:@" "]
+                         stringByAppendingString:_initialCompnay.name]
+                        stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"]]
+                       stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
+      [titleLabel setText:ttl];
+      [titleLabel sizeToFit];
+      
+      //ロゴ表示
+      UIImage *resize = [self resizeImage:_initialCompnay.image Rect:self.groupImageView.frame];
+      self.groupImageView.image = resize;
+      CGRect rect = self.groupImageView.frame;
+      rect.size = resize.size;
+      rect.origin.x = (( self.groupImageView.frame.origin.x + self.groupImageView.frame.size.width ) / 2 ) - ( resize.size.width / 2 );
+      self.groupImageView.frame = rect;
+      
+      //Description Label位置調整
+      rect= self.descriptionLabel.frame;
+      rect.origin.y = self.groupImageView.frame.origin.y + self.groupImageView.frame.size.height+20;
+      self.descriptionLabel.frame = rect;
+      
+      //Description設定
+      NSString *desc = [[[_initialCompnay.name stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_LABEL_NO"]]stringByAppendingString:_initialName]stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_LABEL_ABOUT"]];
+      self.descriptionTextView.text = [self stringReplacement:desc];
+      rect = self.descriptionTextView.frame;
+      rect.origin.y = self.descriptionLabel.frame.origin.y + self.descriptionLabel.frame.size.height + 10;
+      self.descriptionTextView.frame = rect;
+      
+      //Members => Followers に変更する
+      [memberLabel setText:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_FOLLOWERS"]];
+      
+      //自分のIDを取得
+      [self getMyId];
+      
+    }
+    else {
+      
+      //取引先のチャター
+      
+      [self setInitialId];
+      
+      //取引先・取引先責任者のSubscriptionIDを取得 (nilの場合はフォローしていない状態)
+      [self getSubscriptionId];
+      
+      //画面タイトル設定
+      NSString *ttl = [[_initialCompnay.name stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"]]stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
+      [titleLabel setText:ttl];
+      [titleLabel sizeToFit];
+      
+      //ロゴ表示
+      UIImage *resize = [self resizeImage:_initialCompnay.image Rect:self.groupImageView.frame];
+      self.groupImageView.image = resize;
+      CGRect rect = self.groupImageView.frame;
+      rect.size = resize.size;
+      rect.origin.x = (( self.groupImageView.frame.origin.x + self.groupImageView.frame.size.width ) / 2 ) - ( resize.size.width / 2 );
+      self.groupImageView.frame = rect;
+      
+      //Description Label位置調整
+      rect= self.descriptionLabel.frame;
+      rect.origin.y = self.groupImageView.frame.origin.y + self.groupImageView.frame.size.height+20;
+      self.descriptionLabel.frame = rect;
+      
+      //Description設定
+      NSString *desc = [_initialCompnay.name stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_LABEL_ABOUTCAHT"]];
+      self.descriptionTextView.text = [self stringReplacement:desc];
+      rect = self.descriptionTextView.frame;
+      rect.origin.y = self.descriptionLabel.frame.origin.y + self.descriptionLabel.frame.size.height + 10;
+      self.descriptionTextView.frame = rect;
+      
+      //Members => Followers に変更する
+      [memberLabel setText:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_FOLLOWERS"]];
+      
+      //自分のIDを取得
+      [self getMyId];
+    }
+  }
 	
 	//ナビゲーションバーに「戻る」ボタン配置
 	if ( _chatterType == 2 ){
@@ -400,10 +887,12 @@ NSString *hasImgPickerStatus = @"NO";
 		backBtn = [btnBuilder buildHomeStepBtn];
 		self.navigationItem.leftBarButtonItem = backBtn;
 	}
-	
-	// ローディング
-	[self alertShow];
   
+	if ( isFirst == YES) {
+		// ローディング
+		[self alertShow];
+	}
+	
 	if ( _chatterType ) {
     NSLog(@"chatterTYpe %d", _chatterType);
 		//StoreViewから呼ばれた場合、ここでTLを表示する
@@ -420,6 +909,53 @@ NSString *hasImgPickerStatus = @"NO";
 	if ( ![tgt isEqualToString:myClass]){
 		[self.navigationController pushViewController:func animated:NO];
 	}
+}
+
+// 手書きメモ
+-(void)didPushMemoFunction:(id)sender
+{
+  
+  metricsBtn.enabled = NO;
+  self.navigationItem.leftBarButtonItem.enabled = NO;
+  
+  memoVC = [[MemoViewController alloc] initWithNibName:@"MemoViewController" bundle:[NSBundle mainBundle]company:_initialCompnay];
+  memoVC.delegate = self;
+  [memoVC.view setClipsToBounds:YES];
+  
+  memoVC.view.frame = CGRectMake(0, 0, 200, 100);
+  memoVC.view.center = self.view.center;
+  memoVC.view.alpha = 1.0;
+  
+  [self addChildViewController:memoVC];
+  
+  
+  // フリップ移動前処理
+  [UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDuration:0.01];
+  [self.view addSubview:memoVC.view];
+  [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:memoVC.view cache:YES];
+  [UIView setAnimationDidStopSelector:@selector(dispMemoViewAppear:finished:context:)];
+	[UIView commitAnimations];
+}
+
+- (void)dispMemoViewAppear:(NSString *)animationID finished:(NSNumber *) finished context:(void *) context
+{
+  [UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDuration:0.5];
+  memoVC.view.frame = self.view.frame;
+  memoVC.view.alpha = 1.0;
+  [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:memoVC.view cache:YES];
+	[UIView commitAnimations];
+}
+
+// close時のdelegate
+-(void)didClose:(id)sender
+{
+  // ボタンを戻す
+  metricsBtn.enabled = YES;
+  self.navigationItem.leftBarButtonItem.enabled = YES;
 }
 
 //ナビゲーションバーの「戻る」ボタン処理
@@ -457,8 +993,48 @@ NSString *hasImgPickerStatus = @"NO";
 	self.updateBtn.enabled = YES;
 }
 
+-(void)clearPostMention
+{
+  // mention用ラベル
+  [self listSubviewsOfView:self.view];
+  UIView *baseView = (UIView *)[subViewDictionary objectForKey:[NSString stringWithFormat:@"%d", 67535]];
+  for (UIView *view in [baseView subviews]) {
+    NSLog(@"mention view : %@", view);
+    if ([view isKindOfClass:[UILabel class]]){
+      UILabel *lb = (UILabel*)view;
+      if(![lb.text isEqual:@"@ : "])[view removeFromSuperview];
+    }
+    if ([view isKindOfClass:[UITextField class]]){
+      UITextField *tf = (UITextField*)view;
+      tf.frame = CGRectMake(30,0, self.postView.frame.size.width - 20, 20);
+      tf.text = @"";
+    }
+  }
+  mentionInputLabelDictionary = [NSMutableDictionary dictionary];
+  mentionIdDictionary = [NSMutableDictionary dictionary];
+  subViewDictionary = [NSMutableDictionary dictionary];
+  mentionExist = NO;
+  commmentFlagDictionary =[NSMutableDictionary dictionary];
+}
+
 -(void)reload
 {
+	//添付ファイル管理用配列初期化
+	upFileArray = [NSMutableDictionary dictionary];
+	upFileEXTArray = [NSMutableDictionary dictionary];
+	upFileNameArray = [NSMutableDictionary dictionary];
+  
+  [self clearPostMention];
+  
+  // topの添付済みボタン
+  [fileAttachedButton removeFromSuperview];
+  
+  // topの入力欄
+  postInput.text = @"";
+  
+  // コメント
+  commentArray = [NSMutableDictionary dictionary];
+  
 	feedCount = 0;
 	[self getMyTimeLine:0 url:nil];
 	
@@ -498,6 +1074,22 @@ NSString *hasImgPickerStatus = @"NO";
 //グループ選択
 -(void)didSelectGroup:(NSString *)groupId
 {
+	
+  //保存したコメントクリア
+	commentArray = [NSMutableArray array];
+	
+	//新規フィード用入力欄をクリア
+	postInput.text = @"";
+	
+	//添付ファイル管理用配列初期化
+	upFileArray = [NSMutableDictionary dictionary];
+	upFileEXTArray = [NSMutableDictionary dictionary];
+	upFileNameArray = [NSMutableDictionary dictionary];
+	[fileAttachedButton removeFromSuperview];
+	
+  // mentionをクリア
+  [self clearPostMention];
+  
   // feedカウントをリセット
   feedCount = 0;
   
@@ -571,10 +1163,10 @@ NSString *hasImgPickerStatus = @"NO";
                                       CGRect Rect =  CGRectMake(x, y, 50, 50);
                                       memberBtn.frame = Rect;
                                       memberBtn.tag = i;
-									  um = [UtilManager sharedInstance];
-									  CGSize size = CGSizeMake(5.0, 5.0);
-									  [um makeViewRound:memberBtn corners:UIRectCornerAllCorners size:&size];
-
+                                      um = [UtilManager sharedInstance];
+                                      CGSize size = CGSizeMake(5.0, 5.0);
+                                      [um makeViewRound:memberBtn corners:UIRectCornerAllCorners size:&size];
+                                      
                                       [memberBtn setBackgroundImage:[self resizeImage:image Rect:memberBtn.frame]forState:UIControlStateNormal];
                                       [memberBtn addTarget:self action:@selector(memberBtnPushed:) forControlEvents:UIControlEventTouchUpInside];
                                       //[self.MemberView addSubview:memberBtn];
@@ -641,44 +1233,46 @@ NSString *hasImgPickerStatus = @"NO";
                                 completeBlock:^(id jsonResponse){
                                   
                                   NSString *nextPageUrl;
-                                  if (( url == ( NSString *)[NSNull null] ) || ([url isEqual:[NSNull null]] ) || ( url ==  nil )){
-                                    myTimeLine = (NSMutableDictionary *)jsonResponse;
-                                    //nextPageUrl = [myTimeLine objectForKey:@"nextPageUrl"];
-                                    @try {
-                                      nextPageUrl = [myTimeLine objectForKey:@"nextPageUrl"];
-                                    }
-                                    @catch (NSException *exception) {
-                                      NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
-                                    }
-                                    @finally {
-                                    }
-                                    
-                                    //NSLog(@"myTimeLine::%@",myTimeLine);
-                                    
-                                    //1ページ目
-                                    [self buildTimeLine:myTimeLine firstPage:YES];
-                                    scrl.contentOffset = CGPointMake(0, pos);
+                                  //								  if (( url == ( NSString *)[NSNull null] ) || ([url isEqual:[NSNull null]] ) || ( url ==  nil )){
+                                  myTimeLine = (NSMutableDictionary *)jsonResponse;
+                                  //nextPageUrl = [myTimeLine objectForKey:@"nextPageUrl"];
+                                  @try {
+                                    nextPageUrl = [myTimeLine objectForKey:@"nextPageUrl"];
                                   }
-                                  else {
-                                    NSDictionary *otherPages = (NSDictionary *)jsonResponse;
-                                    if(otherPages.count){
-                                      //nextPageUrl = [otherPages objectForKey:@"nextPageUrl"];
-                                      @try {
-                                        nextPageUrl = [otherPages objectForKey:@"nextPageUrl"];
-                                      }
-                                      @catch (NSException *exception) {
-                                        NSLog(@"%d", __LINE__);
-                                        NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
-                                      }
-                                      @finally {
-                                      }
-                                    }
-                                    //NSLog(@"myTimeLine::%@",otherPages);
-                                    
-                                    //2ページ目以降
-                                    [self buildTimeLine:otherPages firstPage:NO];
-                                    scrl.contentOffset = CGPointMake(0, pos);
+                                  @catch (NSException *exception) {
+                                    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
                                   }
+                                  @finally {
+                                  }
+                                  
+                                  //NSLog(@"myTimeLine::%@",myTimeLine);
+                                  
+                                  //1ページ目
+                                  [self buildTimeLine:myTimeLine firstPage:YES];
+                                  scrl.contentOffset = CGPointMake(0, pos);
+                                  /*
+                                   }
+                                   else {
+                                   NSDictionary *otherPages = (NSDictionary *)jsonResponse;
+                                   if(otherPages.count){
+                                   //nextPageUrl = [otherPages objectForKey:@"nextPageUrl"];
+                                   @try {
+                                   nextPageUrl = [otherPages objectForKey:@"nextPageUrl"];
+                                   }
+                                   @catch (NSException *exception) {
+                                   NSLog(@"%d", __LINE__);
+                                   NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+                                   }
+                                   @finally {
+                                   }
+                                   }
+                                   //NSLog(@"myTimeLine::%@",otherPages);
+                                   
+                                   //2ページ目以降
+                                   [self buildTimeLine:otherPages firstPage:NO];
+                                   scrl.contentOffset = CGPointMake(0, pos);
+                                   }
+                                   */
                                   //応答受信済み
                                   inWait = NO;
                                   
@@ -758,13 +1352,13 @@ NSString *hasImgPickerStatus = @"NO";
         default:
           break;
       }
-    }else{  
+    }else{
 			//自分がフォローするもの
 			if ([currentGroup isEqualToString:@"Follow"]) {
 				path = @"v27.0/chatter/feeds/news/me/feed-items";
 				NSString *ttl =[[[pData getDataForKey:@"DEFINE_CHATTER_LABEL_FOLLOW"]
-								stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"] ]
-								stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
+                         stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"] ]
+                        stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
 				[titleLabel setText:ttl];
 				[titleLabel sizeToFit];
 				[self getMyImage];
@@ -773,18 +1367,18 @@ NSString *hasImgPickerStatus = @"NO";
 			else if ([currentGroup isEqualToString:@"toMe"]) {
 				path = @"v27.0/chatter/feeds/to/me/feed-items";
 				NSString *ttl =[[[pData getDataForKey:@"DEFINE_CHATTER_LABEL_TOME"]
-								 stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"] ]
-								stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
+                         stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"] ]
+                        stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
 				[titleLabel setText:ttl];
 				[titleLabel sizeToFit];
 				[self getMyImage];
 			}
-		//ブックマーク
+      //ブックマーク
 			else if ([currentGroup isEqualToString:@"bookMark"]) {
 				path = @"v27.0/chatter/feeds/bookmarks/me/feed-items";
 				NSString *ttl =[[[pData getDataForKey:@"DEFINE_CHATTER_LABEL_BOOKMARK"]
-								 stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"] ]
-								stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
+                         stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"] ]
+                        stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
 				[titleLabel setText:ttl];
 				[titleLabel sizeToFit];
 				[self getMyImage];
@@ -793,8 +1387,8 @@ NSString *hasImgPickerStatus = @"NO";
 			else if ([currentGroup isEqualToString:@"AllOfCompany"]) {
 				path = @"v27.0/chatter/feeds/company/feed-items";
 				NSString *ttl =[[[pData getDataForKey:@"DEFINE_CHATTER_LABEL_ALLCOMPANY"]
-								 stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"] ]
-								stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
+                         stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_CONNECT"] ]
+                        stringByAppendingString:[pData getDataForKey:@"DEFINE_CHATTER_TITLE"]];
 				[titleLabel setText:ttl];
 				[titleLabel sizeToFit];
 				[self getMyImage];
@@ -897,6 +1491,8 @@ NSString *hasImgPickerStatus = @"NO";
 //タイムライン構築
 -(void)buildTimeLine:(NSDictionary*)feeds firstPage:(BOOL)first
 {
+  //NSLog(@"buildTimeLine feed %@", feeds);
+  
 	CGFloat y;
 	if ( first == YES ) {
     
@@ -913,6 +1509,7 @@ NSString *hasImgPickerStatus = @"NO";
 	NSArray *items = [feeds objectForKey:@"items"];
 	for ( int i = 0; i< [items count]; i++ ){
 		NSMutableDictionary *item = [items objectAtIndex:i];
+    //NSLog(@"%d %@", __LINE__, item);
 		y = [self makeFeedCell:item position:y comment:NO];
 		
 		//再表示用に保存(再表示は全てPage1として扱うので、重複して保存されることは無い
@@ -932,6 +1529,10 @@ NSString *hasImgPickerStatus = @"NO";
 	//Feed格納用
 	FeedItem *feed = [[FeedItem alloc]init];
 	
+  // 認証したユーザー情報にアクセス
+  SFAccountManager *sm = [SFAccountManager sharedInstance];
+  NSString *myUserId = sm.idData.userId;
+  
 	//投稿者情報
 	NSDictionary *actor = [ary objectForKey:@"actor"];
 	feed.createdDate = [self conv2Tz:[ary objectForKey:@"createdDate"]];
@@ -966,6 +1567,7 @@ NSString *hasImgPickerStatus = @"NO";
 		isBookmarked = [ary objectForKey:@"isBookmarkedByCurrentUser"];
 		
 		NSArray *ms = [pre objectForKey:@"messageSegments"];
+
 		NSDictionary *motif = [[ms objectAtIndex:0]objectForKey:@"motif"];
 		NSString *instance = [[[[[SFRestAPI sharedInstance] coordinator] credentials] instanceUrl]absoluteString];
     
@@ -975,8 +1577,31 @@ NSString *hasImgPickerStatus = @"NO";
 	}
 	
 	//本文取得
-	NSDictionary *body = [ary objectForKey:@"body"];
-	feed.text = [body objectForKey:@"text"];
+	//NSDictionary *body = [ary objectForKey:@"body"];
+	//feed.text = [body objectForKey:@"text"];
+  
+  NSDictionary *body = [ary objectForKey:@"body"];
+  NSArray *messageSegments = [body objectForKey:@"messageSegments"];
+  // 仮
+  feed.text = [body objectForKey:@"text"];
+  
+  // メンションと本文を取得
+  NSString *men = @"";
+  for(NSDictionary *dic in messageSegments){
+    if([dic.allKeys containsObject:@"type"]){
+      NSString *val = [dic objectForKey:@"type"];
+      if([val isEqual:@"Mention"]){
+        men = [NSString  stringWithFormat:@"%@ %@", men,[dic objectForKey:@"text"]];
+      }
+      if([val isEqual:@"Text"]){
+        feed.text = [dic objectForKey:@"text"];
+      }
+    }
+  }
+  //NSLog(@"feed.text : %@", feed.text);
+  if(![men isEqual:@""]){
+    feed.text = [NSString  stringWithFormat:@"%@\n %@", men, feed.text];
+  }
   
 	@try
 	{
@@ -989,7 +1614,7 @@ NSString *hasImgPickerStatus = @"NO";
 	}
 	@try{
 		feed.text = [feed.text stringByReplacingOccurrencesOfString:@"&gt;" withString:@">"];
-		}
+  }
 	@catch (NSException *exception)
 	{
 		NSLog(@"name  :%@",exception.name);
@@ -1015,6 +1640,7 @@ NSString *hasImgPickerStatus = @"NO";
 	//使用フォント
 	UIFont *font = [UIFont systemFontOfSize:14.0];
   
+  UIImageView *imgView;
 	@try{
 		//画像取得
 		if ( [motifFullURL length]) {
@@ -1030,9 +1656,9 @@ NSString *hasImgPickerStatus = @"NO";
 				[iconArray setObject:data forKey:motifFullURL];
 			}
 			UIImage *image = [[UIImage alloc] initWithData:data];
-			CGSize siz = image.size;
-			NSLog(@"%f:%f", siz.width,siz.height);
-			UIImageView *imgView = [[UIImageView alloc]initWithFrame:CGRectMake(55, 0, 16, 16)];
+			//CGSize siz = image.size;
+			//NSLog(@"%f:%f", siz.width,siz.height);
+			imgView = [[UIImageView alloc]initWithFrame:CGRectMake(55, 0, 16, 16)];
 			imgView.image = image;
 			[feedCell addSubview:imgView];
 		}
@@ -1056,7 +1682,7 @@ NSString *hasImgPickerStatus = @"NO";
 	actorLbl.backgroundColor = [UIColor whiteColor];
 	actorLbl.text = feed.actorName;
 	actorLbl.font = font;
-//	actorLbl.lineBreakMode = NSLineBreakByTruncatingHead;
+  //	actorLbl.lineBreakMode = NSLineBreakByTruncatingHead;
 	actorLbl.lineBreakMode = NSLineBreakByTruncatingTail;
 	actorLbl.textAlignment = NSTextAlignmentLeft;
 	//[actorLbl sizeToFit];
@@ -1070,19 +1696,38 @@ NSString *hasImgPickerStatus = @"NO";
 	[dateLbl sizeToFit];
 	
 	//textラベルのサイズを求める
-	CGRect rect = CGRectMake(55, 15, baseSize.width, baseSize.height);
-	UILabel *textlbl = [[UILabel alloc]initWithFrame:rect];
-	textlbl.text = [self stringReplacement:feed.text];								//本文設定
-	textlbl.lineBreakMode = NSLineBreakByWordWrapping;
+	CGRect rect;
+  NSString  *feedText = feed.text; //[@"\n" stringByAppendingString:feed.text];
+  CGSize s = [feedText
+              sizeWithFont:font
+              constrainedToSize:CGSizeMake(baseSize.width-10, 2000)
+              lineBreakMode:UILineBreakModeCharacterWrap];
+  rect = CGRectMake(55, 15, baseSize.width-10, s.height);
+  
+  // コメント
+  if(commmentFlag){
+    s = [feedText
+         sizeWithFont:font
+         constrainedToSize:CGSizeMake(baseSize.width-70, 2000)
+         lineBreakMode:UILineBreakModeCharacterWrap];
+    rect = CGRectMake(55, 15, baseSize.width-70, s.height);
+  }
+  
+  //rect = CGRectMake(55, 15, baseSize.width, baseSize.height);
+  
+  UILabel *textlbl = [[UILabel alloc]initWithFrame:rect];
+	textlbl.text = [self stringReplacement:feedText];								//本文設定
+  textlbl.lineBreakMode = NSLineBreakByCharWrapping;
 	textlbl.numberOfLines = 0;
-	[textlbl sizeToFit];
+  
+	//[textlbl sizeToFit];
 	CGSize textSize = textlbl.frame.size;
 	textlbl.backgroundColor =[UIColor whiteColor];
 	textlbl.font = font;
 	
-	//textの大きさに合わせfeedCellのサイズを調整
+  //textの大きさに合わせfeedCellのサイズを調整
 	CGRect cellFrame = feedCell.frame;
-  
+  /*
 	//BookMark追加・解除
 	if ( commmentFlag == NO ){
 		rect.size.width = 50;
@@ -1109,7 +1754,8 @@ NSString *hasImgPickerStatus = @"NO";
 		}
 		[feedCell addSubview:bookMarkBtn];
 	}
-  
+  */
+  /*
 	if ( [isDeleteRestricted intValue] == 0 ){
 		rect.size.width = 50;
 		rect.size.height = 25;
@@ -1133,31 +1779,44 @@ NSString *hasImgPickerStatus = @"NO";
 		}
 		[feedCell addSubview:delBtn];
 	}
-	
+	*/
+  
+  if ( commmentFlag == YES ){
+    [commmentFlagDictionary setObject:feed.feedId  forKey:feed.feedId];
+  }
+  
+  UIImageView *actorImgView;
 	@try{
 		//画像取得
 		if ( [feed.actorStandardEmailPhotoUrl length]) {
       
 			NSData *data;
 			data = [iconArray objectForKey:feed.actorId];
-
+      
 			//画像がキャッシュ済みであればそれを使う
 			if (![data length]) {
 				NSString *imageURL = feed.actorStandardEmailPhotoUrl;
 				NSURL *url = [NSURL URLWithString:imageURL];
 				data = [NSData dataWithContentsOfURL:url];
-
+        
 				//画像をキャッシュする
 				[iconArray setObject:data forKey:feed.actorId];
 			}
 			UIImage *image = [[UIImage alloc] initWithData:data];
-			UIImageView *imgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, 50, 50)];
-			imgView.image = image;
-
+      // 自分
+      if([myUserId isEqualToString:feed.actorId]){
+        actorImgView = [[UIImageView alloc]initWithFrame:CGRectMake(feedCell.bounds.size.width-(x+50), 0, 50, 50)];
+      }
+      // 他人
+      else{
+        actorImgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, 50, 50)];
+      }
+			actorImgView.image = image;
+      
 			um = [UtilManager sharedInstance];
 			CGSize size = CGSizeMake(5.0, 5.0);
-			[um makeViewRound:imgView corners:UIRectCornerAllCorners size:&size];
-			[feedCell addSubview:imgView];
+			[um makeViewRound:actorImgView corners:UIRectCornerAllCorners size:&size];
+			//[feedCell addSubview:imgView];
 		}
 	}
 	@catch (NSException *exception)
@@ -1169,12 +1828,18 @@ NSString *hasImgPickerStatus = @"NO";
 	//添付ファイル
 	NSMutableDictionary *attach = [ary objectForKey:@"attachment"];
   
+  NSString *_downLoadUrl;
+  NSString *_thumbnailUrl;
+  UIButton *aBtn;
+  UIButton *fileNameBtn;
+  NSString *_renditionUrl;
+  UIImageView *fileImageView;
 	if  ( ![attach isEqual:[NSNull null]]) {
     //NSLog(@" attr %@", attach);
     
     // 「自分がフォローするもの」の場合、download url が無い場合があるので先にチェックする
-    NSString *_downLoadUrl;
-    NSString *_thumbnailUrl;
+    //NSString *_downLoadUrl;
+    //NSString *_thumbnailUrl;
     if([attach count]>0){
       _downLoadUrl = (NSString*)[attach objectForKey:@"downloadUrl"];
       _thumbnailUrl = (NSString*)[attach objectForKey:@"thumbnailUrl"];
@@ -1184,20 +1849,50 @@ NSString *hasImgPickerStatus = @"NO";
     if(_downLoadUrl != nil && ![_downLoadUrl  isEqual:[NSNull null]]){
       
       //NSLog(@"downLoadUrl %@", _downLoadUrl );
+      _renditionUrl  = (NSString*)[attach objectForKey:@"renditionUrl"];
+      //リクエスト作成
+      //SFRestRequest *req =[SFRestRequest requestWithMethod:SFRestMethodGET path:downloadUrl queryParams:nil];
+      NSString *instance = [[[[[SFRestAPI sharedInstance] coordinator] credentials] instanceUrl]absoluteString];
+      NSString *fullUrl = [instance stringByAppendingString:_renditionUrl];
+      NSURL *myURL = [NSURL URLWithString:fullUrl];
+      NSMutableURLRequest *requestDoc = [[NSMutableURLRequest alloc]initWithURL:myURL];
+      
+      //OAuth認証情報をヘッダーに追加
+      NSString *token = [@"OAuth " stringByAppendingString:[[[[SFRestAPI sharedInstance]coordinator]credentials]accessToken]];
+      [requestDoc addValue:token forHTTPHeaderField:@"Authorization"];
+      
+      // HTTP同期通信を実行
+      NSURLResponse* response = nil;
+      NSError* error = nil;
+      NSData* data = [NSURLConnection
+                      sendSynchronousRequest:requestDoc
+                      returningResponse:&response
+                      error:&error];
+      if(data){
+        UIImage *image = [UIImage imageWithData:data];
+        fileImageView = [[UIImageView alloc] initWithImage:image];
+        fileImageView.userInteractionEnabled = YES;
+        fileImageView.tag = attachNum;
+        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(downloadTap:)];
+        [fileImageView addGestureRecognizer:tapGesture];
+        //iv.center = self.view.center;
+        //[self.view addSubview:iv];
+      }
+      
       
       //DownLoadボタン
       UIImage *attachImg = [UIImage imageNamed:@"icon_attachedfile.png"];
       rect.size = attachImg.size;
       rect.origin.x = 60;
       rect.origin.y = textlbl.frame.origin.y + textlbl.frame.size.height + 15;
-      UIButton *aBtn = [[UIButton alloc]initWithFrame:rect];
+      aBtn = [[UIButton alloc]initWithFrame:rect];
       aBtn.frame = rect;
       [aBtn setBackgroundImage:attachImg forState:UIControlStateNormal];
       aBtn.tag = attachNum;
       [aBtn addTarget:self action:@selector(download:) forControlEvents:UIControlEventTouchUpInside];
       
       NSString *fileName = [self stringReplacement:[attach objectForKey:@"title"]];
-      UIButton *fileNameBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+      fileNameBtn = [UIButton buttonWithType:UIButtonTypeCustom];
       cellFrame.size.height = textSize.height + 25;
       
       fileNameBtn.frame = CGRectMake((aBtn.frame.origin.x + aBtn.frame.size.width + 10 ), aBtn.frame.origin.y - 3 ,( feedCell.frame.origin.y + feedCell.frame.size.width ) -90, 20 );
@@ -1212,8 +1907,8 @@ NSString *hasImgPickerStatus = @"NO";
       //左寄せ
       fileNameBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
       
-      [feedCell addSubview:aBtn];
-      [feedCell addSubview:fileNameBtn];
+      //[feedCell addSubview:aBtn];
+      //[feedCell addSubview:fileNameBtn];
       
       //ダウンロードURLをdictionaryで管理する
       NSString *downLoadUrl = [attach objectForKey:@"downloadUrl"];
@@ -1237,20 +1932,23 @@ NSString *hasImgPickerStatus = @"NO";
       attachNum++;
       
     }else if(_thumbnailUrl != nil && ![_thumbnailUrl isEqual:[NSNull null]]){
+      
+      //NSLog(@"_thumbnailUrl %@", _thumbnailUrl );
+      
       // _thumbnailUrl = (NSString*)[attach objectForKey:@"thumbnailUrl"];
       //DownLoadボタン
       UIImage *attachImg = [UIImage imageNamed:@"icon_attachedfile.png"];
       rect.size = attachImg.size;
       rect.origin.x = 60;
       rect.origin.y = textlbl.frame.origin.y + textlbl.frame.size.height + 15;
-      UIButton *aBtn = [[UIButton alloc]initWithFrame:rect];
+      aBtn = [[UIButton alloc]initWithFrame:rect];
       aBtn.frame = rect;
       [aBtn setBackgroundImage:attachImg forState:UIControlStateNormal];
       aBtn.tag = attachNum;
       [aBtn addTarget:self action:@selector(download:) forControlEvents:UIControlEventTouchUpInside];
       
       NSString *fileName = [self stringReplacement:[attach objectForKey:@"componentName"]];
-      UIButton *fileNameBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+      fileNameBtn = [UIButton buttonWithType:UIButtonTypeCustom];
       cellFrame.size.height = textSize.height + 25;
       
       fileNameBtn.frame = CGRectMake((aBtn.frame.origin.x + aBtn.frame.size.width + 10 ), aBtn.frame.origin.y - 3 ,( feedCell.frame.origin.y + feedCell.frame.size.width ) -90, 20 );
@@ -1276,7 +1974,7 @@ NSString *hasImgPickerStatus = @"NO";
       @try {
         if(downLoadUrl!= nil && ![downLoadUrl isEqualToString:@""]){
           [attacheArray setObject:downLoadUrl forKey:tag];
-          NSLog(@"%@", attacheArray);
+          //NSLog(@"%@", attacheArray);
         }
       }
       @catch (NSException *exception) {
@@ -1292,7 +1990,7 @@ NSString *hasImgPickerStatus = @"NO";
 	else {
 		cellFrame.size.height = textSize.height;
 	}
-  
+  /*
 	//Like(いいね)
 	UIImage *likesImg = [UIImage imageNamed:@"likeicon.png"];
 	rect.size.width = 22;
@@ -1319,14 +2017,198 @@ NSString *hasImgPickerStatus = @"NO";
 	likeCount.text = [NSString stringWithFormat:@"%d",likesNum];
 	likeCount.font = font;
 	[feedCell addSubview:likeCount];
+	*/
+  
+	cellFrame.size.height+= 55;
 	
-	cellFrame.size.height+= 40;
-	
+  if([um chkNullString:_downLoadUrl]) cellFrame.size.height += 20.0;
+  if(fileImageView) cellFrame.size.height += fileImageView.bounds.size.height;
+  
 	[feedCell setFrame:cellFrame];
-	[feedCell addSubview:actorLbl];
-	[feedCell addSubview:dateLbl];
-	[feedCell addSubview:textlbl];
-	[scrl addSubview:feedCell];
+	//[feedCell addSubview:actorLbl];
+	//[feedCell addSubview:dateLbl];
+  //[feedCell addSubview:textlbl];
+  
+  
+  // 吹き出しの画像
+  textlbl.backgroundColor = [UIColor clearColor];
+  
+  //Like(いいね)
+	UIImage *likesImg = [UIImage imageNamed:@"likeicon.png"];
+	rect.size.width = 22;
+	rect.size.height = 22;
+	rect.origin.x = 100;
+	rect.origin.y = cellFrame.size.height + 30;
+	UIButton *likeBtn = [[UIButton alloc]initWithFrame:rect];
+	[likeBtn setBackgroundImage:likesImg forState:UIControlStateNormal];
+	likeBtn.tag = tagNum;
+  
+	if ( commmentFlag == YES ) {
+		[likeBtn addTarget:self action:@selector(commentLikePost:) forControlEvents:UIControlEventTouchUpInside];
+	}
+	else {
+		[likeBtn addTarget:self action:@selector(feedLikePost:) forControlEvents:UIControlEventTouchUpInside];
+	}
+	//[feedCell addSubview:likeBtn];
+  
+	//Like数
+	NSMutableDictionary *likes = [ary objectForKey:@"likes"];
+	NSMutableArray *likes2  = [likes objectForKey:@"likes"];
+	int likesNum = [likes2 count];
+	UILabel *likeCount = [[UILabel alloc]initWithFrame:CGRectMake((likeBtn.frame.origin.x + likeBtn.frame.size.width +8), rect.origin.y + 8, 100, 10)];
+	likeCount.text = [NSString stringWithFormat:@"%d",likesNum];
+	likeCount.font = font;
+	//[feedCell addSubview:likeCount];
+  
+  
+  UIImageView *bubbleImage = [[UIImageView alloc] init];
+  bubbleImage.userInteractionEnabled = YES;
+  bubbleImage.tag = tagNum;
+  // 認証したユーザー情報にアクセス
+  if([myUserId isEqualToString:feed.actorId]){
+    bubbleImage.image = [[UIImage imageNamed:@"bubbleMine.png"] stretchableImageWithLeftCapWidth:21 topCapHeight:14];
+  }else{
+    bubbleImage.image = [[UIImage imageNamed:@"bubbleSomeone.png"] stretchableImageWithLeftCapWidth:21 topCapHeight:14];
+  }
+  //bubbleImage.frame = CGRectMake(50, 10, 400, 50);
+  
+  //BookMark追加・解除
+	if ( commmentFlag == NO ){
+		bubbleImage.userInteractionEnabled = YES;
+    
+		if ( [isBookmarked intValue] == 0) {
+			UILongPressGestureRecognizer *lt= [[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(bookMarkAddImage:)];
+      lt.numberOfTapsRequired = 0;
+      lt.minimumPressDuration = 1;
+      [bubbleImage addGestureRecognizer:lt];
+		}
+		else {
+			UILongPressGestureRecognizer *lt= [[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(bookMarkDelImage:)];
+      lt.numberOfTapsRequired = 0;
+      lt.minimumPressDuration = 1;
+      [bubbleImage addGestureRecognizer:lt];
+		}
+	}
+  // コメントの場合は削除のみ
+  else{
+    UILongPressGestureRecognizer *lt= [[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(longPressDeleteCommnet:)];
+    lt.numberOfTapsRequired = 0;
+    lt.minimumPressDuration = 1;
+    [bubbleImage addGestureRecognizer:lt];
+  }
+  
+  // 吹き出しX位置
+  float _x = 45;
+  if([myInfo.userId isEqualToString:feed.actorId]) _x = 2;
+  
+  // 吹き出しY位置
+  float _y = 0.0;
+  float _height = 0.0;
+  
+  // コンテンツ配置X位置
+  float _cx = 20;
+  if([myInfo.userId isEqualToString:feed.actorId]) _cx = 10;
+  
+  // コンテンツ配置Y位置
+  _height = textlbl.bounds.size.height+5+dateLbl.bounds.size.height+likeBtn.bounds.size.height+5+3;
+  if([um chkNullString:_downLoadUrl]) _height += 25.0;
+  if(fileImageView) _height += fileImageView.bounds.size.height + 20;
+  
+  //bubbleImage.frame = CGRectMake(_x, 20, textlbl.bounds.size.width+27, _height+5);
+  bubbleImage.frame = CGRectMake(_x, 0, textlbl.bounds.size.width+27, _height+5);
+  textlbl.frame = CGRectMake(_cx, 15+dateLbl.bounds.size.height, textlbl.bounds.size.width, textlbl.bounds.size.height);
+  
+  // bookmark目印
+  if ( [isBookmarked intValue] !=0) {
+    UIImage *_bimage = [UIImage imageNamed:@"bookmark.png"];
+    UIImageView *_biv = [[UIImageView alloc] initWithImage:_bimage];
+    _biv.frame = CGRectMake(bubbleImage.bounds.size.width-50, 0, _biv.bounds.size.width, _biv.bounds.size.height);
+    [bubbleImage addSubview:_biv];
+  }
+  // アイコン
+  _y = 10;
+  /*
+  if(imgView){
+    imgView.frame = CGRectMake(_cx, _y, imgView.bounds.size.width, imgView.bounds.size.height);
+    [bubbleImage addSubview:imgView];
+    actorLbl.frame = CGRectMake(imgView.frame.origin.x + imgView.bounds.size.width+3 , _y, actorLbl.bounds.size.width, actorLbl.bounds.size.height);
+    actorLbl.backgroundColor = [UIColor clearColor];
+    [bubbleImage addSubview:actorLbl];
+    _cx = _cx + imgView.bounds.size.width;
+  }else{
+    actorLbl.frame = CGRectMake(_cx, _y, actorLbl.bounds.size.width, actorLbl.bounds.size.height);
+    actorLbl.backgroundColor = [UIColor clearColor];
+    [bubbleImage addSubview:actorLbl];
+  }
+  */
+  // 日付ラベル
+  dateLbl.frame = CGRectMake(_cx, _y, dateLbl.bounds.size.width, dateLbl.bounds.size.height);
+  dateLbl.backgroundColor = [UIColor clearColor];
+  
+	[bubbleImage addSubview:dateLbl];
+  [bubbleImage addSubview:textlbl];
+  
+  _y += textlbl.bounds.size.height+dateLbl.bounds.size.height + 5;
+  
+  if([um chkNullString:_downLoadUrl]){
+    _y += 5;
+    aBtn.frame = CGRectMake(_cx, _y, aBtn.bounds.size.width, aBtn.bounds.size.height);
+    [bubbleImage addSubview:aBtn];
+    fileNameBtn.frame = CGRectMake((aBtn.frame.origin.x + aBtn.frame.size.width + 10 ), aBtn.frame.origin.y - 3 ,fileNameBtn.bounds.size.width, 20 );
+    [bubbleImage addSubview:fileNameBtn];
+    
+    _y += aBtn.bounds.size.height + 3;
+    
+    if(fileImageView){
+      fileImageView.frame = CGRectMake(fileNameBtn.frame.origin.x, fileNameBtn.frame.origin.y+20 ,fileImageView.bounds.size.width, fileImageView.bounds.size.height );
+      [bubbleImage addSubview:fileImageView];
+      
+      _y += fileImageView.bounds.size.height +7;
+    }
+  }
+  
+  _y += 2;
+  
+  // イイネ
+  likeBtn.frame = CGRectMake(bubbleImage.bounds.size.width-80, _y, likeBtn.bounds.size.width, likeBtn.bounds.size.height);//textlbl.bounds.size.height+15+actorLbl.bounds.size.height)];
+  [bubbleImage addSubview:likeBtn];
+  
+  likeCount.frame = CGRectMake((likeBtn.frame.origin.x + likeBtn.frame.size.width +8), likeBtn.frame.origin.y + 8, 100, 10);
+  likeCount.backgroundColor = [UIColor clearColor];
+  [bubbleImage addSubview:likeCount];
+  
+  [feedCell addSubview:bubbleImage];
+  
+  actorImgView.frame = CGRectMake(actorImgView.frame.origin.x, bubbleImage.bounds.origin.y+bubbleImage.bounds.size.height-30, actorImgView.bounds.size.width, actorImgView.bounds.size.height);
+  [feedCell addSubview:actorImgView];
+  
+  // 投稿者
+  [actorLbl sizeToFit];
+  if([myUserId isEqualToString:feed.actorId]){
+    actorLbl.frame = CGRectMake(feedCell.bounds.size.width-(x+actorLbl.bounds.size.width) , actorImgView.frame.origin.y + actorImgView.bounds.size.height, actorLbl.bounds.size.width, actorLbl.bounds.size.height);
+    // アイコン
+    if(imgView){
+      imgView.frame = CGRectMake(actorLbl.frame.origin.x-imgView.bounds.size.width-1, actorLbl.frame.origin.y, imgView.bounds.size.width, imgView.bounds.size.height);
+      [feedCell addSubview:imgView];
+    }
+  }
+  // 他人
+  else{
+    // アイコン
+    if(imgView){
+      actorLbl.frame = CGRectMake(actorImgView.frame.origin.x-1+imgView.bounds.size.width , actorImgView.frame.origin.y + actorImgView.bounds.size.height, actorLbl.bounds.size.width, actorLbl.bounds.size.height);
+      imgView.frame = CGRectMake(actorLbl.frame.origin.x-imgView.bounds.size.width, actorLbl.frame.origin.y, imgView.bounds.size.width, imgView.bounds.size.height);
+      [feedCell addSubview:imgView];
+    }else{
+      actorLbl.frame = CGRectMake(actorImgView.frame.origin.x-1 , actorImgView.frame.origin.y + actorImgView.bounds.size.height, actorLbl.bounds.size.width, actorLbl.bounds.size.height);
+    }
+  }
+  actorLbl.backgroundColor = [UIColor clearColor];
+  [feedCell addSubview:actorLbl];
+  
+
+  
+  [scrl addSubview:feedCell];
   
 	//戻り値
 	float ret = (positionY + feedCell.frame.size.height + 50);
@@ -1354,6 +2236,7 @@ NSString *hasImgPickerStatus = @"NO";
   
 	//コメント表示
 	NSArray *comments = [[ary objectForKey:@"comments"]objectForKey:@"comments"];
+  //NSLog(@"%d %@", __LINE__, comments);
 	for ( int i = 0 ; i < [comments count]; i++ ){
 		NSMutableDictionary *com = [[NSMutableDictionary alloc]initWithDictionary:[comments objectAtIndex:i]];
 		ret = [self makeFeedCell:com position:ret comment:YES];
@@ -1364,17 +2247,125 @@ NSString *hasImgPickerStatus = @"NO";
 	//UITextViewに枠線を付けるため、一回り大きいViewに載せる
 	if ( commmentFlag == NO ) {
 		
+    // 枠
+    UIView *view = [[UITextView alloc]initWithFrame:CGRectMake(30,ret, scrl.frame.size.width - 60, 110)];
+    view.backgroundColor = [UIColor whiteColor];
+    view.layer.borderWidth = 1;
+    view.layer.cornerRadius = 4;
+    view.layer.borderColor = [[UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f]CGColor];
+    [scrl addSubview:view];
+    
+    //メンション用スクロール
+    UIScrollView *comMentionScrView = [[UIScrollView alloc]initWithFrame:CGRectMake(30, ret, scrl.frame.size.width - 60, 30)];
+    //comMentionScrView.layer.cornerRadius = 4;
+		//comMentionScrView.layer.borderWidth = 1;
+		//comMentionScrView.layer.borderColor = [[UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f]CGColor];
+    comMentionScrView.tag = rsvTag+1000;
+    
+    // スクロール内部ビュー
+    UIView *comMentionView = [[UIView alloc]initWithFrame:CGRectMake(10, 5, scrl.frame.size.width - 60, 30)];
+    comMentionScrView.contentSize = comMentionView.bounds.size;
+    comMentionView.backgroundColor = [UIColor clearColor];
+    comMentionView.tag = rsvTag+2000;
+    
+    // @ : 
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 50, 20)];
+    label.text = [NSString stringWithFormat:@"@ : "];
+    label.font = [UIFont boldSystemFontOfSize:16];
+    label.textColor = [UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f];
+    label.textAlignment = NSTextAlignmentLeft;
+    [label sizeToFit];
+    label.tag = rsvTag+5000;
+    [comMentionView addSubview:label];
+    
+    // メンション選択ボタン
+    UIButton *comMentionAddButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
+    comMentionAddButton.frame = CGRectMake(comMentionView.frame.size.width- comMentionAddButton.bounds.size.width-15,-4, comMentionAddButton.bounds.size.width, comMentionAddButton.bounds.size.height);
+    
+    comMentionAddButton.tag = rsvTag+3000;
+    [comMentionAddButton addTarget:self action:@selector(selectComMention:) forControlEvents:UIControlEventTouchUpInside];
+    //[comMentionView addSubview:comMentionAddButton];
+    
+    // メンション入力欄
+    UITextField *textField;
+    
+    //NSLog(@"%d mentionIdDictionary : %@",__LINE__, mentionIdDictionary);
+    //NSLog(@"%d mentionInputLabelDictionary : %@",__LINE__,mentionInputLabelDictionary);
+    
+    NSString *_tag = [NSString stringWithFormat:@"%d", rsvTag];
+    NSMutableArray *idArray = [mentionIdDictionary objectForKey:_tag];
+    NSMutableArray *labelArray = [mentionInputLabelDictionary objectForKey:_tag];
+    
+    // 既にメンション先を選択している場合
+    if([idArray count]>0){
+      int __x = 3.0 + 30.0;
+      int __y = 0;
+      for(int i=0; i<[labelArray count]; i++){
+        UILabel *_label = [labelArray objectAtIndex:i];
+        if(__x+_label.bounds.size.width>=comMentionView.frame.size.width - 40){
+          __x = 0.0;
+          __y++;
+        }
+        _label.frame = CGRectMake(__x, 20*__y, _label.bounds.size.width, 20);
+        __x = __x + _label.bounds.size.width + 2;
+        [labelArray replaceObjectAtIndex:i withObject:_label];
+      }
+      
+      // メンション宛先
+      for(UILabel *_label in labelArray){
+        _label.textColor = [UIColor grayColor];
+        _label.backgroundColor = [UIColor colorWithHex:@"#e6e6fa"];
+        [comMentionView addSubview:_label];
+      }
+      if(__x+100>comMentionScrView.frame.size.width - 20){
+        __x = 0.0;
+        __y++;
+          comMentionView.frame = CGRectMake(10,05, comMentionView.frame.size.width, 20*(__y+1));
+        }
+      // メンション入力欄
+      textField = [[UITextField alloc]initWithFrame:CGRectMake(5+__x, 20*__y, 100, 20)];
+      textField.tag = rsvTag+4000;
+      textField.backgroundColor = [UIColor clearColor];
+      textField.font = [UIFont systemFontOfSize:14.0];
+      textField.delegate = self;
+      textField.text = @"  ";
+      [textField addTarget:self action:@selector(textFieldEditingChanged:) forControlEvents:UIControlEventEditingChanged];
+    }
+    //入力無し
+    else{
+      // メンション入力欄
+      textField = [[UITextField alloc]initWithFrame:CGRectMake(30,0, 250, 20)];
+      textField.font = [UIFont systemFontOfSize:14.0];
+      textField.text = @"";
+      textField.tag = rsvTag+4000;
+      textField.delegate = self;
+      [textField addTarget:self action:@selector(textFieldEditingChanged:) forControlEvents:UIControlEventEditingChanged];
+      textField.backgroundColor = [UIColor clearColor];
+      [comMentionView addSubview:textField];
+    }
+    
+    [comMentionScrView addSubview:comMentionView];
+    [scrl addSubview:comMentionScrView];
+		ret += comMentionScrView.frame.size.height;
+    
+    //[mentionInputLabelDictionary setObject:[NSMutableArray array] forKey:[NSString stringWithFormat:@"%d", rsvTag]];
+    //[mentionIdDictionary setObject:[NSMutableArray array] forKey:[NSString stringWithFormat:@"%d", rsvTag]];
+    
+    UIView *line = [[UITextView alloc]initWithFrame:CGRectMake(30,ret, scrl.frame.size.width - 60, 1)];
+    line.backgroundColor = [UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f];
+    [scrl addSubview:line];
+    
 		NSString *comText = [commentArray objectForKey:[NSString stringWithFormat:@"%d",rsvTag]];
 		
     //		UIView *comView  = [[UIView alloc]initWithFrame:CGRectMake(30, ret, scrl.frame.size.width - 60, 80)];
     //		comView.backgroundColor = [UIColor blackColor];
-		UITextView *commentInput = [[UITextView alloc]initWithFrame:CGRectMake(30, ret, scrl.frame.size.width - 60, 80)];
+		UITextView *commentInput = [[UITextView alloc]initWithFrame:CGRectMake(32, ret+2, scrl.frame.size.width - 64, 76)];
 		commentInput.tag = rsvTag;
 		commentInput.text = comText;
 		commentInput.delegate = self;
 		commentInput.layer.cornerRadius = 4;
-		commentInput.layer.borderWidth = 1;
-		commentInput.layer.borderColor = [[UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f]CGColor];
+		//commentInput.layer.borderWidth = 0;
+		//commentInput.layer.borderColor = [[UIColor colorWithRed:0.6f green:0.6f blue:0.6f alpha:1.0f]CGColor];
     //		[comView addSubview:commentInput];
 		[scrl addSubview:commentInput];
 		ret += commentInput.frame.size.height+10;
@@ -1452,6 +2443,47 @@ NSString *hasImgPickerStatus = @"NO";
 	return ret;
 }
 
+// button
+-(void) selectComMention:(id)sender
+{
+  UIButton *button = (UIButton*)sender;
+  
+  // popover の位置指定のためコメント入力欄を取得
+  int tag = button.tag-3000;
+  [pData setData:[NSString stringWithFormat:@"%d", tag] forKey:@"tag"];
+  
+  UIButton *wkBtn;
+  for (UIView* view in [scrl subviews]){
+    // 種類を判定
+    if ([view isKindOfClass:[UIButton class]] && view.tag==tag) {
+      wkBtn = (UIButton*)view;
+    }
+  }
+  
+  scrl.contentOffset = CGPointMake(0, wkBtn.frame.origin.y-140);
+  
+  @try{
+    //PopOverを消す
+    if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+    
+    //MentionをPopoverで表示
+    MentionPopoverViewController *mentionPopoverViewController = [[MentionPopoverViewController alloc] init];
+    mentionPopoverViewController.word = @"";
+    mentionPopoverViewController.delegate = self;
+    pop = [[UIPopoverController alloc]initWithContentViewController:mentionPopoverViewController];
+    pop.delegate = self;
+    pop.popoverContentSize = mentionPopoverViewController.view.frame.size;
+    // ボタンの位置からpopoverを出現
+    
+    [pop presentPopoverFromRect:
+     CGRectMake(wkBtn.frame.origin.x+wkBtn.bounds.size.width-20, wkBtn.frame.origin.y-100,0,0)
+                         inView:scrl permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES];
+    
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
+}
+
 //コメントの残りページ取得処理
 -(float)retriveOtherComments:(NSString*)url pos:(float)pos addArray:(NSMutableArray*)addArray
 {
@@ -1472,14 +2504,16 @@ NSString *hasImgPickerStatus = @"NO";
 	}
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary  *otherCommment = (NSDictionary *)jsonResponse;
-                                  NSLog(@"otherCooment::%@",otherCommment);
+                                  //NSLog(@"otherCooment::%@",otherCommment);
                                   NSArray *items = [otherCommment objectForKey:@"comments"];
                                   float y = pos;
                                   for ( int i = 0 ; i < [items count] ; i++ ){
                                     y = [self makeFeedCell:[items objectAtIndex:i] position:y comment:YES];
                                     
                                     //コメントデータを元スレッドの配列に追加する(再読み込時にnextPageURLを読み込まずともスレッドを再現出来るようにする）
-                                    [addArray addObject:[items objectAtIndex:i]];
+                                    
+                                    // 上で表示しているためこの時点で配列には追加しない
+                                    //[addArray addObject:[items objectAtIndex:i]];
                                   }
                                   inWait = NO;
                                   addPoint = y;
@@ -1498,9 +2532,9 @@ NSString *hasImgPickerStatus = @"NO";
 	inWait = NO;
 }
 
--(void)didAttachAborted
+-(void)didAttachAborted:(int)tag
 {
-	[self didAttachCanceld];
+	[self removeAttach:tag];
 }
 
 
@@ -1541,7 +2575,7 @@ NSString *hasImgPickerStatus = @"NO";
         }
       }
     }@catch (NSException *exception) {
-        NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+      NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
     }
   }
   hasImgPickerStatus = @"NO";
@@ -1550,8 +2584,6 @@ NSString *hasImgPickerStatus = @"NO";
 //添付ファイル選択時に呼ばれるデリゲート
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
-  //	NSLog(@"%@",info);
-  
 	//カレントのtagを保存
 	lastSelectTag = picker.tabBarItem.tag;
 	
@@ -1575,7 +2607,7 @@ NSString *hasImgPickerStatus = @"NO";
 	NSString *fileExt;
 	NSURL *refUrl = [info objectForKey:@"UIImagePickerControllerReferenceURL"];
 	NSString *referenceURL = [refUrl absoluteString];
-  
+
 	if ([referenceURL length]){
 		NSRange range = [referenceURL rangeOfString:@"PNG"];
 		if (range.location != NSNotFound) {
@@ -1637,13 +2669,15 @@ NSString *hasImgPickerStatus = @"NO";
 				NSString *className = NSStringFromClass([view class]);
 				if ([className isEqualToString:@"UIButton"]){
 					UIButton *tmpBtn = (UIButton*)view;
-					if ( tmpBtn.frame.origin.y == 70 ){
+          //NSLog(@"tmpBtn : %@", tmpBtn);
+          //if ( tmpBtn.frame.origin.y == 70 ){
+					if ( tmpBtn.frame.origin.y == 105 ){
 						//日付時刻をデフォルトファイル名とする
 						[fInput setFileName:[df stringFromDate:[NSDate date]]];
-					
+            
 						//ファイルネーム入力画面表示
 						[pop presentPopoverFromRect:((UIButton*)view).frame inView:self.postView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-          
+            
 						//ファイルネーム入力中
 						fileNameInputInProgress = YES;
 						break;
@@ -1714,6 +2748,7 @@ NSString *hasImgPickerStatus = @"NO";
 	
 	//投稿(not comment)欄にファイル名のボタン追加
 	if ( lastSelectTag == 65535 ) {
+
 		[fileAttachedButton removeFromSuperview];
 		
 		//ファイル名取得
@@ -1766,10 +2801,15 @@ NSString *hasImgPickerStatus = @"NO";
 }
 
 //添付取りやめ
--(void)didAttachCanceld{
-  
+-(void)didAttachCanceld
+{
+	[self removeAttach:lastSelectTag];
+}
+-(void)removeAttach:(int)tagNo
+{
+	
 	//添付ファイル、ファイル名、拡張子を削除
-	NSString *tag = [NSString stringWithFormat:@"%d",lastSelectTag];
+	NSString *tag = [NSString stringWithFormat:@"%d",tagNo];
 	[upFileArray removeObjectForKey:tag];
 	[upFileEXTArray removeObjectForKey:tag];
 	[upFileNameArray removeObjectForKey:tag];
@@ -1780,8 +2820,8 @@ NSString *hasImgPickerStatus = @"NO";
   
 	//ファイルネーム入力中
 	fileNameInputInProgress = NO;
-
-	if ( lastSelectTag == 65535 ){
+  
+	if ( tagNo == 65535 ){
 		[fileAttachedButton removeFromSuperview];
 		return;
 	}
@@ -1796,7 +2836,7 @@ NSString *hasImgPickerStatus = @"NO";
 	//取得済みFeedをクリア
 	[self clearSubView:scrl];
 	feedCount = 0;
-
+  
 	//タイムライン再構築
 	[self buildTimeLine:myTimeLine firstPage:YES];
 	
@@ -2012,6 +3052,117 @@ NSString *hasImgPickerStatus = @"NO";
 	[self bookMark:feedId value:NO];
 }
 
+-(void)bookMarkAddImage:(id)sender
+{
+	if( postInProgress == YES) {
+		return;
+	}
+
+  UILongPressGestureRecognizer *recognizer = (UILongPressGestureRecognizer*) sender;
+  
+  //画像のtagからFeedIDを求める
+	NSString *feedId = [feedIdArray objectAtIndex:recognizer.view.tag];
+  
+  [pData setData:feedId forKey:@"feedId"];
+  [pData setData:@"add" forKey:@"bookmarkVal"];
+  
+  // ロングプレスの地点
+  CGPoint p = [recognizer locationInView:recognizer.view];
+
+  @try{
+    //PopOverを消す
+    if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+    
+    //bookmarkメニューをPopoverで表示
+    MentionBookmarkViewController *bookmarkViewController = [[MentionBookmarkViewController alloc] init];
+    bookmarkViewController.delegate = self;
+    [bookmarkViewController setMenu:0];
+    
+    pop = [[UIPopoverController alloc]initWithContentViewController:bookmarkViewController];
+    pop.delegate = self;
+    pop.popoverContentSize = bookmarkViewController.view.frame.size;
+    [pop presentPopoverFromRect:CGRectMake(p.x,p.y,0,0) inView:recognizer.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
+  /*
+	//連投防止
+	postInProgress = YES;
+  
+	UILongPressGestureRecognizer *recognizer = (UILongPressGestureRecognizer*) sender;
+	
+	//画像のtagからFeedIDを求める
+	NSString *feedId = [feedIdArray objectAtIndex:recognizer.view.tag];
+	
+	//ブックマーク追加
+	[self bookMark:feedId value:YES];
+   */
+}
+
+-(void)bookMarkDelImage:(id)sender
+{
+	if( postInProgress == YES) {
+		return;
+	}
+	
+  UILongPressGestureRecognizer *recognizer = (UILongPressGestureRecognizer*) sender;
+  
+  //画像のtagからFeedIDを求める
+	NSString *feedId = [feedIdArray objectAtIndex:recognizer.view.tag];
+  
+  [pData setData:feedId forKey:@"feedId"];
+  [pData setData:@"del" forKey:@"bookmarkVal"];
+  
+  // ロングプレスの地点
+  CGPoint p = [recognizer locationInView:recognizer.view];
+  
+  @try{
+    //PopOverを消す
+    if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+    
+    //bookmarkメニューをPopoverで表示
+    MentionBookmarkViewController *bookmarkViewController = [[MentionBookmarkViewController alloc] init];
+    bookmarkViewController.delegate = self;
+    [bookmarkViewController setMenu:1];
+    
+    pop = [[UIPopoverController alloc]initWithContentViewController:bookmarkViewController];
+    pop.delegate = self;
+    pop.popoverContentSize = bookmarkViewController.view.frame.size;
+    [pop presentPopoverFromRect:CGRectMake(p.x,p.y,0,0) inView:recognizer.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+    
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
+  /*
+	//連投防止
+	postInProgress = YES;
+	
+	UILongPressGestureRecognizer *recognizer = (UILongPressGestureRecognizer*) sender;
+	
+	//画像のtagからFeedIDを求める
+	NSString *feedId = [feedIdArray objectAtIndex:recognizer.view.tag];
+	
+	//ブックマーク追加
+	[self bookMark:feedId value:NO];
+  */
+}
+
+// delegate
+-(void)didSelectBookmark:(id)sender
+{
+  //PopOverを消す
+  if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+  
+  NSString *feedId = [pData getDataForKey:@"feedId"];
+  NSString *val = [pData getDataForKey:@"bookmarkVal"];
+  
+  if([val isEqual:@"add"]){
+    [self bookMark:feedId value:YES];
+  }else{
+    [self bookMark:feedId value:NO];
+  }
+}
 
 //BookMark設定
 -(void)bookMark:(NSString*)feedId value:(BOOL)value
@@ -2024,7 +3175,7 @@ NSString *hasImgPickerStatus = @"NO";
 	else {
 		val = @"false";
 	}
-
+  
 	
 	//投稿用parameter
 	NSDictionary *messageSegments = [[NSDictionary alloc]initWithObjectsAndKeys:val, @"isBookmarkedByCurrentUser",nil];
@@ -2067,7 +3218,24 @@ NSString *hasImgPickerStatus = @"NO";
    ];
 }
 
--(void)deletePost:(id)sender
+// delegate
+-(void)didSelectDelete:(id)sender
+{
+  //PopOverを消す
+  if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+  
+  NSString *feedId = [pData getDataForKey:@"feedId"];
+  
+  BOOL is_exists = [commmentFlagDictionary.allKeys containsObject:feedId];
+  if(is_exists){
+    [self deleteComment:feedId];
+  }else{
+    [self deletePost:feedId];
+  }
+}
+
+//-(void)deletePost:(id)sender
+-(void)deletePost:(NSString *)_feedId
 {
   
 	if( postInProgress == YES) {
@@ -2076,12 +3244,13 @@ NSString *hasImgPickerStatus = @"NO";
   
 	//連投防止
 	postInProgress = YES;
-	
+	/*
 	UIButton *wrkBtn = (UIButton*)sender;
-	
 	//ボタンのtagからFeedIDを求める
 	deleteId = [feedIdArray objectAtIndex:wrkBtn.tag];
-	
+	*/
+  deleteId = _feedId;
+  
 	delAlert =	[[UIAlertView alloc]
                initWithTitle:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_DELETE"]
                message:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_DELETE_MESSAGE"]
@@ -2091,7 +3260,53 @@ NSString *hasImgPickerStatus = @"NO";
 	[delAlert show];
 }
 
--(void)deleteComment:(id)sender
+// delegate
+-(void)didSelectCommentDelete:(id)sender
+{
+  //PopOverを消す
+  if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+  
+  NSString *feedId = [pData getDataForKey:@"feedId"];
+  [self deleteComment:feedId];
+}
+
+// コメント削除gesture
+-(void)longPressDeleteCommnet:(id)sender
+{
+	if( postInProgress == YES) {
+		return;
+	}
+	
+  UILongPressGestureRecognizer *recognizer = (UILongPressGestureRecognizer*) sender;
+  
+  //画像のtagからFeedIDを求める
+	NSString *feedId = [feedIdArray objectAtIndex:recognizer.view.tag];
+  
+  [pData setData:feedId forKey:@"feedId"];
+  
+  // ロングプレスの地点
+  CGPoint p = [recognizer locationInView:recognizer.view];
+  
+  @try{
+    //PopOverを消す
+    if(pop.popoverVisible) [pop dismissPopoverAnimated:YES];
+    
+    //bookmarkメニューをPopoverで表示
+    CommentMenuViewController *cmenuViewController = [[CommentMenuViewController alloc] init];
+    cmenuViewController.delegate = self;
+    
+    pop = [[UIPopoverController alloc]initWithContentViewController:cmenuViewController];
+    pop.delegate = self;
+    pop.popoverContentSize = cmenuViewController.view.frame.size;
+    [pop presentPopoverFromRect:CGRectMake(p.x,p.y,0,0) inView:recognizer.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+    
+  }@catch (NSException *exception) {
+    NSLog(@"main:Caught %@:%@", [exception name], [exception reason]);
+  }
+}
+
+//-(void)deleteComment:(id)sender
+-(void)deleteComment:(NSString *)_feedId
 {
 	if( postInProgress == YES) {
 		return;
@@ -2099,12 +3314,12 @@ NSString *hasImgPickerStatus = @"NO";
 	
 	//連投防止
 	postInProgress = YES;
-	
+	/*
 	UIButton *wrkBtn = (UIButton*)sender;
-	
 	//ボタンのtagからFeedIDを求める
 	deleteId = [feedIdArray objectAtIndex:wrkBtn.tag];
-  
+  */
+  deleteId = _feedId;
 	delCommentAlert =	[[UIAlertView alloc]
                      initWithTitle:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_DELETE_COM"]
                      message:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_DELETE_COM_MESSAGE"]
@@ -2285,7 +3500,7 @@ NSString *hasImgPickerStatus = @"NO";
                                                       initWithTitle:[pData getDataForKey:
                                                                      @"DEFINE_CHATTER_TITLE_FOLLOW"]
                                                       message:[pData getDataForKey:
-                                                      @"DEFINE_CHATTER_TITLE_FOLLOW_MESSAGE"]
+                                                               @"DEFINE_CHATTER_TITLE_FOLLOW_MESSAGE"]
                                                       delegate:nil
                                                       cancelButtonTitle:nil
                                                       otherButtonTitles:[pData getDataForKey:
@@ -2324,8 +3539,8 @@ NSString *hasImgPickerStatus = @"NO";
                                 completeBlock:^(id jsonResponse){
                                   [self getSubscriptionId];
                                   postInProgress = NO;
-
-									UIAlertView *alt = [[UIAlertView alloc]
+                                  
+                                  UIAlertView *alt = [[UIAlertView alloc]
                                                       initWithTitle:[pData getDataForKey:
                                                                      @"DEFINE_CHATTER_TITLE_REMOVE"]
                                                       message:[pData getDataForKey:
@@ -2358,7 +3573,7 @@ NSString *hasImgPickerStatus = @"NO";
                                     }
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary  *records = (NSDictionary *)jsonResponse;
-                                  NSLog(@"following::%@",records);
+                                  //NSLog(@"following::%@",records);
                                   NSNumber *total = [records objectForKey:@"total"];
                                   
                                   if ( 0 != [total intValue]){
@@ -2370,13 +3585,13 @@ NSString *hasImgPickerStatus = @"NO";
                                       NSDictionary *mySubscription = [subject objectForKey:@"mySubscription"];
                                       NSString *subscriptionId = [mySubscription objectForKey:@"id"];
                                       /*
-                                      NSLog(@"companyname : %@", [subject objectForKey:@"companyName"]);
-                                      NSLog(@"Name : %@ %@", [subject objectForKey:@"firstName"], [subject objectForKey:@"lastName"]);
-                                      NSLog(@"self.chatterType : %d", self.chatterType);
-                                      NSLog(@"cpId : %@", cpId);
-                                      NSLog(@"currentSubscriptionId : %@", currentSubscriptionId);
-                                      NSLog(@"---------------------");
-                                      */
+                                       NSLog(@"companyname : %@", [subject objectForKey:@"companyName"]);
+                                       NSLog(@"Name : %@ %@", [subject objectForKey:@"firstName"], [subject objectForKey:@"lastName"]);
+                                       NSLog(@"self.chatterType : %d", self.chatterType);
+                                       NSLog(@"cpId : %@", cpId);
+                                       NSLog(@"currentSubscriptionId : %@", currentSubscriptionId);
+                                       NSLog(@"---------------------");
+                                       */
                                       if ( [currentGroup isEqualToString:cpId] ) {
                                         currentSubscriptionId = subscriptionId;
                                         break;
@@ -2415,7 +3630,7 @@ NSString *hasImgPickerStatus = @"NO";
                                     }
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary  *records = (NSDictionary *)jsonResponse;
-                                  NSLog(@"record::%@",records);
+                                  //NSLog(@"record::%@",records);
                                   NSNumber *total = [records objectForKey:@"total"];
                                   
                                   if ( 0 != [total intValue]){
@@ -2442,11 +3657,11 @@ NSString *hasImgPickerStatus = @"NO";
                                         CGRect Rect =  CGRectMake(x, y, 50, 50);
                                         memberBtn.frame = Rect;
                                         memberBtn.tag = i;
-										  
-										um = [UtilManager sharedInstance];
-										CGSize size = CGSizeMake(5.0, 5.0);
-										[um makeViewRound:memberBtn corners:UIRectCornerAllCorners size:&size];
-
+                                        
+                                        um = [UtilManager sharedInstance];
+                                        CGSize size = CGSizeMake(5.0, 5.0);
+                                        [um makeViewRound:memberBtn corners:UIRectCornerAllCorners size:&size];
+                                        
                                         [memberBtn setBackgroundImage:[self resizeImage:image Rect:memberBtn.frame]forState:UIControlStateNormal];
                                         [memberBtn addTarget:self action:@selector(memberBtnPushed:) forControlEvents:UIControlEventTouchUpInside];
                                         [self.MemberView addSubview:memberBtn];
@@ -2462,7 +3677,7 @@ NSString *hasImgPickerStatus = @"NO";
 //添付ファイルダウンロード押下時処理
 -(void)download:(id)sender
 {
-  NSLog(@"attacheArray %@", attacheArray);
+  //NSLog(@"attacheArray %@", attacheArray);
   
 	UIButton *wrkBtn = (UIButton*)sender;
 	
@@ -2493,19 +3708,137 @@ NSString *hasImgPickerStatus = @"NO";
 	[self.navigationController pushViewController:vView animated:YES];
 }
 
-//コメント/新規フィードを投稿
+-(void)downloadTap:(id)sender
+{
+  //NSLog(@"attacheArray %@", attacheArray);
+	
+  UITapGestureRecognizer *recognizer = (UITapGestureRecognizer*) sender;
+  
+	//メニュー消去
+	[btnBuilder dismissMenu];
+	
+	//ボタンのtagからTextViewの内容を求める
+	NSString *tag = [NSString stringWithFormat:@"%d",recognizer.view.tag];
+	NSString *downloadUrl = [attacheArray objectForKey:tag];
+  
+	[pop dismissPopoverAnimated:YES];
+	
+	//リクエスト作成
+	//SFRestRequest *req =[SFRestRequest requestWithMethod:SFRestMethodGET path:downloadUrl queryParams:nil];
+	NSString *instance = [[[[[SFRestAPI sharedInstance] coordinator] credentials] instanceUrl]absoluteString];
+	NSString *fullUrl = [instance stringByAppendingString:downloadUrl];
+	NSURL *myURL = [NSURL URLWithString:fullUrl];
+	NSMutableURLRequest *requestDoc = [[NSMutableURLRequest alloc]initWithURL:myURL];
+  
+	//OAuth認証情報をヘッダーに追加
+	NSString *token = [@"OAuth " stringByAppendingString:[[[[SFRestAPI sharedInstance]coordinator]credentials]accessToken]];
+	[requestDoc addValue:token forHTTPHeaderField:@"Authorization"];
+  //	[NSURLConnection connectionWithRequest:requestDoc delegate:self];
+  
+	//viewerViewController内のUIWebviewで表示
+	ViewerViewController *vView = [[ViewerViewController alloc]init];
+	[vView setReq:requestDoc];
+	[self.navigationController pushViewController:vView animated:YES];
+}
+
+
 -(void)postToFeed:(id)sender
 {
-	
 	if (( fileNameInputInProgress == YES ) || ( postInProgress == YES )){
 		NSLog(@"@exit");
 		return;
 	}
-	
+  // 空対策
+  UIButton *wrkBtn = (UIButton*)sender;
+	NSString *tag = [NSString stringWithFormat:@"%d",wrkBtn.tag];
+	NSString *commentText = [commentArray objectForKey:tag];
+  if([commentText isEqualToString:@""] || commentText==nil){
+    postInProgress = NO;
+    return;
+  }
+  
+  // 1000文字チェック
+  //NSLog(@"commentText length %d", [commentText length]);
+  if([commentText length]>1000){
+    fileNameAlertView = [[UIAlertView alloc]
+                         initWithTitle:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_LENGTH_ERROR"]
+                         message:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_LENGTH_MESSAGE_ERROR"]
+                         delegate:nil
+                         cancelButtonTitle:nil
+                         otherButtonTitles:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_LENGTH_OK_ERROR"], nil ];
+    [fileNameAlertView show];
+    return;
+  }
+  
+  NSData *sendData = [upFileArray objectForKey:tag];
+	if( [commentText length]==1000 && [sendData length]){
+    fileNameAlertView = [[UIAlertView alloc]
+                         initWithTitle:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_ATTACH_ERROR"]
+                         message:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_ATTACH_MESSAGE_ERROR"]
+                         delegate:nil
+                         cancelButtonTitle:nil
+                         otherButtonTitles:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_ATTACH_OK_ERROR"], nil ];
+    [fileNameAlertView show];
+    return;
+  }
+  
+  // mention
+  NSMutableArray *mentionIDs = [mentionIdDictionary objectForKey:tag];
+  if([mentionIDs count]){
+    int _length = 1000-21*[mentionIDs count];
+    if([commentText length]>_length){
+      fileNameAlertView = [[UIAlertView alloc]
+                           initWithTitle:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_MENTION_LENGTH_ERROR"]
+                           message:[NSString stringWithFormat:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_MENTION_LENGTH_MESSAGE_ERROR"], _length]
+                           delegate:nil
+                           cancelButtonTitle:nil
+                           otherButtonTitles:[pData getDataForKey:@"DEFINE_CHATTER_TITLE_MENTION_LENGTH_OK_ERROR"], nil ];
+      [fileNameAlertView show];
+      return;
+    }
+  }
+  // alertをすぐに出す
+  [self performSelector:@selector(alertShow) withObject:nil afterDelay:0.001];
+  // 少し時間差を作ってコメント/新規フィードを投稿
+  [self performSelector:@selector(postToFeedDo:) withObject:sender afterDelay:0.50f];
+}
+
+
+//コメント/新規フィードを投稿
+-(void)postToFeedDo:(id)sender
+{
+  
+  //NSLog(@"postInProgress %d", postInProgress);
+  
+	if (( fileNameInputInProgress == YES ) || ( postInProgress == YES )){
+		NSLog(@"@exit");
+		return;
+	}
+  
 	//投稿処理中（連投防止）
 	postInProgress = YES;
 	
 	UIButton *wrkBtn = (UIButton*)sender;
+  
+  // 他の添付はクリア
+  for (UIView* view in [scrl subviews])
+  {
+    if ([view isKindOfClass:[UIButton class]]) {
+      //NSLog(@" UIButton tag : %d", view.tag);
+      if(view.tag==wrkBtn.tag) continue;
+      
+      NSString *_tag = [NSString stringWithFormat:@"%d", view.tag];
+      if([upFileArray.allKeys containsObject:_tag]){
+        [upFileArray removeObjectForKey:_tag];
+      }
+      if([upFileEXTArray.allKeys containsObject:_tag]){
+        [upFileEXTArray removeObjectForKey:_tag];
+      }
+      if([upFileNameArray.allKeys containsObject:_tag]){
+        [upFileNameArray removeObjectForKey:_tag];
+      }
+    }
+  }
   
 	//ボタンのtagからTextViewの内容を求める
 	NSString *tag = [NSString stringWithFormat:@"%d",wrkBtn.tag];
@@ -2514,8 +3847,11 @@ NSString *hasImgPickerStatus = @"NO";
   // 空対策
   if([commentText isEqualToString:@""] || commentText==nil){
     postInProgress = NO;
+    [self alertClose];
     return;
   }
+  
+  
 	//添付ファイル処理
   NSLog(@"file----");
 	NSData *sendData = [upFileArray objectForKey:tag];
@@ -2612,10 +3948,22 @@ NSString *hasImgPickerStatus = @"NO";
 		NSString *ext = [upFileEXTArray objectForKey:tag];
 		NSString *filename = [[fileStr stringByAppendingString:@"."]stringByAppendingString:ext];
     
+    NSString *mention = @"";
+    NSMutableArray *mentionIDs = [mentionIdDictionary objectForKey:tag];
+    for(NSString *str in mentionIDs){
+      mention = [mention stringByAppendingFormat:@""
+                "{\r\n"
+                "  \"type\": \"mention\", \r\n"
+                "  \"id\":\"%@\" \r\n"
+                "},\r\n", str ];
+    }
+    
+    //NSLog(@"montion : %@", mention);
 		NSString *bodyString = [NSString stringWithFormat:@""
                             "{ \"body\":\r\n"
                             "   {\r\n"
                             "      \"messageSegments\" : [\r\n"
+                            "      %@\r\n"
                             "      {\r\n"
                             "         \"type\" : \"Text\", \r\n"
                             "         \"text\" : \"%@ \"\r\n"
@@ -2627,11 +3975,16 @@ NSString *hasImgPickerStatus = @"NO";
                             "      \"desc\": \"\",\r\n"
                             "      \"filename\": \"%@\"\r\n"
                             "   }\r\n"
-                            "}", commentText,filename];
+                            "}", mention, commentText,filename];
 		
+    //NSLog(@"bodyString : %@", bodyString);
+    
 		[body appendData:[[NSString stringWithFormat:@"%@\r\n", bodyString] dataUsingEncoding:NSUTF8StringEncoding]];
 		[body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 		
+    //NSLog(@"%d bodyString : %@", __LINE__, [[NSString stringWithFormat:@"%@\r\n", bodyString] dataUsingEncoding:NSUTF8StringEncoding]);
+    //NSLog(@"%d boundary : %@", __LINE__, [[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]);
+    
 		[body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"feedItemFileUpload\"; filename=\"%@\"\r\n", filename] dataUsingEncoding:NSUTF8StringEncoding]];
 		[body appendData:[@"Content-Type: application/octet-stream\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
 		[body appendData:[@"Content-Transfer-Encoding: binary\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
@@ -2648,6 +4001,7 @@ NSString *hasImgPickerStatus = @"NO";
                           returningResponse:&response
                                       error:&error];
 		
+    NSLog(@"%d error : %@", __LINE__, error);
 		NSHTTPURLResponse *httpurlResponse = (NSHTTPURLResponse *)response;
 		NSLog(@"response -> %d", [httpurlResponse statusCode]);
     
@@ -2670,6 +4024,9 @@ NSString *hasImgPickerStatus = @"NO";
 		
 		//新規フィード用入力欄をクリア
 		postInput.text = @"";
+
+    // mentionクリア
+    [self clearPostMention];
 	}
 	else {
 		//
@@ -2678,11 +4035,20 @@ NSString *hasImgPickerStatus = @"NO";
 		
 		//投稿用parameter
 		NSDictionary *messageSegments = [[NSDictionary alloc]initWithObjectsAndKeys:@"Text",@"type",commentText,@"text",nil];
-		NSArray *message = [NSArray arrayWithObject:messageSegments];
-		NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithObjectsAndKeys:message,@"messageSegments", nil];
+		//NSArray *message = [NSArray arrayWithObject:messageSegments];
+    
+    NSMutableArray *messages = [[NSMutableArray alloc] init];
+    [messages addObject:messageSegments];
+    
+    NSMutableArray *mentionIDs = [mentionIdDictionary objectForKey:tag];
+    for(NSString *str in mentionIDs){
+      NSDictionary *tmp = [[NSDictionary alloc]initWithObjectsAndKeys:@"mention",@"type",str,@"id",nil];
+      [messages addObject:tmp];
+    }
+    
+		NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithObjectsAndKeys:messages,@"messageSegments", nil];
     
 		NSDictionary *body = [[NSDictionary alloc]initWithObjectsAndKeys:dict, @"body", nil];
-		NSLog(@"%@",body);
     
 		//リクエスト作成
 		NSString *feedId;
@@ -2730,10 +4096,31 @@ NSString *hasImgPickerStatus = @"NO";
 		[[SFRestAPI sharedInstance] sendRESTRequest:req
                                       failBlock:^(NSError *e) {
                                         NSLog(@"FAILWHALE with error: %@", [e description] );
+                                        
+                                        feedCount = 0;
+                                        
+                                        //保存したコメント入力内容をクリア
+                                        [commentArray removeObjectForKey:tag];
+                                        
+                                        //新規フィード用入力欄をクリア
+                                        postInput.text = @"";
+                                        
+                                        //添付ファイル管理用配列初期化
+                                        upFileArray = [NSMutableDictionary dictionary];
+                                        upFileEXTArray = [NSMutableDictionary dictionary];
+                                        upFileNameArray = [NSMutableDictionary dictionary];
+                                        [fileAttachedButton removeFromSuperview];
+                                        
+                                        // mentionクリア
+                                        [self clearPostMention];
+                                        
+                                        //全Feedを再取得
+                                        [self getMyTimeLine:0.0f url:nil];
+                                        
                                       }
                                   completeBlock:^(id jsonResponse){
-                                    NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                    NSLog(@"%@",dict);
+                                    //NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                    //NSLog(@"%@",dict);
                                     
                                     feedCount = 0;
                                     
@@ -2747,6 +4134,11 @@ NSString *hasImgPickerStatus = @"NO";
                                     upFileArray = [NSMutableDictionary dictionary];
                                     upFileEXTArray = [NSMutableDictionary dictionary];
                                     upFileNameArray = [NSMutableDictionary dictionary];
+                                    
+                                    [fileAttachedButton removeFromSuperview];
+                                    
+                                    // mentionクリア
+                                    [self clearPostMention];
                                     
                                     //全Feedを再取得
                                     [self getMyTimeLine:0.0f url:nil];
@@ -2797,7 +4189,7 @@ NSString *hasImgPickerStatus = @"NO";
 	}
                                 completeBlock:^(id jsonResponse){
                                   NSDictionary *dict = (NSDictionary *)jsonResponse;
-                                  NSLog(@"dict::%@",dict);
+                                  //NSLog(@"dict::%@",dict);
                                   NSMutableArray *groups = [dict objectForKey:@"groups"];
                                   
                                   grpArray = [NSMutableArray array];
@@ -2829,6 +4221,63 @@ NSString *hasImgPickerStatus = @"NO";
                                 }];
 }
 
+//メンションを取得
+-(void)getMention
+{
+  mentionIdList = [[NSMutableArray alloc] init];
+  mentionList = [[NSMutableArray alloc] init];
+  mentionImageUrlList = [[NSMutableArray alloc] init];
+  
+  // 画像を保存しておく
+  NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+  NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+  
+  //検索用parameter
+	NSDictionary *q = [[NSDictionary alloc]initWithObjectsAndKeys:@"", @"q",nil];
+  
+	//リクエスト作成
+	NSString *path = @"v27.0/chatter/users";
+	SFRestRequest *req =[SFRestRequest requestWithMethod:SFRestMethodGET path:path queryParams:q];
+	
+	//GET実行
+	[[SFRestAPI sharedInstance] sendRESTRequest:req failBlock:^(NSError *e) {
+		NSLog(@"FAILWHALE with error: %@", [e description] );
+	}
+                                completeBlock:^(id jsonResponse){
+                                  NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                  //NSLog(@" mention dict::%@",dict);
+                                  
+                                  NSMutableArray *users = [dict objectForKey:@"users"];
+                                  
+                                  for ( int i = 0; i < [users count]; i++){
+                                    
+                                    //ユーザーを取得
+                                    NSMutableDictionary *user = [users objectAtIndex:i];
+                                    
+                                    //名前保存
+                                    NSString *name = [NSString stringWithFormat:@"%@ %@", [um chkNullString:[user valueForKey:@"lastName"]],[um chkNullString:[user valueForKey:@"firstName"]]];
+                                    
+                                    //NSLog(@" user name::%@",name);
+                                    
+                                    [mentionList addObject:name];
+                                    
+                                    //ID保存
+                                    NSString *uId = [user objectForKey:@"id"];
+                                    [mentionIdList addObject:uId];
+                                    
+                                    //画像取得
+                                    NSDictionary *photo = [user objectForKey:@"photo"];
+                                    NSString *fullEmailPhotoUrl = [photo objectForKey:@"fullEmailPhotoUrl"];
+                                    NSURL *url = [NSURL URLWithString:fullEmailPhotoUrl];
+                                    NSData *data = [NSData dataWithContentsOfURL:url];
+                                    [dic setObject:data forKey:fullEmailPhotoUrl];
+                                    [mentionImageUrlList addObject:fullEmailPhotoUrl];
+                                  }
+                                  [ud registerDefaults:dic];
+                                  
+                                }];
+}
+
 -(void)viewWillDisappear:(BOOL)animated
 {
   [pop dismissPopoverAnimated:NO];
@@ -2850,6 +4299,14 @@ NSString *hasImgPickerStatus = @"NO";
 	[self setDescriptionLabel:nil];
 	[self setDescriptionLabel:nil];
 	[super viewDidUnload];
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
+  if ((orientation == UIInterfaceOrientationLandscapeLeft) ||
+      (orientation == UIInterfaceOrientationLandscapeRight )){
+    return YES;
+  }
+  return NO;
 }
 
 @end

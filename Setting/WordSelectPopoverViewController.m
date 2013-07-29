@@ -81,7 +81,7 @@
   // ファイル配列をループ
   for (NSString *file in files) {
     
-    NSLog(@"file : %@", file);
+    //NSLog(@"file : %@", file);
     [textList addObject:file];
   }
   

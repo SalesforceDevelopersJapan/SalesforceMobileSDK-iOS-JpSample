@@ -26,6 +26,9 @@
 #import <Foundation/Foundation.h>
 
 @interface PublicDatas : NSObject
+{
+  NSMutableDictionary* dictionary;
+}
 
 + (id)instance;
 - (void)setData:(id)anObject forKey:(id) aKey;

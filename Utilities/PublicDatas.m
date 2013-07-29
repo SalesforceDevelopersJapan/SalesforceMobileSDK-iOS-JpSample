@@ -26,46 +26,48 @@
 #import "PublicDatas.h"
 #import "UtilManager.h"
 
-@implementation PublicDatas {
-    NSMutableDictionary* dictionary;
-}
+@implementation PublicDatas
+
+static PublicDatas *_instance = nil;
+
 - (id)init
 {
-    self =  [super init];
-    if(self) {
+    if (self = [super init]) {
         dictionary = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
 
-+ (id)instance
++ (PublicDatas*)instance
 {
-    static id _instance = nil;
     @synchronized(self) {
-        if(!_instance) {
-            _instance = [[self alloc] init];
+        if (_instance == nil) {
+            _instance = [[PublicDatas alloc] init];
         }
     }
     return _instance;
 }
 
-- (void)setData:(id) anObject forKey:(id) aKey
+- (void)setData:(id) obj forKey:(id) key
 {
     @synchronized(dictionary) {
-        [dictionary setObject:anObject forKey:aKey];
+        [dictionary setObject:obj forKey:key];
     }
 }
 
-- (id)getDataForKey:(id)aKey
+- (id)getDataForKey:(id)key
 {
-    id retval = [dictionary objectForKey:aKey];
-    return retval != [NSNull null] ? retval : nil;
+    id val = [dictionary objectForKey:key];
+    if(val != [NSNull null]){
+      return val;
+    }
+    return nil;
 }
 
-- (void)removeDataForKey:(id)aKey
+- (void)removeDataForKey:(id)key
 {
     @synchronized(dictionary) {
-        [dictionary removeObjectForKey:aKey];
+        [dictionary removeObjectForKey:key];
     }
 }
 @end

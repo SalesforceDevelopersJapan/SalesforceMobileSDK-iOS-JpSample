@@ -31,7 +31,7 @@
 	
 	//小画面表示中
 	dispChildScreen = YES;
-
+  
   // ボタン無効、透明ビューの配置
   metricsBtn.enabled = NO;
 	mapBtn.enabled = NO;
@@ -42,10 +42,7 @@
   clearView = [[UIView alloc] initWithFrame:self.view.frame];
   
 	//ポップオーバー表示中は消す
-	if (![self isNull:pop]){
-		[pop dismissPopoverAnimated:YES];
-		pop = nil;
-	}
+  [pop dismissPopoverAnimated:YES];
 	
 	self.historyWindow = [[UIView alloc]initWithFrame:CGRectMake(115,80,TOTAL2_WIDTH + 50, 470)];
 	historyScrl = [[UIScrollView alloc]initWithFrame:CGRectMake(25,ROW_HEIGHT*3,TOTAL2_WIDTH, 12*ROW_HEIGHT)];
@@ -279,64 +276,64 @@
 	historyArray = [NSMutableArray array];
 	
 	[NSTimer scheduledTimerWithTimeInterval:30.0f
-									 target:self
-								   selector:@selector(timeUp)
-								   userInfo:nil
-									repeats:NO ];
+                                   target:self
+                                 selector:@selector(timeUp)
+                                 userInfo:nil
+                                  repeats:NO ];
 	
 	NSString *query = [NSString stringWithFormat:@"SELECT Quantity,CreatedDate,PricebookEntryId,status__c , Opportunity.CloseDate,Opportunity.accountId FROM OpportunityLineItem WHERE Opportunity.AccountId ='%@' AND Opportunity.CreatedDate > N_DAYS_AGO:90 ORDER BY Opportunity.CloseDate DESC",cp.company_id];
 	
 	
 	SFRestRequest *request = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] sendRESTRequest:request
-									  failBlock:^(NSError *e) {
-										  NSLog(@"FAILWHALE with error: %@", [e description] );
-										  if(alertView.visible){
-											  [alertView dismissWithClickedButtonIndex:0 animated:NO];
-										  }
-										  
-										  //エラーアラート
-										  alertView = [[UIAlertView alloc]
-													   initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEMHIST_ERROR"]
-													   message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEMHIST_MESSAGE_ERROR"]
-													   delegate:nil
-													   cancelButtonTitle:nil
-													   otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEMHIST_OK_ERROR"], nil ];
-										  [alertView show];
-										  return;
-									  }
-								  completeBlock:^(id jsonResponse){
-									  NSDictionary *dict = (NSDictionary *)jsonResponse;
-									  NSLog(@"%@",dict);
-									  NSArray *records = [dict objectForKey:@"records"];
-									  NSDateFormatter* fmt= [[NSDateFormatter alloc] init];
-									  [fmt setDateFormat:@"yyyy-MM-dd"];
-									  
-									  for ( int i = 0; i < [records count]; i++ ) {
-										  NSDictionary *rec = [records objectAtIndex:i];
-										  
-										  NSArray  *dateArry = [rec objectForKey:@"Opportunity"];
-										  
-										  NSString *dateStr  = [dateArry valueForKey:@"CloseDate"];
-										  NSNumber *qty = [rec objectForKey:@"Quantity"];
-										  NSString *priceBookId = [rec objectForKey:@"PricebookEntryId"];
-										  NSString *status = [rec objectForKey:@"status__c"];
-										  
-										  OrderInfo *oi = [[OrderInfo alloc]init];
-										  oi.date= [fmt dateFromString:dateStr];
-										  oi.quanty = [qty intValue];
-										  oi.priceBookEntryId = priceBookId;
-										  if ([self isNull:status]){
-											  oi.status = [pData getDataForKey:@"DEFINE_STORORDER_LABEL_CONFIRM"];
-										  }
-										  else {
-											  oi.status = status;
-										  }
-										  [historyArray addObject:oi];
-									  }
-									  [self getHistoryName];
-									  
-								  }];
+                                    failBlock:^(NSError *e) {
+                                      NSLog(@"FAILWHALE with error: %@", [e description] );
+                                      if(alertView.visible){
+                                        [alertView dismissWithClickedButtonIndex:0 animated:NO];
+                                      }
+                                      
+                                      //エラーアラート
+                                      alertView = [[UIAlertView alloc]
+                                                   initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEMHIST_ERROR"]
+                                                   message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEMHIST_MESSAGE_ERROR"]
+                                                   delegate:nil
+                                                   cancelButtonTitle:nil
+                                                   otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEMHIST_OK_ERROR"], nil ];
+                                      [alertView show];
+                                      return;
+                                    }
+                                completeBlock:^(id jsonResponse){
+                                  NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                  NSLog(@"%@",dict);
+                                  NSArray *records = [dict objectForKey:@"records"];
+                                  NSDateFormatter* fmt= [[NSDateFormatter alloc] init];
+                                  [fmt setDateFormat:@"yyyy-MM-dd"];
+                                  
+                                  for ( int i = 0; i < [records count]; i++ ) {
+                                    NSDictionary *rec = [records objectAtIndex:i];
+                                    
+                                    NSArray  *dateArry = [rec objectForKey:@"Opportunity"];
+                                    
+                                    NSString *dateStr  = [dateArry valueForKey:@"CloseDate"];
+                                    NSNumber *qty = [rec objectForKey:@"Quantity"];
+                                    NSString *priceBookId = [rec objectForKey:@"PricebookEntryId"];
+                                    NSString *status = [rec objectForKey:@"status__c"];
+                                    
+                                    OrderInfo *oi = [[OrderInfo alloc]init];
+                                    oi.date= [fmt dateFromString:dateStr];
+                                    oi.quanty = [qty intValue];
+                                    oi.priceBookEntryId = priceBookId;
+                                    if (![um chkString:status]){
+                                      oi.status = [pData getDataForKey:@"DEFINE_STORORDER_LABEL_CONFIRM"];
+                                    }
+                                    else {
+                                      oi.status = status;
+                                    }
+                                    [historyArray addObject:oi];
+                                  }
+                                  [self getHistoryName];
+                                  
+                                }];
 	
 }
 
@@ -361,10 +358,10 @@
 {
 	inWait = YES;
 	[NSTimer scheduledTimerWithTimeInterval:30.0f
-									 target:self
-								   selector:@selector(timeUp)
-								   userInfo:nil
-									repeats:NO ];
+                                   target:self
+                                 selector:@selector(timeUp)
+                                 userInfo:nil
+                                  repeats:NO ];
 	NSString *where = @"";
 	int loopMax = [odArray count];
 	int loopCnt = 0;
@@ -378,48 +375,48 @@
 	NSString *query = [NSString stringWithFormat:@"SELECT Id, Name FROM PricebookEntry WHERE %@",where];
 	SFRestRequest *request = [[SFRestAPI sharedInstance] requestForQuery:query];
 	[[SFRestAPI sharedInstance] sendRESTRequest:request
-									  failBlock:^(NSError *e) {
-										  NSLog(@"FAILWHALE with error: %@", [e description] );
-										  if(alertView.visible) {
-											  [alertView dismissWithClickedButtonIndex:0 animated:NO];
-										  }
-										  //エラーアラート
-										  alertView = [[UIAlertView alloc]
-													   initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEMHIST_ERROR"]
-													   message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEMHIST_MESSAGE_ERROR"]
-													   delegate:nil
-													   cancelButtonTitle:nil
-													   otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEMHIST_OK_ERROR"], nil ];
-										  [alertView show];
-										  return ;
-									  }
-								  completeBlock:^(id jsonResponse){
-									  NSDictionary *dict = (NSDictionary *)jsonResponse;
-									  NSLog(@"%@",dict);
-									  NSNumber *recCount = [dict objectForKey:@"totalSize"];
-									  if ( [recCount intValue]){
-										  NSArray *records = [dict objectForKey:@"records"];
-										  for ( int i = 0; i < [records count]; i++  ) {
-											  NSDictionary *rec = [records objectAtIndex:i];
-											  NSString *pbId = [rec objectForKey:@"Id"];
-											  
-											  OrderInfo *oi = [[OrderInfo alloc]init];
-											  for ( oi in odArray ){
-												  if ( [oi.priceBookEntryId isEqualToString:pbId]) {
-													  NSString *name = [rec objectForKey:@"Name"];
-													  oi.product_name = name;
-												  }
-											  }
-										  }
-									  }
-									  //全件取得したら表示
-									  OrderInfo *tempod;
-									  for ( int i = 0; i < [historyArray count]; i++ ){
-										  tempod = [historyArray objectAtIndex:i];
-										  [historyScrl addSubview:[self makeHistoryRow:tempod row:i]];
-									  }
-									  historyScrl.contentSize = CGSizeMake(TOTAL2_WIDTH, [historyArray count] * ROW_HEIGHT);
-								  }
+                                    failBlock:^(NSError *e) {
+                                      NSLog(@"FAILWHALE with error: %@", [e description] );
+                                      if(alertView.visible) {
+                                        [alertView dismissWithClickedButtonIndex:0 animated:NO];
+                                      }
+                                      //エラーアラート
+                                      alertView = [[UIAlertView alloc]
+                                                   initWithTitle:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEMHIST_ERROR"]
+                                                   message:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEMHIST_MESSAGE_ERROR"]
+                                                   delegate:nil
+                                                   cancelButtonTitle:nil
+                                                   otherButtonTitles:[pData getDataForKey:@"DEFINE_STORORDER_TITLE_ITEMHIST_OK_ERROR"], nil ];
+                                      [alertView show];
+                                      return ;
+                                    }
+                                completeBlock:^(id jsonResponse){
+                                  NSDictionary *dict = (NSDictionary *)jsonResponse;
+                                  NSLog(@"%@",dict);
+                                  NSNumber *recCount = [dict objectForKey:@"totalSize"];
+                                  if ( [recCount intValue]){
+                                    NSArray *records = [dict objectForKey:@"records"];
+                                    for ( int i = 0; i < [records count]; i++  ) {
+                                      NSDictionary *rec = [records objectAtIndex:i];
+                                      NSString *pbId = [rec objectForKey:@"Id"];
+                                      
+                                      OrderInfo *oi = [[OrderInfo alloc]init];
+                                      for ( oi in odArray ){
+                                        if ( [oi.priceBookEntryId isEqualToString:pbId]) {
+                                          NSString *name = [rec objectForKey:@"Name"];
+                                          oi.product_name = name;
+                                        }
+                                      }
+                                    }
+                                  }
+                                  //全件取得したら表示
+                                  OrderInfo *tempod;
+                                  for ( int i = 0; i < [historyArray count]; i++ ){
+                                    tempod = [historyArray objectAtIndex:i];
+                                    [historyScrl addSubview:[self makeHistoryRow:tempod row:i]];
+                                  }
+                                  historyScrl.contentSize = CGSizeMake(TOTAL2_WIDTH, [historyArray count] * ROW_HEIGHT);
+                                }
 	 ];
 }
 

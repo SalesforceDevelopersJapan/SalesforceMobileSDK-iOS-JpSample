@@ -33,6 +33,7 @@
 #import "CompanyProfiles.h"
 #import "BuildNavButtons.h"
 #import "iCarousel.h"
+#import "MemoViewController.h"
 
 @class PublicDatas;
 @class Company;
@@ -50,7 +51,7 @@
 @class GraphDataManager;
 @class NameCard;
 
-@interface MetricsViewController : UIViewController <CompanyProfileDelegate,UIAlertViewDelegate,TileImageViewerDelegate,SFRestDelegate,UIPopoverControllerDelegate, DashBoardNaviMenuDelegate,ChangeFunctionDelegate, iCarouselDataSource, iCarouselDelegate>
+@interface MetricsViewController : UIViewController <CompanyProfileDelegate,UIAlertViewDelegate,TileImageViewerDelegate,SFRestDelegate,UIPopoverControllerDelegate, DashBoardNaviMenuDelegate,ChangeFunctionDelegate, iCarouselDataSource, iCarouselDelegate, MemoViewControllerDelegate>
 {
 	Company					*cp;
 	UILabel					*titleLabel;
@@ -90,7 +91,7 @@
   CGFloat nameCardy;
   CGFloat nameCardw;
   CGFloat nameCardh;
-  
+  MemoViewController *memoVC;
 }
 
 @property (strong, nonatomic) IBOutlet CompanyProfiles *companyProfile;

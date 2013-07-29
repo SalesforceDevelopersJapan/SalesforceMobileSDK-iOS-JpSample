@@ -105,6 +105,8 @@
 	UIView *selectPanel;
 	BOOL	isLstBtnDisp;
 	UILabel *label;
+  
+  BOOL firstGPS;
 }
 
 @property (strong, nonatomic) IBOutlet UIView *mapView;

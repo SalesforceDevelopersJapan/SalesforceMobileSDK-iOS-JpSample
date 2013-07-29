@@ -35,37 +35,37 @@
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-      
-      _pData = [PublicDatas instance];
-      NSString *isKeyboard = [_pData getDataForKey:@"isKeyboard"];
-      CGRect frame_size_height = CGRectZero;
-      CGRect table_size_height = CGRectZero;
-      if([isKeyboard isEqual: @"YES"]){
-        frame_size_height = CGRectMake(0,50,300,270);
-        table_size_height = CGRectMake(0,50,300,220);
-      }else if ([isKeyboard isEqual: @"NO"]){
-        frame_size_height = CGRectMake(0,50,300,520);
-        table_size_height = CGRectMake(0,50,300,470);
-      }
-      
-        // Custom initialization
-      self.view.frame = frame_size_height;
-      UILabel *titleLbl = [[UILabel alloc]initWithFrame:CGRectMake(0,0,300,50)];
-	  titleLbl.text = [_pData getDataForKey:@"DEFINE_MAP_HISTORY"];
-      titleLbl.backgroundColor = [UIColor blackColor];
-      [titleLbl setTextAlignment:NSTextAlignmentCenter];
-      titleLbl.textColor = [UIColor whiteColor];
-      [titleLbl setFont:[UIFont systemFontOfSize:25]];
-      [self.view addSubview:titleLbl];
-      _resultTable = [[UITableView alloc]initWithFrame:table_size_height style:UITableViewStylePlain];
-      _resultTable.delegate = self;
-      _resultTable.dataSource = self;
-      [self.view addSubview:_resultTable];
-      
+  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+  if (self) {
+    
+    _pData = [PublicDatas instance];
+    NSString *isKeyboard = [_pData getDataForKey:@"isKeyboard"];
+    CGRect frame_size_height = CGRectZero;
+    CGRect table_size_height = CGRectZero;
+    if([isKeyboard isEqual: @"YES"]){
+      frame_size_height = CGRectMake(0,50,300,270);
+      table_size_height = CGRectMake(0,50,300,220);
+    }else if ([isKeyboard isEqual: @"NO"]){
+      frame_size_height = CGRectMake(0,50,300,520);
+      table_size_height = CGRectMake(0,50,300,470);
     }
-    return self;
+    
+    // Custom initialization
+    self.view.frame = frame_size_height;
+    UILabel *titleLbl = [[UILabel alloc]initWithFrame:CGRectMake(0,0,300,50)];
+	  titleLbl.text = [_pData getDataForKey:@"DEFINE_MAP_HISTORY"];
+    titleLbl.backgroundColor = [UIColor blackColor];
+    [titleLbl setTextAlignment:NSTextAlignmentCenter];
+    titleLbl.textColor = [UIColor whiteColor];
+    [titleLbl setFont:[UIFont systemFontOfSize:25]];
+    [self.view addSubview:titleLbl];
+    _resultTable = [[UITableView alloc]initWithFrame:table_size_height style:UITableViewStylePlain];
+    _resultTable.delegate = self;
+    _resultTable.dataSource = self;
+    [self.view addSubview:_resultTable];
+    
+  }
+  return self;
 }
 
 -(void)setSearchWordList:(NSMutableArray *)list
@@ -88,7 +88,7 @@
 {
   //searchWordList = [[NSMutableArray alloc]init];
   
-    [super viewDidLoad];
+  [super viewDidLoad];
 	// Do any additional setup after loading the view.
   
   um = [UtilManager sharedInstance];
@@ -115,7 +115,7 @@
     cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
 		
   }
-
+  
 	cell.textLabel.text = [_searchWordList objectAtIndex:indexPath.row];
 	cell.detailTextLabel.font = [UIFont systemFontOfSize:8.0f];
   //	cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -149,8 +149,8 @@
 
 - (void)didReceiveMemoryWarning
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+  [super didReceiveMemoryWarning];
+  // Dispose of any resources that can be recreated.
 }
 
 @end

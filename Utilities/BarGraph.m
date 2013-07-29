@@ -42,7 +42,7 @@
 	CGFloat x,y;
 	
 	//背景色
-	self.backgroundColor = [UIColor whiteColor];
+	self.backgroundColor = [UIColor clearColor];
 	
 	//グラフ色
 	UIColor *col[26] = {

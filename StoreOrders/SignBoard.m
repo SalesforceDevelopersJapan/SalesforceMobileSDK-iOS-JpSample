@@ -106,8 +106,6 @@
     
     // 現在のタッチ座標を次の開始座標にセット
     touchPoint = currentPoint;
-	
-	
 }
 
 
