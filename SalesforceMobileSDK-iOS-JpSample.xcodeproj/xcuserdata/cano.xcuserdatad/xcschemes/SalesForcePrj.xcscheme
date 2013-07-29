@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A1899F6316D2673E0085A970"
-            BuildableName = "SalesForcePrj.app"
-            BlueprintName = "SalesForcePrj"
-            ReferencedContainer = "container:SalesForcePrj.xcodeproj">
+            BuildableName = "SalesforceMobileSDK-iOS-JpSample.app"
+            BlueprintName = "SalesforceMobileSDK-iOS-JpSample"
+            ReferencedContainer = "container:SalesforceMobileSDK-iOS-JpSample.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -52,9 +52,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A1899F6316D2673E0085A970"
-            BuildableName = "SalesForcePrj.app"
-            BlueprintName = "SalesForcePrj"
-            ReferencedContainer = "container:SalesForcePrj.xcodeproj">
+            BuildableName = "SalesforceMobileSDK-iOS-JpSample.app"
+            BlueprintName = "SalesforceMobileSDK-iOS-JpSample"
+            ReferencedContainer = "container:SalesforceMobileSDK-iOS-JpSample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -64,15 +64,15 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       debugDocumentVersioning = "YES">
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A1899F6316D2673E0085A970"
-            BuildableName = "SalesForcePrj.app"
-            BlueprintName = "SalesForcePrj"
-            ReferencedContainer = "container:SalesForcePrj.xcodeproj">
+            BuildableName = "SalesforceMobileSDK-iOS-JpSample.app"
+            BlueprintName = "SalesforceMobileSDK-iOS-JpSample"
+            ReferencedContainer = "container:SalesforceMobileSDK-iOS-JpSample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
